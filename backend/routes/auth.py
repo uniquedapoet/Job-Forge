@@ -1,0 +1,1 @@
+# Handles registration, login, and JWT token generation.
