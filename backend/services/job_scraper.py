@@ -12,7 +12,7 @@ data_dir = os.path.join(backend_dir, "data")
 file_path = os.path.join(data_dir, "jobs.csv")
 
 
-def getJobsData(job_title: str, location: str):
+def get_jobs_data(job_title: str, location: str):
     jobs = scrape_jobs(
     site_name=['indeed'], # others may require proxies: "linkedin", "zip_recruiter", "glassdoor", "google"
     search_term=job_title,
@@ -27,9 +27,6 @@ def getJobsData(job_title: str, location: str):
     print(f"Found {len(jobs)} jobs")
     return jobs
 
-jobs = getJobsData("Data Scientist", "Denver, CO")
+jobs = get_jobs_data("Data Scientist", "Denver, CO")
 
 jobs.to_csv(file_path, quoting=csv.QUOTE_NONNUMERIC, escapechar="\\", index=False) # to_excel
-
-
-
