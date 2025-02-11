@@ -171,3 +171,4 @@ cython_debug/
 .pypirc
 job-forge/node_modules/
 job-forge/package-lock.json
+scratch.ipynb
