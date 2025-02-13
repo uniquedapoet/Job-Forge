@@ -7,6 +7,10 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
+# nltk.download('stopwords')
+# nltk.download('punkt_tab')
+# nltk.download('wordnet')
+
 def clean_text(raw_text):
     set_of_stopwords = set(stopwords.words("english") + list(string.punctuation))
     lemmatizer = WordNetLemmatizer()
