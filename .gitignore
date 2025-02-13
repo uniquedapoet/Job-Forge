@@ -169,5 +169,5 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-job-forge/node_modules/
-job-forge/package-lock.json
+frontend/job-forge/node_modules/
+frontend/job-forge/package-lock.json
