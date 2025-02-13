@@ -1,4 +1,4 @@
-Username,Email,Password,FirstName,LastName,Phone,City,Zipcode,JobTitles
+username,email,password,first_name,last_name,phone,city,zipcode,job_titles
 Uniquedapoet,eddiebenjamin@gmail.com,password,Eddie,Benjamin,1234567890,Denver,80138,Software Engineer
 jadenite,jadencastle@gmail.com,password,Jaden,Castle,1234567890,Denver,80138,Software Engineer
 seen,jacksongiemza@gmail.com,password,Jackson,Giemza,1234567890,Denver,80138,Software Engineer
