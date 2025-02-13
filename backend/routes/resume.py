@@ -42,8 +42,8 @@ def detect_dominant_header_format(text):
 
 def extract_resume_sections(text):
     # Define flexible patterns for detecting section headers
-    header_pattern = r'(?:(?:^[A-Z\s]{3,}$)|(?:^[A-Z][a-z]+(?: [A-Z][a-z]+)*:))'
-    # header_pattern = detect_dominant_header_format(text)
+    # header_pattern = r'(?:(?:^[A-Z\s]{3,}$)|(?:^[A-Z][a-z]+(?: [A-Z][a-z]+)*:))'
+    header_pattern = detect_dominant_header_format(text)
 
     # Split text into lines for better header detection
     lines = text.split('\n')
@@ -65,3 +65,10 @@ def extract_resume_sections(text):
         sections[section] = sections[section].strip()
 
     return sections
+
+if __name__ == '__main__':
+    # Test the functions
+    pdf_path = './example_resume.pdf'
+    text = extract_text_from_pdf(pdf_path)
+    sections = extract_resume_sections(text)
+    print(sections.keys())
