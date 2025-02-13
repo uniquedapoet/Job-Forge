@@ -168,7 +168,9 @@ cython_debug/
 #.idea/
 
 # PyPI configuration file
+
 .pypirc
 frontend/job-forge/node_modules/
 frontend/job-forge/package-lock.json
 scratch.ipynb
+
