@@ -1,12 +1,15 @@
 import sqlite3
-from config import USER_DATABASE_URL
-import pandas as pd
 import os
-# Establishes PostgreSQL connection using SQLAlchemy.
-# Defines a session for interacting with the database.
+import pandas as pd
+from config import USER_DATABASE_URL
+from models import User  # Import your SQLAlchemy model
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
-# Create SQLAlchemy instance
-
+# SQLAlchemy setup
+engine = create_engine(f"sqlite:///{USER_DATABASE_URL}")  # Change to PostgreSQL URL if needed
+Session = sessionmaker(bind=engine)
+session = Session()
 
 def create_users_table():
     os.makedirs(os.path.dirname(USER_DATABASE_URL), exist_ok=True)
@@ -37,40 +40,58 @@ def create_users_table():
     print("Database and table created successfully!")
 
 
-def user_csv_to_db(csv_path):
-    # Load user data from CSV
-    user_data = pd.read_csv(csv_path)
-
-    # Connect to SQLite database
-    conn = sqlite3.connect(USER_DATABASE_URL)
-
-    # Insert user data into the users table
-    user_data.to_sql(
-        "users", conn, if_exists="replace", index=False
+def validate_and_insert_user(user_data):
+    """Validates and inserts a user into the database using SQLAlchemy."""
+    try:
+        user = User(
+            username=user_data["username"],
+            email=user_data["email"],
+            password=user_data["password"],  # Hash this before storing
+            first_name=user_data["first_name"],
+            last_name=user_data["last_name"],
+            phone=user_data.get("phone"),
+            city=user_data.get("city"),
+            zipcode=user_data.get("zipcode"),
+            job_titles=user_data.get("job_titles"),
         )
-    
-    conn.commit()
-    conn.close()
+        session.add(user)
+        session.commit()
+        print(f"Inserted user: {user.username}")
+    except Exception as e:
+        session.rollback()
+        print(f"Error inserting user {user_data.get('username')}: {e}")
+
+
+def user_csv_to_db(csv_path):
+    """Loads user data from CSV and validates it with the SQLAlchemy model before insertion."""
+    if not os.path.exists(csv_path):
+        print(f"Error: CSV file not found at {csv_path}")
+        return
+
+    user_data = pd.read_csv(csv_path, dtype={
+        "username": str, "email": str, "password": str,
+        "first_name": str, "last_name": str, "phone": str,
+        "city": str, "zipcode": str, "job_titles": str
+    })
+
+    for _, row in user_data.iterrows():
+        validate_and_insert_user(row.to_dict())
 
     print("User data loaded successfully!")
 
 
 def test_user_data():
-    # Connect to SQLite database
-    conn = sqlite3.connect(USER_DATABASE_URL)
-    cursor = conn.cursor()
+    """Fetches and prints user data from the database."""
+    with sqlite3.connect(USER_DATABASE_URL) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        users = cursor.fetchall()
 
-    # Query the users table
-    cursor.execute("SELECT * FROM users")
-    users = cursor.fetchall()
-
-    # Print the user data
     for user in users:
         print(user)
 
-    conn.close()
-
 
 if __name__ == "__main__":
-    user_csv_to_db("./backend/data/user_data.csv")
+    create_users_table()
+    user_csv_to_db("./backend/data/csvs/user_data.csv")
     test_user_data()
