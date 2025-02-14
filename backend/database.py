@@ -1,24 +1,19 @@
-import sqlite3
 import os
+import sqlite3
 import pandas as pd
-from config import USER_DATABASE_URL
-from models import User  # Import your SQLAlchemy model
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from config import USER_DATABASE_URL, RESUME_DATABASE_URL
+import uuid
 
-# SQLAlchemy setup
-engine = create_engine(f"sqlite:///{USER_DATABASE_URL}")  # Change to PostgreSQL URL if needed
-Session = sessionmaker(bind=engine)
-session = Session()
+# Ensure database directories exist
+os.makedirs(os.path.dirname(USER_DATABASE_URL), exist_ok=True)
+os.makedirs(os.path.dirname(RESUME_DATABASE_URL), exist_ok=True)
+
 
 def create_users_table():
-    os.makedirs(os.path.dirname(USER_DATABASE_URL), exist_ok=True)
-
-    # Connect to SQLite database (or create if it doesn't exist)
+    """Creates the users table in SQLite."""
     conn = sqlite3.connect(USER_DATABASE_URL)
     cursor = conn.cursor()
 
-    # Create the users table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,34 +31,42 @@ def create_users_table():
 
     conn.commit()
     conn.close()
-
-    print("Database and table created successfully!")
+    print("Users table created successfully!")
 
 
 def validate_and_insert_user(user_data):
-    """Validates and inserts a user into the database using SQLAlchemy."""
+    """Validates and inserts a user into the database using sqlite3."""
+    conn = sqlite3.connect(USER_DATABASE_URL)
+    cursor = conn.cursor()
+
     try:
-        user = User(
-            username=user_data["username"],
-            email=user_data["email"],
-            password=user_data["password"],  # Hash this before storing
-            first_name=user_data["first_name"],
-            last_name=user_data["last_name"],
-            phone=user_data.get("phone"),
-            city=user_data.get("city"),
-            zipcode=user_data.get("zipcode"),
-            job_titles=user_data.get("job_titles"),
-        )
-        session.add(user)
-        session.commit()
-        print(f"Inserted user: {user.username}")
-    except Exception as e:
-        session.rollback()
-        print(f"Error inserting user {user_data.get('username')}: {e}")
+        cursor.execute("""
+        INSERT INTO users (username, email, password, first_name, last_name, phone, city, zipcode, job_titles)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            user_data["username"],
+            user_data["email"],
+            user_data["password"],  # Should be hashed before storing
+            user_data["first_name"],
+            user_data["last_name"],
+            user_data.get("phone"),
+            user_data.get("city"),
+            user_data.get("zipcode"),
+            user_data.get("job_titles"),
+        ))
+
+        conn.commit()
+        print(f"Inserted user: {user_data['username']}")
+
+    except sqlite3.IntegrityError as e:
+        print(f"Error inserting user {user_data['username']}: {e}")
+
+    finally:
+        conn.close()
 
 
 def user_csv_to_db(csv_path):
-    """Loads user data from CSV and validates it with the SQLAlchemy model before insertion."""
+    """Loads user data from CSV and inserts it into SQLite."""
     if not os.path.exists(csv_path):
         print(f"Error: CSV file not found at {csv_path}")
         return
@@ -82,16 +85,79 @@ def user_csv_to_db(csv_path):
 
 def test_user_data():
     """Fetches and prints user data from the database."""
-    with sqlite3.connect(USER_DATABASE_URL) as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users")
-        users = cursor.fetchall()
+    conn = sqlite3.connect(USER_DATABASE_URL)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+
+    conn.close()
 
     for user in users:
         print(user)
 
 
+def create_resumes_table():
+    """Creates the resumes table in SQLite."""
+    conn = sqlite3.connect(RESUME_DATABASE_URL)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS resumes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        filename TEXT NOT NULL,
+        file_url TEXT NOT NULL,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    """)
+
+    conn.commit()
+    conn.close()
+    print("Resumes table created successfully!")
+
+
+def validate_and_insert_resume(user_id, uploaded_file):
+    """Generates filename and file URL, then inserts into the database."""
+    conn = sqlite3.connect(RESUME_DATABASE_URL)
+    cursor = conn.cursor()
+
+    try:
+        # Generate a unique filename
+        unique_filename = f"{user_id}_{uuid.uuid4().hex}.pdf"
+        file_path = os.path.join('data/resumes', unique_filename)
+
+        # Save the file locally
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.read())
+
+        # Store the file URL
+        file_url = f"/download/{unique_filename}"  # API path for downloading
+
+        # Insert into the database
+        cursor.execute("""
+        INSERT INTO resumes (user_id, filename, file_url)
+        VALUES (?, ?, ?)
+        """, (user_id, unique_filename, file_url))
+
+        conn.commit()
+        print(f"Inserted resume for user_id: {user_id}, File: {unique_filename}")
+
+    except sqlite3.IntegrityError as e:
+        print(f"Error inserting resume for user_id {user_id}: {e}")
+
+    finally:
+        conn.close()
+
+        
 if __name__ == "__main__":
+    # Setup database tables
     create_users_table()
+    create_resumes_table()
+
+    # Load users from CSV
     user_csv_to_db("./backend/data/csvs/user_data.csv")
+
+    # Test user data
     test_user_data()
