@@ -4,9 +4,8 @@ from routes.resume import validate_and_insert_resume, allowed_file
 from flask_cors import CORS
 import sqlite3
 import os
-from config import USER_DATABASE_URL
+from config import USER_DATABASE_URL, JOBS_DATABASE_URL
 
-from routes.jobs import create_jobs_table, jobs_csv_to_db, test_job_data
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -126,8 +125,23 @@ def download_resume(filename):
         return jsonify({"error": "File not found"}), 404
 
 
+@app.route("/jobs", methods=["GET"])
+def get_jobs():
+    conn = sqlite3.connect(JOBS_DATABASE_URL)
+    cursor = conn.cursor()
 
+    # Fetch all jobs
+    cursor.execute("SELECT * FROM jobs")
+    jobs = cursor.fetchall()
+
+    # Get column names
+    column_names = [description[0] for description in cursor.description]
+
+    # Convert tuples to list of dictionaries
+    job_list = [dict(zip(column_names, job)) for job in jobs]
+
+    return jsonify({"jobs": job_list})
+    
 
 if __name__ == "__main__":
-    test_job_data()
-    # app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
