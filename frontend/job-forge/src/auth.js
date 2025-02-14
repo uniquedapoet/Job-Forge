@@ -35,8 +35,8 @@ const Auth = () => {
 
     const user = users.find(
       (u) =>
-        u.Username?.trim().toLowerCase() === username.trim().toLowerCase() &&
-        u.Password?.trim() === password.trim()
+        u.username?.trim().toLowerCase() === username.trim().toLowerCase() &&
+        u.password?.trim() === password.trim()
     );
 
     if (user) {
