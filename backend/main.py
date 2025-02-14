@@ -3,8 +3,9 @@ from werkzeug.utils import secure_filename
 from database import validate_and_insert_resume
 from flask_cors import CORS
 import sqlite3
+import os
 from config import USER_DATABASE_URL
-from database import create_users_table, test_user_data
+from database import create_users_table
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -63,12 +64,21 @@ def upload_resume():
         return jsonify({"error": "No file selected for uploading"}), 400
     
     if file and allowed_file(file.filename):
-        validate_and_insert_resume(user_id, file) # Function to store/name the file in the database
+        validate_and_insert_resume(user_id, file) 
         return jsonify({"message": "File uploaded successfully"}), 201
 
     return jsonify({"error": "File type not allowed"}), 400
+
+
+@app.route("/download/<filename>", methods=["GET"])
+def download_resume(filename):
+    """Flask endpoint to serve a stored resume."""
+    file_path = os.path.join('data/resumes', secure_filename(filename))
     
-    
+    if os.path.exists(file_path):
+        return send_from_directory('data/resumes', filename, as_attachment=True)
+    else:
+        return jsonify({"error": "File not found"}), 404
 
 
 

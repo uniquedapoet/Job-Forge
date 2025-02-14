@@ -4,10 +4,6 @@ import pandas as pd
 from config import USER_DATABASE_URL, RESUME_DATABASE_URL
 import uuid
 
-# Ensure database directories exist
-os.makedirs(os.path.dirname(USER_DATABASE_URL), exist_ok=True)
-os.makedirs(os.path.dirname(RESUME_DATABASE_URL), exist_ok=True)
-
 
 def create_users_table():
     """Creates the users table in SQLite."""
@@ -98,28 +94,51 @@ def test_user_data():
 
 
 def create_resumes_table():
-    """Creates the resumes table in SQLite."""
-    conn = sqlite3.connect(RESUME_DATABASE_URL)
-    cursor = conn.cursor()
+    """Creates the resumes table in SQLite and ensures the database file is generated."""
+    try:
+        # Ensure the directory for the database exists
+        db_directory = os.path.dirname(RESUME_DATABASE_URL)
+        if not os.path.exists(db_directory):
+            os.makedirs(db_directory, exist_ok=True)
+            print(f"✅ Created database directory: {db_directory}")
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS resumes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        filename TEXT NOT NULL,
-        file_url TEXT NOT NULL,
-        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );
-    """)
+        # Connect to SQLite (creates file if it doesn't exist)
+        conn = sqlite3.connect(RESUME_DATABASE_URL)
+        cursor = conn.cursor()
 
-    conn.commit()
-    conn.close()
-    print("Resumes table created successfully!")
+        # Create table if it doesn't exist
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS resumes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            file_url TEXT NOT NULL,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """)
+
+        conn.commit()
+        conn.close()
+        print(f"✅ Database file created at: {RESUME_DATABASE_URL}")
+
+        # Check if the database file exists now
+        if os.path.exists(RESUME_DATABASE_URL):
+            print(f"✅ Database {RESUME_DATABASE_URL} successfully created.")
+        else:
+            print(f"❌ Database file {RESUME_DATABASE_URL} was not created.")
+
+    except Exception as e:
+        print(f"❌ Error creating database: {e}")
 
 
 def validate_and_insert_resume(user_id, uploaded_file):
     """Generates filename and file URL, then inserts into the database."""
+    print('======================',RESUME_DATABASE_URL)
+    if not os.path.exists(RESUME_DATABASE_URL):
+        print(f"❌ Database file {RESUME_DATABASE_URL} does not exist. Creating...")
+        create_resumes_table()
+
     conn = sqlite3.connect(RESUME_DATABASE_URL)
     cursor = conn.cursor()
 
@@ -152,12 +171,4 @@ def validate_and_insert_resume(user_id, uploaded_file):
 
         
 if __name__ == "__main__":
-    # Setup database tables
-    create_users_table()
-    create_resumes_table()
-
-    # Load users from CSV
-    user_csv_to_db("./backend/data/csvs/user_data.csv")
-
-    # Test user data
-    test_user_data()
+        create_resumes_table()
