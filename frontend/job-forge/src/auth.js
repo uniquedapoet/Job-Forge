@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [users, setUsers] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate(); 
 
   // Fetch users from backend
   useEffect(() => {
@@ -41,6 +43,7 @@ const Auth = () => {
 
     if (user) {
       setMessage("Login Successful!");
+      navigate("/dashboard");
     } else {
       setMessage("Invalid Credentials");
     }
