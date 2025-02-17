@@ -66,6 +66,9 @@ def extract_resume_sections(text):
 
     return sections
 
+
+
+
 if __name__ == '__main__':
     # Test the functions
     pdf_path = './example_resume.pdf'
