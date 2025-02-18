@@ -1,5 +1,6 @@
 import "./App.css";
 import Auth from "./auth";
+import ResumeUploader from "./resume_uploader";
 import React, { useEffect, useState } from "react";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
       <h1>Flask + React Integration</h1>
       <p>Backend Response: {message}</p>
       <Auth />
+      <ResumeUploader />
     </div>
   );
 }
