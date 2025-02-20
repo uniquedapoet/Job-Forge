@@ -1,77 +1,89 @@
-from pdf2image import convert_from_path
-import pytesseract
-import re
-# Accepts PDF/DOCX uploads.
-# Extracts text and runs AI-based improvements.
+import uuid
+from config import RESUME_DATABASE_URL
+import sqlite3
+import os
+
+ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
 
 
-def extract_text_from_pdf(pdf_path):
-    # Convert PDF pages to images
-    pages = convert_from_path(pdf_path, 500)
+def create_resumes_table():
+    """Creates the resumes table in SQLite and ensures the database file is generated."""
+    try:
+        # Ensure the directory for the database exists
+        db_directory = os.path.dirname(RESUME_DATABASE_URL)
+        if not os.path.exists(db_directory):
+            os.makedirs(db_directory, exist_ok=True)
+            print(f"✅ Created database directory: {db_directory}")
 
-    text = ''
-    for page in pages:
-        text += pytesseract.image_to_string(page)
+        # Connect to SQLite (creates file if it doesn't exist)
+        conn = sqlite3.connect(RESUME_DATABASE_URL)
+        cursor = conn.cursor()
 
-    return text
+        # Create table if it doesn't exist
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS resumes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            file_url TEXT NOT NULL,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        """)
 
+        conn.commit()
+        conn.close()
+        print(f"✅ Database file created at: {RESUME_DATABASE_URL}")
 
-def detect_dominant_header_format(text):
-    lines = text.split('\n')
-
-    # Patterns to check
-    patterns = {
-        'all_caps': r'^[A-Z\s]{3,}$',
-        'colon_headers': r'^[A-Z][a-z]+.*:$',
-        'mixed_case': r'^[A-Z][a-z]+(?: [A-Z][a-z]+)*$'
-    }
-
-    # Count occurrences of each pattern
-    pattern_counts = {key: 0 for key in patterns}
-
-    for line in lines:
-        line = line.strip()
-        for key, pattern in patterns.items():
-            if re.match(pattern, line):
-                pattern_counts[key] += 1
-
-    # Choose the pattern with the highest count
-    dominant_pattern = max(pattern_counts, key=pattern_counts.get)
-    return patterns[dominant_pattern] if pattern_counts[dominant_pattern] > 0 else None
-
-
-def extract_resume_sections(text):
-    # Define flexible patterns for detecting section headers
-    # header_pattern = r'(?:(?:^[A-Z\s]{3,}$)|(?:^[A-Z][a-z]+(?: [A-Z][a-z]+)*:))'
-    header_pattern = detect_dominant_header_format(text)
-
-    # Split text into lines for better header detection
-    lines = text.split('\n')
-
-    sections = {}
-    current_section = 'Summary'  # Default section if no header detected
-    sections[current_section] = ''
-
-    for line in lines:
-        line = line.strip()
-        if re.match(header_pattern, line):
-            current_section = line.replace(':', '').strip()
-            sections[current_section] = ''
+        # Check if the database file exists now
+        if os.path.exists(RESUME_DATABASE_URL):
+            print(f"✅ Database {RESUME_DATABASE_URL} successfully created.")
         else:
-            sections[current_section] += line + ' '
+            print(f"❌ Database file {RESUME_DATABASE_URL} was not created.")
 
-    # Clean up extra spaces
-    for section in sections:
-        sections[section] = sections[section].strip()
-
-    return sections
+    except Exception as e:
+        print(f"❌ Error creating database: {e}")
 
 
+def validate_and_insert_resume(user_id, uploaded_file):
+    """Generates filename and file URL, then inserts into the database."""
+    print('======================',RESUME_DATABASE_URL)
+    if not os.path.exists(RESUME_DATABASE_URL):
+        print(f"❌ Database file {RESUME_DATABASE_URL} does not exist. Creating...")
+        create_resumes_table()
 
+    conn = sqlite3.connect(RESUME_DATABASE_URL)
+    cursor = conn.cursor()
 
-if __name__ == '__main__':
-    # Test the functions
-    pdf_path = './example_resume.pdf'
-    text = extract_text_from_pdf(pdf_path)
-    sections = extract_resume_sections(text)
-    print(sections.keys())
+    try:
+        # Generate a unique filename
+        unique_filename = f"{user_id}_{uuid.uuid4().hex}.pdf"
+        file_path = os.path.join('data/resumes', unique_filename)
+
+        # Save the file locally
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.read())
+
+        # Store the file URL
+        file_url = f"/download/{unique_filename}"  # API path for downloading
+
+        # Insert into the database
+        cursor.execute("""
+        INSERT INTO resumes (user_id, filename, file_url)
+        VALUES (?, ?, ?)
+        """, (user_id, unique_filename, file_url))
+
+        conn.commit()
+        print(f"Inserted resume for user_id: {user_id}, File: {unique_filename}")
+
+    except sqlite3.IntegrityError as e:
+        print(f"Error inserting resume for user_id {user_id}: {e}")
+
+    finally:
+        conn.close()
+
+def allowed_file(filename):
+    """Check if the uploaded file has an allowed extension."""
+    return '.' in filename and (
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        )

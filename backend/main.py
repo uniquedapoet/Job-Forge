@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
-from database import validate_and_insert_resume
+from routes.resume import validate_and_insert_resume, allowed_file
 from flask_cors import CORS
 import sqlite3
 import os
-from config import USER_DATABASE_URL
-from database import create_users_table
+from config import USER_DATABASE_URL, JOBS_DATABASE_URL
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -13,7 +13,6 @@ app = Flask(__name__)
 # Allow CORS for all routes
 CORS(app, origins=["http://localhost:3000"])
 
-ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
 
 @app.route("/", methods=["GET"])
 def read_root():
@@ -40,12 +39,57 @@ def get_users():
     return jsonify({"users": user_list})
 
 
-def allowed_file(filename):
-    """Check if the uploaded file has an allowed extension."""
-    return '.' in filename and (
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-        )
+@app.route("/users/<int:user_id>", methods=["GET"])
+def get_user(user_id):
+    conn = sqlite3.connect(USER_DATABASE_URL)
+    cursor = conn.cursor()
 
+    # Fetch user by ID
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    user = cursor.fetchone()
+
+    # Get column names
+    column_names = [description[0] for description in cursor.description]
+
+    conn.close()
+
+    if user:
+        return jsonify({"user": dict(zip(column_names, user))})
+    else:
+        return jsonify({"error": "User not found"}), 404
+
+
+@app.route("/register_user", methods=["POST"])
+def register_user():
+    conn = sqlite3.connect(USER_DATABASE_URL)
+    cursor = conn.cursor()
+
+    user_data = request.json
+
+    try:
+        cursor.execute("""
+        INSERT INTO users (username, email, password, first_name, last_name, phone, city, zipcode, job_titles)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            user_data["username"],
+            user_data["email"],
+            user_data["password"],  # Should be hashed before storing
+            user_data["first_name"],
+            user_data["last_name"],
+            user_data.get("phone"),
+            user_data.get("city"),
+            user_data.get("zipcode"),
+            user_data.get("job_titles"),
+        ))
+
+        conn.commit()
+        return jsonify({"message": "User created successfully"}), 201
+
+    except sqlite3.IntegrityError as e:
+        return jsonify({"error": f"Error inserting user {user_data['username']}: {e}"}), 400
+
+    finally:
+        conn.close()
 
 
 @app.route("/upload", methods=["POST"])
@@ -81,7 +125,23 @@ def download_resume(filename):
         return jsonify({"error": "File not found"}), 404
 
 
+@app.route("/jobs", methods=["GET"])
+def get_jobs():
+    conn = sqlite3.connect(JOBS_DATABASE_URL)
+    cursor = conn.cursor()
+
+    # Fetch all jobs
+    cursor.execute("SELECT * FROM jobs")
+    jobs = cursor.fetchall()
+
+    # Get column names
+    column_names = [description[0] for description in cursor.description]
+
+    # Convert tuples to list of dictionaries
+    job_list = [dict(zip(column_names, job)) for job in jobs]
+
+    return jsonify({"jobs": job_list})
+    
 
 if __name__ == "__main__":
-    create_users_table()
     app.run(host="0.0.0.0", port=5001, debug=True)
