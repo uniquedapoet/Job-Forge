@@ -5,7 +5,7 @@ from flask_cors import CORS
 import sqlite3
 import os
 from config import USER_DATABASE_URL, JOBS_DATABASE_URL
-
+from routes.auth import test_get_score
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -144,4 +144,5 @@ def get_jobs():
     
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    test_get_score()
+    # app.run(host="0.0.0.0", port=5001, debug=True)

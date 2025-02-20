@@ -82,6 +82,7 @@ def validate_and_insert_resume(user_id, uploaded_file):
     finally:
         conn.close()
 
+
 def allowed_file(filename):
     """Check if the uploaded file has an allowed extension."""
     return '.' in filename and (
