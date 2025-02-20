@@ -1,5 +1,7 @@
 # !pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
+# how to implement:
+# https://mabbkhawaja.medium.com/integrating-gmail-api-in-a-react-app-a-step-by-step-guide-for-fetching-and-displaying-emails-fd62a9c78f40
 import os.path
 import base64
 import pandas as pd
@@ -51,7 +53,6 @@ class Gmail:
 
     def search_job_applications(self):
         service = self.authenticate_gmail()
-
         query = """(subject:(application OR applied OR "job application" OR resume OR interview OR position OR recruiter OR "career opportunity") 
                     OR body:(application OR resume OR recruiter OR hiring OR interview OR opportunity OR "job offer"))"""
         
@@ -59,7 +60,6 @@ class Gmail:
         messages = results.get('messages', [])
 
         email_data = []
-
         for msg in messages:
             msg_data = service.users().messages().get(userId='me', id=msg['id']).execute()
             headers = msg_data['payload']['headers']
