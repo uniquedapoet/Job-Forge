@@ -165,7 +165,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from resume import extract_text_from_pdf
 from services.score import Score
 import pandas as pd
-import db_tools
+# import db_tools
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 backend_dir = os.path.dirname(script_dir)
