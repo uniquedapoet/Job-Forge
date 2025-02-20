@@ -11,13 +11,17 @@ from services.score import Score
 import pandas as pd
 import db_tools
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.dirname(script_dir)
+data_dir = os.path.join(backend_dir, "data")
+JOBS_PATH = os.path.join(data_dir, "csvs", "jobs.csv")
+
 
 def get_score(user_id, job_posting_id):
     try:
         # get job description from jobs csv using job_posting_id
         # TODO: create job_posting_id column in jobs csv
 
-        JOBS_PATH = os.path.join("backend", "data", "csvs", "jobs.csv")
         jobs = pd.read_csv(JOBS_PATH)
         job_description = jobs.loc[jobs["id"] == job_posting_id, "description"][0]
 
@@ -43,3 +47,6 @@ def get_score(user_id, job_posting_id):
             "message": "An error occurred while computing similarity score",
             "error": str(e)
         }
+
+if __name__ == "__main__":
+    print(get_score(1,"in-b26a372f08fef696"))
