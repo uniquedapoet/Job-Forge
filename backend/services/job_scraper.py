@@ -11,10 +11,10 @@ from config import JOBS_DATABASE_URL
 # file_path = os.path.join(data_dir, "jobs.csv")
 
 
-def get_jobs_data(job_title: str, location: str, search_query=None):
+def get_jobs_data(job_title: str, location: str):
     jobs = scrape_jobs(
     site_name=['indeed'], # others may require proxies: "linkedin", "zip_recruiter", "glassdoor", "google"
-    search_term=job_title + search_query,
+    search_term=job_title,
     location=location,
     results_wanted=20,
     hours_old=72,
@@ -27,8 +27,6 @@ def get_jobs_data(job_title: str, location: str, search_query=None):
     return jobs
 
 jobs = get_jobs_data("Data Scientist", "Denver, CO")
-
-
 
 
 print(jobs)
