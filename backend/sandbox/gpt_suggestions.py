@@ -43,14 +43,14 @@ def get_suggestions(user_id, job_posting_id):
     Job Description:
     {raw_job_description}
 
-    Please return the response in a structured format with sections for:
-    - Skills to Develop
-    - Keywords to Include
-    - Grammar & Formatting Suggestions
+    Please return the response in a json structured format applicable to an api with sections for:
+    - skills_to_develop
+    - keywords
+    - grammar_formatting
     """
 
     # Use OpenAI API key
-    API_KEY = os.getenv("OPENAI_API_KEY")  # Updated environment variable name
+    API_KEY = os.getenv("OPEN_API_KEY")  # Updated environment variable name
     client = OpenAI(api_key=API_KEY)  # Removed base_url since OpenAI uses default endpoint
 
     # Request GPT-4o
@@ -62,7 +62,5 @@ def get_suggestions(user_id, job_posting_id):
 
     return response.choices[0].message.content
     
-
-
 if __name__ == "__main__":
     print(get_suggestions(1,"in-b26a372f08fef696"))
