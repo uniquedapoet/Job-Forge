@@ -144,5 +144,5 @@ def get_jobs():
     
 
 if __name__ == "__main__":
-    test_get_score()
-    # app.run(host="0.0.0.0", port=5001, debug=True)
+    #test_get_score()
+    app.run(host="0.0.0.0", port=5001, debug=True)

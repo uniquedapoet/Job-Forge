@@ -1,10 +1,10 @@
 import "./App.css";
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
-import Auth from "./auth";
-import Dashboard from "./dashboard";
-import ResumeUploader from "./resume_uploader";
-import logo from "./JF_LOGO.jpg"; // 
+import Auth from "./Auth";
+import Dashboard from "./Dashboard";
+import ResumeUploader from "./Resume_uploader";
+import logo from "./JF_LOGO.jpg";
 
 function App() {
   return (
