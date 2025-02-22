@@ -26,8 +26,10 @@ button:hover {
   background-color: #9a4620;
 }
 
+/* Add input[type="email"] to the list of styled inputs */
 input[type="text"],
 input[type="password"],
+input[type="email"],
 input[type="file"] {
   padding: 10px;
   border: 1px solid #ddd;

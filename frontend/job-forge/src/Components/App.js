@@ -5,31 +5,34 @@ import Auth from "./Auth";
 import Dashboard from "./Dashboard";
 import ResumeUploader from "./Resume_uploader";
 import logo from "./JF_LOGO.jpg";
+import { UserProvider } from "./UserContext";
 
 function App() {
   return (
     <Router>
-      <div>
-        <Header />
-        <div className="container">
-          <Routes>
-            <Route path="/" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/upload-resume" element={<ResumeUploader />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
+      <UserProvider>
+        <div>
+          <Header />
+          <div className="container">
+            <Routes>
+              <Route path="/" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/upload-resume" element={<ResumeUploader />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </div>
         </div>
-      </div>
+      </UserProvider>
     </Router>
   );
 }
 
-// Header Component
+
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Login Checker
+
   const isLoggedIn = location.pathname === "/dashboard" || location.pathname === "/upload-resume";
 
   return (

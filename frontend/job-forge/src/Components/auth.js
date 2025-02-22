@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { UserContext } from "./UserContext"; 
 
 const Auth = () => {
   const [users, setUsers] = useState([]);
@@ -7,6 +8,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext); // Access setUser from context
 
   useEffect(() => {
     fetch("http://localhost:5001/users")
@@ -35,6 +37,7 @@ const Auth = () => {
 
     if (user) {
       setMessage("Login Successful!");
+      setUser(user); // Set the user data in context
       navigate("/dashboard");
     } else {
       setMessage("Invalid Credentials");
@@ -66,6 +69,9 @@ const Auth = () => {
         />
         <button onClick={handleLogin}>Login</button>
         <p className="message">{message}</p>
+        <p>
+          Don't have an account? <Link to="/register">Register here</Link>
+        </p>
       </div>
     </div>
   );

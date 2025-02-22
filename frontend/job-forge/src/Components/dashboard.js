@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import JobSearch from "./JobSearch";
+import { UserContext } from "./UserContext"; // Import the UserContext
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [allJobs, setAllJobs] = useState([]); // Stores all jobs fetched from the backend
-  const [filteredJobs, setFilteredJobs] = useState([]); // Stores jobs filtered by user input
+  const [allJobs, setAllJobs] = useState([]); // Storing jobs fetched
+  const [filteredJobs, setFilteredJobs] = useState([]); // Storing jobs filtered by user input
   const [isSearching, setIsSearching] = useState(false); // Tracks whether a search is in progress
+  const { user } = useContext(UserContext); // Access user from context
 
   // Fetch all jobs when the component mounts
   useEffect(() => {
@@ -14,8 +16,8 @@ const Dashboard = () => {
       try {
         const response = await fetch("/jobs");
         const data = await response.json();
-        setAllJobs(data.jobs); // Store all jobs
-        setFilteredJobs(data.jobs); // Initially, display all jobs
+        setAllJobs(data.jobs);
+        setFilteredJobs(data.jobs);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       }
@@ -34,7 +36,7 @@ const Dashboard = () => {
 
   // Filter jobs based on job title and location
   const handleSearch = (jobTitle, location) => {
-    setIsSearching(true); // Indicate that a search is in progress
+    setIsSearching(true);
 
     const filtered = allJobs.filter((job) => {
       const matchesTitle = job.title.toLowerCase().includes(jobTitle.toLowerCase());
@@ -57,12 +59,13 @@ const Dashboard = () => {
     >
       <div className="card" style={{ maxWidth: "800px", width: "100%", textAlign: "center" }}>
         <h2>Welcome to Job Forge</h2>
-        <p>You have successfully logged in!</p>
+        {/* Display the user's name */}
+        {user && (
+          <p>Welcome back, {user.first_name} {user.last_name}!</p>
+        )}
 
-        {/* Add the JobSearch component */}
         <JobSearch onSearch={handleSearch} />
 
-        {/* Display the filtered jobs or a message if no jobs match */}
         <div>
           {isSearching && filteredJobs.length === 0 ? (
             <p>No jobs match your search criteria.</p>
