@@ -6,9 +6,7 @@ from openai import OpenAI
 from services.resume_scraper import extract_text_from_pdf
 
 
-
 def get_suggestions(user_id, job_posting_id):
-
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     script_dir = os.path.dirname(os.path.abspath(__file__))
     backend_dir = os.path.dirname(script_dir)
