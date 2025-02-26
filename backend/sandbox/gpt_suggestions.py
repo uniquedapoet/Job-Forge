@@ -1,15 +1,11 @@
 import os
-import sys
 import pandas as pd
 from openai import OpenAI
 import db_tools
 from services.resume_scraper import extract_text_from_pdf
 
 def get_suggestions(user_id, job_posting_id):
-    # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    # script_dir = os.path.dirname(os.path.abspath(__file__))
-    # backend_dir = os.path.dirname(script_dir)
-    # data_dir = os.path.join(backend_dir, "data")
+    """Get suggestion from OpenAI API gpt-4o for the users resume given a job description."""
 
     # Get user resume
     resume_file_name = db_tools.get_resumes_by_user_id(user_id)[0]['filename']
@@ -44,9 +40,10 @@ def get_suggestions(user_id, job_posting_id):
     - grammar_formatting
     """
 
-    # Use OpenAI API key
-    API_KEY = os.getenv("OPEN_API_KEY")  # Updated environment variable name
-    client = OpenAI(api_key=API_KEY)  # Removed base_url since OpenAI uses default endpoint
+    #TODO: Figure out away to make the key universal for users, 
+    # maybe have users input their own api key
+    API_KEY = os.getenv("OPEN_API_KEY")  
+    client = OpenAI(api_key=API_KEY) 
 
     # Request GPT-4o
     response = client.chat.completions.create(
@@ -56,6 +53,3 @@ def get_suggestions(user_id, job_posting_id):
     )
 
     return response.choices[0].message.content
-    
-if __name__ == "__main__":
-    print(get_suggestions(1,"in-b26a372f08fef696"))
