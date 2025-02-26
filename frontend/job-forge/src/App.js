@@ -1,11 +1,11 @@
 import "./App.css";
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
-import Auth from "./Auth";
-import Dashboard from "./Dashboard";
-import ResumeUploader from "./Resume_uploader";
+import Auth from "./Components/Auth.jsx";
+import Dashboard from "./Components/Dashboard.jsx";
+import ResumeUploader from "./Components/ResumeUploader.jsx";
 import logo from "./JF_LOGO.jpg";
-import { UserProvider } from "./UserContext";
+import { UserProvider } from "./Components/UserContext.jsx";
 
 function App() {
   return (
