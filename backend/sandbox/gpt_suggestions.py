@@ -2,25 +2,22 @@ import os
 import sys
 import pandas as pd
 from openai import OpenAI
-
+import db_tools
 from services.resume_scraper import extract_text_from_pdf
 
-
 def get_suggestions(user_id, job_posting_id):
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    backend_dir = os.path.dirname(script_dir)
-    data_dir = os.path.join(backend_dir, "data")
+    # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    # script_dir = os.path.dirname(os.path.abspath(__file__))
+    # backend_dir = os.path.dirname(script_dir)
+    # data_dir = os.path.join(backend_dir, "data")
 
     # Get user resume
-    # resume_data = db_tools.get_resumes_by_user_id(user_id)
-    # resume_file_name = resume_data[0]['filename']
-    resume_file_name = "1_9bcbe3bfdcaa4a86bad974b490a397e9.pdf"
-    RESUME_PATH = os.path.join(data_dir, "resumes", resume_file_name)
+    resume_file_name = db_tools.get_resumes_by_user_id(user_id)[0]['filename']
+    RESUME_PATH = os.path.join("data", "resumes", resume_file_name)
     raw_resume = extract_text_from_pdf(RESUME_PATH)
 
     # Get job description
-    JOBS_PATH = os.path.join(data_dir, "csvs", "jobs.csv")
+    JOBS_PATH = os.path.join("data", "csvs", "jobs.csv")
     jobs = pd.read_csv(JOBS_PATH)
     raw_job_description = jobs.loc[jobs["job_id"] == job_posting_id, "description"].iloc[0]
 
