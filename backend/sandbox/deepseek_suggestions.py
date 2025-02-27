@@ -1,17 +1,37 @@
 import os
+import sys
+import pandas as pd
 from openai import OpenAI
+# import db_tools
+from backend.services.resume_scraper import extract_text_from_pdf
 
 
-def get_suggestions(user_id, resume_path, job_description_id):
+def get_suggestions(user_id, job_posting_id):
+
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    backend_dir = os.path.dirname(script_dir)
+    data_dir = os.path.join(backend_dir, "data")
+
     API_KEY = os.getenv("deepseek")
     client = OpenAI(api_key=API_KEY, base_url="https://api.deepseek.com")
 
-    # get resume content
+    db_tools.get_resumes_by_user_id(user_id)
+    resume_data = db_tools.get_resumes_by_user_id(user_id)
+    resume_file_name = resume_data[0]['filename']
+    RESUME_PATH = os.path.join(data_dir, "resumes", resume_file_name)
+    raw_resume = extract_text_from_pdf(RESUME_PATH)
 
-    # get job description_content
+    JOBS_PATH = os.path.join(data_dir, "csvs", "jobs.csv")
+    jobs = pd.read_csv(JOBS_PATH)
+    raw_job_description = jobs.loc[jobs["job_id"] == job_posting_id, "description"][0]
+
+
+# use the keyword analysis that was used fo the door dash jobs in protfolio class
+
 
     # Format the prompt
-    prompt = """
+    prompt = f"""
     You are an expert resume advisor. Your task is to provide actionable, realistic suggestions to optimize a user's resume for a specific job description. 
     Focus on:
     1. Relevant skills to highlight or develop that are within reach for the user.
@@ -21,10 +41,10 @@ def get_suggestions(user_id, resume_path, job_description_id):
     5. Provide concise, practical recommendations that the user can implement quickly.
 
     User's Resume:
-    {resume_content}
+    {raw_resume}
 
     Job Description:
-    {job_description_content}
+    {raw_job_description}
 
     Please return the response in a structured format with sections for:
     - Skills to Develop
