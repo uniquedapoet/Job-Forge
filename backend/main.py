@@ -138,6 +138,7 @@ def job_search():
     try:
         # Fetch jobs based on the search criteria
         jobs = get_jobs_data(job_title=job_title, location=location)
+        print(f"Fetched jobs: {jobs}")
 
         if jobs is None:
             return jsonify({"error": "No matching jobs found"}), 404
@@ -163,7 +164,8 @@ def job_search():
         if location:
             query += " AND location LIKE ?"
             params.append(f"%{location}%")  # Allow partial matching
-
+        
+        print(f"Query: {query}, Params: {params}")
         cursor.execute(query, params)
         jobs = cursor.fetchall()
 
@@ -176,7 +178,7 @@ def job_search():
         conn.close()
 
         if not job_list:
-            return jsonify({"error": "No matching jobs found"}), 404
+            return jsonify({"error": "No matching job list found"}), 404
 
         return jsonify({"message": "Jobs successfully retrieved!", "jobs": job_list}), 200
 
