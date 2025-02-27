@@ -1,7 +1,7 @@
 # Scrapes job postings using BeautifulSoup & Selenium.
 # https://github.com/Bunsly/JobSpy/tree/main
+import sys
 from jobspy import scrape_jobs
-from config import JOBS_DATABASE_URL
 
 
 # # get path
@@ -11,7 +11,10 @@ from config import JOBS_DATABASE_URL
 # file_path = os.path.join(data_dir, "jobs.csv")
 
 
-def get_jobs_data(job_title: str, location: str):
+
+
+def get_jobs_data(job_title: str, location: str) -> list:
+
     jobs = scrape_jobs(
     site_name=['indeed'], # others may require proxies: "linkedin", "zip_recruiter", "glassdoor", "google"
     search_term=job_title,
@@ -26,8 +29,7 @@ def get_jobs_data(job_title: str, location: str):
     # print(f"Found {len(jobs)} jobs")
     return jobs
 
-jobs = get_jobs_data("Data Scientist", "Denver, CO")
+if __name__ == "__main__":
+    jobs = get_jobs_data("Data Scientist", "Denver, CO")
+    print(jobs)
 
-
-print(jobs)
-# jobs.to_csv(file_path, quoting=csv.QUOTE_NONNUMERIC, escapechar="\\", index=False) 

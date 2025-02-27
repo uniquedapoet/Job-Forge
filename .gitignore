@@ -172,6 +172,7 @@ cython_debug/
 .pypirc
 frontend/job-forge/node_modules/
 frontend/job-forge/package-lock.json
+frontend/job-forge/package.json
 scratch.ipynb
 backend/scratch.ipynb
 
