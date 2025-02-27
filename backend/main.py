@@ -136,6 +136,19 @@ def job_search():
         return jsonify({"error": "At least one search criteria is required"}), 400
 
     try:
+        # Fetch jobs based on the search criteria
+        jobs = get_jobs_data(job_title=job_title, location=location)
+
+        if jobs is None:
+            return jsonify({"error": "No matching jobs found"}), 404
+
+        # Try inserting jobs into the database
+        try:
+            validate_and_insert_jobs(jobs)
+        except Exception as e:
+            print(f"Error inserting jobs: {str(e)}")  # Log but don’t block search results
+
+        # Query the database to get relevant jobs
         conn = sqlite3.connect(JOBS_DATABASE_URL)
         cursor = conn.cursor()
 
