@@ -24,7 +24,7 @@
 ### **3. Key Features & Workflow**
 #### **3.1. User Flow**
 1. **User Registration/Login**
-   - Sign up/log in via email/password or OAuth.
+   - Sign up/log in via email/password.
    - Store user information in the database.
 
 2. **Resume Upload**
@@ -32,13 +32,13 @@
    - Parses resume content into structured text.
 
 3. **Job Description Scraping**
-   - User provides a job posting URL.
-   - The backend scrapes the job listing and extracts job title, responsibilities, required skills, and qualifications.
+   - User can search for jobs via our api.
+   - The backend scrapes stores job details.
 
 4. **AI-Powered Resume Analysis**
    - **Keyword Matching:** Compare resume keywords with job post requirements.
    - **Missing Qualification Detection:** Identify required skills/experience absent in the resume.
-   - **Sentence Optimization:** Suggest improvements for clarity and impact.
+   - **Sentence Optimization (Optional):** Suggest improvements for clarity and impact.
 
 5. **Preview & Editing**
    - Display AI-generated suggestions in a Grammarly-style interface.
