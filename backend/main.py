@@ -5,7 +5,7 @@ from flask_cors import CORS
 import sqlite3
 import os
 from config import USER_DATABASE_URL, JOBS_DATABASE_URL
-from services.job_scraper import get_jobs_data
+# from services.job_scraper import get_jobs_data
 from routes.jobs import validate_and_insert_jobs, create_jobs_db, test_job_data
 
 # Initialize Flask app
