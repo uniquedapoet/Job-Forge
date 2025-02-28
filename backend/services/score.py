@@ -9,7 +9,6 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
-
 class Score:
     def __init__(self, raw_resume, raw_jd):
         self.raw_resume = raw_resume
@@ -18,7 +17,6 @@ class Score:
         self.set_of_stopwords = set(stopwords.words("english") + list(string.punctuation))
 
         self.lemmatizer = WordNetLemmatizer()
-
 
     def clean_text(self, raw_text):        
 
@@ -76,11 +74,8 @@ class Score:
                     experience_end = min(experience_end, section_start)
 
         experience_section = self.raw_resume[experience_start:experience_end].strip()
-
         cleaned_experience = self.clean_text(experience_section)
-
         cleaned_skills = self.clean_text(skills)
-
 
         return cleaned_experience + cleaned_skills
 
