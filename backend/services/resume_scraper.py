@@ -66,13 +66,3 @@ def extract_resume_sections(text):
         sections[section] = sections[section].strip()
 
     return sections
-
-
-
-
-if __name__ == '__main__':
-    # Test the functions
-    pdf_path = './example_resume.pdf'
-    text = extract_text_from_pdf(pdf_path)
-    sections = extract_resume_sections(text)
-    print(sections.keys())
