@@ -1,7 +1,0 @@
-fastapi uvicorn pydantic psycopg2 asyncpg sqlalchemy alembic
-
-
-brew install postgresql  # Mac
-sudo apt install postgresql  # Linux
-choco install postgresql  # Windows
-
