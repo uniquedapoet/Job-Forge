@@ -9,6 +9,7 @@ from services.job_scraper import get_jobs_data
 from routes.jobs import validate_and_insert_jobs, create_jobs_db
 import time
 from services.resume_scorer import get_score
+from services.sections_suggestions import improve_sections
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -94,6 +95,9 @@ def register_user():
     finally:
         conn.close()
 
+"""
+Make Resume Automatically Override 
+"""
 
 @app.route("/upload", methods=["POST"])
 def upload_resume():
@@ -226,6 +230,10 @@ def resume_score():
     except Exception as e:
         return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
 
+
+"""
+Make endpoint that returns resume suggestions.
+"""
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True)
