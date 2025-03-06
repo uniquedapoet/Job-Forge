@@ -5,6 +5,7 @@ import db_tools
 import os
 
 
+
 def get_score(user_id, job_posting_id):
     """Get the similarity score between a user's resume and a job posting."""
     try:
