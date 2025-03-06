@@ -6,7 +6,9 @@ import sqlite3
 import os
 from config import USER_DATABASE_URL, JOBS_DATABASE_URL
 from services.job_scraper import get_jobs_data
-from routes.jobs import validate_and_insert_jobs, create_jobs_db, test_job_data
+from routes.jobs import validate_and_insert_jobs, create_jobs_db
+import time
+from services.resume_scorer import get_score
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -28,7 +30,7 @@ def get_users():
     # Fetch all users
     cursor.execute("SELECT * FROM users")
     users = cursor.fetchall()
-
+ 
     # Get column names
     column_names = [description[0] for description in cursor.description]
 
@@ -146,6 +148,7 @@ def job_search():
         # Try inserting jobs into the database
         try:
             validate_and_insert_jobs(jobs)
+            time.sleep(1)  # Wait 1 second before querying
         except Exception as e:
             print(f"Error inserting jobs: {str(e)}")  # Log but don’t block search results
 
@@ -155,8 +158,8 @@ def job_search():
 
         # Build dynamic query for filtering
         query = "SELECT * FROM jobs WHERE 1=1"
-        params = []
-
+        params = [] 
+ 
         if job_title:
             query += " AND title LIKE ?"
             params.append(f"%{job_title}%")  # Allow partial matching
@@ -207,6 +210,22 @@ def get_jobs():
     return jsonify({"jobs": job_list})
 
 
+@app.route("/resume_score", methods=["POST"])
+def resume_score():
+    request_data = request.json
+    user_id = request_data.get("user_id")
+    job_posting_id = request_data.get("job_posting_id")
+
+    if not user_id or not job_posting_id:
+        return jsonify({"error": "User ID and job posting ID are required"}), 400
+
+    try:
+        response = get_score(user_id, job_posting_id)
+        return jsonify(response), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
+
+
 if __name__ == "__main__":
-    # test_job_data()
     app.run(host="0.0.0.0", port=5001, debug=True)

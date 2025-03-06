@@ -8,27 +8,30 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import Auth from "./auth";
-import Dashboard from "./dashboard";
-import ResumeUploader from "./resume_uploader";
+import Auth from "./auth.js";
+import Dashboard from "./dashboard.js";
+import ResumeUploader from "./resume_uploader.jsx";
 import logo from "./JF_LOGO.jpg"; //
-import JobSearch from "./Jobsearch";
+import JobSearch from "./Jobsearch.jsx";
+import { UserProvider } from "./UserContext.jsx";
 
 function App() {
   return (
     <Router>
-      <div>
-        <Header />
-        <JobSearch />
-        <div className="container">
-          <Routes>
-            <Route path="/" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/upload-resume" element={<ResumeUploader />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
+      <UserProvider>
+        <div>
+          <Header />
+          <JobSearch />
+          <div className="container">
+            <Routes>
+              <Route path="/" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/upload-resume" element={<ResumeUploader />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </div>
         </div>
-      </div>
+      </UserProvider>
     </Router>
   );
 }
@@ -38,10 +41,7 @@ function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Login Checker
-  const isLoggedIn =
-    location.pathname === "/dashboard" ||
-    location.pathname === "/upload-resume";
+  const isLoggedIn = location.pathname === "/dashboard" || location.pathname === "/upload-resume";
 
   return (
     <header className="header">
