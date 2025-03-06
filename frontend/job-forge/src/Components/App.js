@@ -1,16 +1,25 @@
 import "./App.css";
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import Auth from "./auth";
 import Dashboard from "./dashboard";
 import ResumeUploader from "./resume_uploader";
-import logo from "./JF_LOGO.jpg"; // 
+import logo from "./JF_LOGO.jpg"; //
+import JobSearch from "./Jobsearch";
 
 function App() {
   return (
     <Router>
       <div>
         <Header />
+        <JobSearch />
         <div className="container">
           <Routes>
             <Route path="/" element={<Auth />} />
@@ -30,7 +39,9 @@ function Header() {
   const navigate = useNavigate();
 
   // Login Checker
-  const isLoggedIn = location.pathname === "/dashboard" || location.pathname === "/upload-resume";
+  const isLoggedIn =
+    location.pathname === "/dashboard" ||
+    location.pathname === "/upload-resume";
 
   return (
     <header className="header">

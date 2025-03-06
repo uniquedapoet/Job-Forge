@@ -6,7 +6,7 @@ from config import JOBS_DATABASE_URL
 import os
 
 
-def create_jobs_table():
+def create_jobs_db():
     """Creates the jobs table in SQLite."""
     conn = sqlite3.connect(JOBS_DATABASE_URL)
     cursor = conn.cursor()
@@ -50,42 +50,47 @@ def create_jobs_table():
     print("Users table created successfully!")
 
 
-
 def validate_and_insert_jobs(job_data):
-    """Validates and inserts a job into the database using sqlite3."""
+    """Validates and inserts jobs into the database using sqlite3."""
     conn = sqlite3.connect(JOBS_DATABASE_URL)
     cursor = conn.cursor()
 
-    # Debugging: Print keys before inserting
-    print(f"🔹 Job Data Keys: {list(job_data.keys())}")
-    print(f"🔹 Number of Keys: {len(job_data.keys())}")
-
-    # Ensure all 28 fields have values by replacing NaN/None with an empty string
-    expected_columns = ['job_id', 'site', 'job_url', 'job_url_direct', 'title', 
+    expected_columns = ['id', 'site', 'job_url', 'job_url_direct', 'title',
                         'company', 'location', 'date_posted', 'job_type', 'salary_source',
-                        'interval', 'min_amount', 'max_amount', 'currency', 'is_remote', 
+                        'interval', 'min_amount', 'max_amount', 'currency', 'is_remote',
                         'job_level', 'job_function', 'listing_type', 'emails', 'description',
                         'company_industry', 'company_url', 'company_logo', 'company_url_direct',
-                        'company_addresses', 'company_num_employees', 'company_revenue', 
+                        'company_addresses', 'company_num_employees', 'company_revenue',
                         'company_description']
 
-    extra_columns = [key for key in job_data.keys() if key not in expected_columns]
-
-    print(f"🔹 Expected Columns: {len(expected_columns)}, Found: {len(job_data.keys())}")
-    if extra_columns:
-        print(f"❌ Extra Columns Detected: {extra_columns}")
-
-     # Extract values for insertion
-    job_values = list(job_data.values())
-
-    # Debugging: Print values before inserting
-    print(f"🔍 Job Data Values (Before Insert): {job_values}")
-    print(f"🔍 Number of Values: {len(job_values)}")
-
     try:
-        # Ensure only the required columns are inserted
-        filtered_job_data = {key: job_data[key] for key in expected_columns if key in job_data}
+        # ✅ If job_data is a DataFrame, drop duplicates and iterate over each row
+        if isinstance(job_data, pd.DataFrame):
+            job_data = job_data.drop_duplicates(subset=["id"])  # Remove duplicate job_ids
+            for _, row in job_data.iterrows():
+                validate_and_insert_jobs(row.to_dict())  # Convert row to dict and process
+            return
 
+        # ✅ If job_data is a Series (single row), convert to dict
+        if isinstance(job_data, pd.Series):
+            job_data = job_data.to_dict()
+
+        job_id = job_data.get("id")
+
+        # ✅ Fetch all existing job IDs and store them in a set for quick lookup
+        cursor.execute("SELECT job_id FROM jobs")
+        existing_jobs = {row[0] for row in cursor.fetchall() if row[0]}  # Remove empty job IDs
+
+        if job_id in existing_jobs:
+            print(f"🔄 Job {job_id} already exists in the database. Skipping insertion.")
+            return
+
+        print(f"🔍 Inserting job: {job_id}")
+
+        # ✅ Ensure only the required columns are inserted
+        filtered_job_data = {key: job_data.get(key, "") for key in expected_columns}
+
+        # ✅ Use INSERT OR IGNORE to avoid duplicate errors
         cursor.execute("""
         INSERT INTO jobs (
             job_id, site, job_url, job_url_direct, title, company, location, date_posted, job_type, 
@@ -97,16 +102,72 @@ def validate_and_insert_jobs(job_data):
         """, tuple(filtered_job_data.values()))
 
         conn.commit()
-        print(f"✅ Inserted job: {job_data['job_id']}")
+        print(f"✅ Inserted job: {job_id}")
 
     except sqlite3.IntegrityError as e:
-        print(f"❌ Error inserting job {job_data['job_id']}: {e}")
+        print(f"❌ IntegrityError: Job {job_id} could not be inserted: {e}")
 
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
 
     finally:
         conn.close()
+
+
+# def validate_and_insert_jobs(job_data: dict):
+#     """Validates and inserts a job into the database using sqlite3."""
+#     conn = sqlite3.connect(JOBS_DATABASE_URL)
+#     cursor = conn.cursor()
+
+#     # print(type(job_data))
+
+#     # Ensure all 28 fields have values by replacing NaN/None with an empty string
+#     expected_columns = ['job_id', 'site', 'job_url', 'job_url_direct', 'title',
+#                         'company', 'location', 'date_posted', 'job_type', 'salary_source',
+#                         'interval', 'min_amount', 'max_amount', 'currency', 'is_remote',
+#                         'job_level', 'job_function', 'listing_type', 'emails', 'description',
+#                         'company_industry', 'company_url', 'company_logo', 'company_url_direct',
+#                         'company_addresses', 'company_num_employees', 'company_revenue',
+#                         'company_description']
+
+#     try:
+#         job_id = job_data["id"]
+
+#         # Check if the job already exists
+#         cursor.execute("SELECT job_id FROM jobs WHERE job_id = ?", (job_id,))
+#         existing_job = cursor.fetchone()
+
+#         if existing_job:
+#             print(f"🔄 Job {job_id} already exists, skipping insertion.")
+#             return
+        
+#         print(f"🔍 Inserting job: {job_id}")
+
+#         # Ensure only the required columns are inserted
+#         filtered_job_data = {key: job_data[key]
+#                              for key in expected_columns if key in job_data}
+
+#         cursor.execute("""
+#         INSERT INTO jobs (
+#             job_id, site, job_url, job_url_direct, title, company, location, date_posted, job_type, 
+#             salary_source, interval, min_amount, max_amount, currency, is_remote, job_level, 
+#             job_function, listing_type, emails, description, company_industry, company_url, 
+#             company_logo, company_url_direct, company_addresses, company_num_employees, 
+#             company_revenue, company_description
+#         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+#         """, tuple(filtered_job_data.values()))
+
+#         conn.commit()
+#         print(f"✅ Inserted job: {job_data['job_id']}")
+
+#     except sqlite3.IntegrityError as e:
+#         print(f"❌ Error inserting job {job_data['job_id']}: {e}")
+
+#     except Exception as e:
+#         print(f"❌ Unexpected error: {e}")
+
+#     finally:
+#         conn.close()
 
 
 def jobs_csv_to_db(csv_path):
@@ -123,14 +184,10 @@ def jobs_csv_to_db(csv_path):
         "company_url": str, "company_logo": str, "company_url_direct": str, "company_addresses": str,
         "company_num_employees": str, "company_revenue": str, "company_description": str
     },
-    # Ensures multiline fields (like job descriptions) are properly read
-    quotechar='"',
-    escapechar="\\",
-    engine="python"
+        quotechar='"',
+        escapechar="\\",
+        engine="python"
     )
-
-    print(f"✅ Data has {len(job_data)} fields, expected 27.")
-    print(f"✅ Job data keys: {list(job_data.keys())}")
 
     for _, row in job_data.iterrows():
         validate_and_insert_jobs(row.to_dict())
@@ -140,11 +197,11 @@ def jobs_csv_to_db(csv_path):
 
 def test_job_data():
     """Fetches and prints user data from the database."""
-    conn=sqlite3.connect(JOBS_DATABASE_URL)
-    cursor=conn.cursor()
+    conn = sqlite3.connect(JOBS_DATABASE_URL)
+    cursor = conn.cursor()
 
-    cursor.execute("SELECT COUNT(*) FROM jobs")
-    jobs=cursor.fetchall()
+    cursor.execute("SELECT id FROM jobs")
+    jobs = cursor.fetchall()
 
     conn.close()
 
@@ -153,4 +210,4 @@ def test_job_data():
 
 
 if __name__ == "__main__":
-    test_job_data()
+    pass
