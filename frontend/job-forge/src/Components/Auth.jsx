@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "./UserContext";
-import logo from "../Icons+Styling/Logo.PNG";
+import logo from "../Icons+Styling/Logo.png";
 
 const Auth = () => {
   const [users, setUsers] = useState([]);

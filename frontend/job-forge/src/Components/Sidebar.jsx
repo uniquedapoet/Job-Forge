@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { NavLink } from "react-router-dom"; 
 import { UserContext } from "./UserContext";
 import { FaHome, FaSearch, FaUpload, FaSignOutAlt } from "react-icons/fa";
-import logo from "../Icons+Styling/Logo.PNG";
+import logo from "../Icons+Styling/Logo.png";
 import "../Icons+Styling/Sidebar.css";
 
 const Sidebar = ({ onLogout }) => {
