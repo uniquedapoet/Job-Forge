@@ -54,8 +54,18 @@ def validate_and_insert_resume(user_id, uploaded_file):
 
     conn = sqlite3.connect(RESUME_DATABASE_URL)
     cursor = conn.cursor()
-
     try:
+        cursor.execute("SELECT filename FROM resumes WHERE user_id = ?", (user_id,))
+        existing_resume = cursor.fetchone()
+
+        if existing_resume:
+            existing_file = os.path.join('data/resumes',existing_resume[0])
+            if os.path.exists(existing_file):
+                os.remove(existing_file)
+                print(f"Removed existing resume file: {existing_resume}")
+
+            cursor.execute("DELETE FROM resumes WHERE user_id = ?", (user_id,))                                       
+                
         # Generate a unique filename
         unique_filename = f"{user_id}_{uuid.uuid4().hex}.pdf"
         file_path = os.path.join('data/resumes', unique_filename)

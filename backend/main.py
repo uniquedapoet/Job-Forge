@@ -6,7 +6,11 @@ import sqlite3
 import os
 from config import USER_DATABASE_URL, JOBS_DATABASE_URL
 from services.job_scraper import get_jobs_data
-from routes.jobs import validate_and_insert_jobs, create_jobs_db, test_job_data
+from routes.jobs import validate_and_insert_jobs, create_jobs_db
+import time
+from services.resume_scorer import get_score
+from services.sections_suggestions import improve_sections
+from db_tools import correct_spelling, state_abbreviations
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -126,11 +130,17 @@ def download_resume(filename):
         return jsonify({"error": "File not found"}), 404
 
 
+"""
+Spellcheck and State names to Abreviations
+"""
 @app.route("/job_search", methods=["POST"])
 def job_search():
     request_data = request.json
     job_title = request_data.get("job_title", "").strip()
     location = request_data.get("location", "").strip()
+
+    job_title = correct_spelling(job_title)
+    location = state_abbreviations(location)
 
     if not job_title and not location:
         return jsonify({"error": "At least one search criteria is required"}), 400
@@ -138,7 +148,6 @@ def job_search():
     try:
         # Fetch jobs based on the search criteria
         jobs = get_jobs_data(job_title=job_title, location=location)
-        print(f"Fetched jobs: {jobs}")
 
         if jobs is None:
             return jsonify({"error": "No matching jobs found"}), 404
@@ -165,7 +174,7 @@ def job_search():
             query += " AND location LIKE ?"
             params.append(f"%{location}%")  # Allow partial matching
         
-        print(f"Query: {query}, Params: {params}")
+        print(f"Params: {params}")
         cursor.execute(query, params)
         jobs = cursor.fetchall()
 
