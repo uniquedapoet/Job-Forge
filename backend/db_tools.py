@@ -23,7 +23,6 @@ def get_user_by_id(user_id):
     cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
     user = cursor.fetchone()
 
-    # Get column names
     column_names = [desc[0] for desc in cursor.description]
 
     conn.close()
@@ -39,7 +38,6 @@ def get_resumes_by_user_id(user_id):
     cursor.execute("SELECT * FROM resumes WHERE user_id = ?", (user_id,))
     resumes = cursor.fetchall()
 
-    # Get column names
     column_names = [desc[0] for desc in cursor.description]
 
     conn.close()
@@ -47,6 +45,21 @@ def get_resumes_by_user_id(user_id):
     return [dict(zip(column_names, resume)) for resume in resumes]
 
 
-def update_jobs(df):   
-    pass
+def get_job(job_id):   
+    conn = sqlite3.connect(JOBS_DATABASE_URL)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM jobs WHERE job_id = ?", (job_id,))
+    job = cursor.fetchall()
+    conn.close()
+
+    if job is None:
+        return None 
+
+    columns = [desc[0] for desc in cursor.description]  
+    job_dict = dict(zip(columns, job))  
+
+    return job_dict
+
+
 
