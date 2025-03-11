@@ -68,7 +68,9 @@ const JobSearch = ({ onLogout, user }) => {
         <ul className="job-search-list">
           {jobs.map((job, index) => (
             <li key={index}>
-              {job.title} - {job.company} ({job.location})
+              <h3>{job.title}</h3>
+              <p>{job.company}</p>
+              <p>{job.location}</p>
             </li>
           ))}
         </ul>
