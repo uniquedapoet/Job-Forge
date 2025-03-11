@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
-from routes.resume import validate_and_insert_resume, allowed_file
+from routes.resume import validate_and_insert_resume, allowed_file, clear_resumes_table
 from flask_cors import CORS
 import sqlite3
 import os
