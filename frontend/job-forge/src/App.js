@@ -9,7 +9,8 @@ import {
 import Auth from "./Components/Auth.jsx";
 import Home from "./Components/Home.jsx";
 import ResumeUploader from "./Components/ResumeUploader.jsx";
-import JobSearch from "./Components/JobSearch.jsx"
+import JobSearch from "./Components/JobSearch.jsx";
+import Dashboard from "./Components/Dashboard.jsx"; // Import the Dashboard component
 import { UserProvider } from "./Components/UserContext.jsx";
 import Register from "./Components/Register.jsx";
 
@@ -28,10 +29,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Auth />} />
               <Route path="/register" element={<Register />} />
-              <Route
-                path="/home"
-                element={<Home onLogout={handleLogout} />}
-              />
+              <Route path="/home" element={<Home onLogout={handleLogout} />} />
               <Route
                 path="/upload-resume"
                 element={<ResumeUploader onLogout={handleLogout} />}
@@ -39,6 +37,10 @@ function App() {
               <Route
                 path="/job-search"
                 element={<JobSearch onLogout={handleLogout} />}
+              />
+              <Route
+                path="/dashboard"
+                element={<Dashboard onLogout={handleLogout} />}
               />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { NavLink } from "react-router-dom"; 
+import { NavLink } from "react-router-dom";
 import { UserContext } from "./UserContext";
-import { FaHome, FaSearch, FaUpload, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaSearch, FaUpload, FaSignOutAlt, FaBookmark, FaDesktop } from "react-icons/fa";
 import logo from "../Icons+Styling/Logo.png";
 import "../Icons+Styling/Sidebar.css";
 
@@ -24,6 +24,14 @@ const Sidebar = ({ onLogout }) => {
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
                 <FaHome className="icon" /> Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                <FaDesktop className="icon" /> Dashboard
               </NavLink>
             </li>
             <li>
