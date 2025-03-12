@@ -7,7 +7,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Auth from "./Components/Auth.jsx";
-import Dashboard from "./Components/Dashboard.jsx";
+import Home from "./Components/Home.jsx";
 import ResumeUploader from "./Components/ResumeUploader.jsx";
 import JobSearch from "./Components/JobSearch.jsx"
 import { UserProvider } from "./Components/UserContext.jsx";
@@ -29,8 +29,8 @@ function App() {
               <Route path="/" element={<Auth />} />
               <Route path="/register" element={<Register />} />
               <Route
-                path="/dashboard"
-                element={<Dashboard onLogout={handleLogout} />}
+                path="/home"
+                element={<Home onLogout={handleLogout} />}
               />
               <Route
                 path="/upload-resume"

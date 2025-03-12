@@ -20,7 +20,7 @@ const Sidebar = ({ onLogout }) => {
           <ul className="sidebar-nav">
             <li>
               <NavLink
-                to="/dashboard"
+                to="/home"
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
                 <FaHome className="icon" /> Home

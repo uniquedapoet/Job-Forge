@@ -35,7 +35,7 @@ const Auth = () => {
     if (user) {
       setMessage("Login Successful!");
       setUser(user);
-      navigate("/dashboard");
+      navigate("/home");
     } else {
       setMessage("Invalid Credentials");
     }

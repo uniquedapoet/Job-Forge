@@ -3,7 +3,7 @@ import MainLayout from "./MainLayout";
 import { UserContext } from "./UserContext";
 import "../Icons+Styling/MainContent.css";
 
-const Dashboard = ({ onLogout }) => {
+const Home = ({ onLogout }) => {
   const { user } = useContext(UserContext); // Access user context
 
   return (
@@ -23,4 +23,4 @@ const Dashboard = ({ onLogout }) => {
   );
 };
 
-export default Dashboard;
+export default Home;
