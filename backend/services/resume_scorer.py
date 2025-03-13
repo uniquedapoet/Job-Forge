@@ -1,21 +1,16 @@
 from services.resume_scraper import extract_text_from_pdf
 from services.score import Score
-import pandas as pd
-import db_tools
+from db_tools import get_job_desc, get_resumes_by_user_id
 import os
-
-
 
 def get_score(user_id, job_posting_id):
     """Get the similarity score between a user's resume and a job posting."""
     try:
-        # get job desctiption from jobs csv
-        JOBS_PATH = 'data/csvs/jobs.csv'
-        jobs = pd.read_csv(JOBS_PATH)
-        job_description = jobs.loc[jobs["job_id"] == job_posting_id, "description"].iloc[0]
+        # get job desctiption from jobs
+        job_description = get_job_desc(job_posting_id)
 
         # get resume content with user id
-        resume_file_name = db_tools.get_resumes_by_user_id(user_id)[0]['filename']
+        resume_file_name = get_resumes_by_user_id(user_id)[0]['filename']
         RESUME_PATH = os.path.join("data", "resumes", resume_file_name)
         raw_resume = extract_text_from_pdf(RESUME_PATH)
 
