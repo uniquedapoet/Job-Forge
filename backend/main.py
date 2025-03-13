@@ -171,8 +171,10 @@ def job_search():
         params = [] 
  
         if job_title:
-            query += " AND title LIKE ?"
-            params.append(f"%{job_title}%")  # Allow partial matching
+            words = job_title.split()  # Split the search term into individual words
+            conditions = " OR ".join(["title LIKE ?"] * len(words))  # Create conditions dynamically
+            query += f" AND ({conditions})"  # Add to the existing query
+            params.extend([f"%{word}%" for word in words])  # Append parameters for each word
 
         if location:
             query += " AND location LIKE ?"

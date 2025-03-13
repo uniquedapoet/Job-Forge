@@ -6,8 +6,9 @@ import textblob
 
 def correct_spelling(text):
     """Corrects spelling errors in a given text."""
-    corrected_text = textblob.TextBlob(text).correct()
-    return str(corrected_text)
+    # corrected_text = textblob.TextBlob(text).correct()
+    # return str(corrected_text)
+    return text
 
 
 def state_abbreviations(state_name):
