@@ -12,6 +12,7 @@ from services.resume_scorer import get_score
 from services.sections_suggestions import improve_sections
 from db_tools import correct_spelling, state_abbreviations
 
+
 # Initialize Flask app
 app = Flask(__name__)
 os.environ['TOKENIZERS_PARALLELISM'] = "false"
