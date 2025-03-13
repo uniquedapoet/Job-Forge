@@ -14,8 +14,15 @@ def extract_text_from_pdf(pdf_path):
     for page in pages:
         text += pytesseract.image_to_string(page)
 
-    return text
+    return clean_resume_text(text)
 
+def clean_resume_text(text):
+    # Replace unwanted characters with a space or appropriate formatting
+    text = re.sub(r'[«¢]', '-', text)  # Replace unusual bullets with standard "-"
+    text = re.sub(r'(?<!\w)D>[. ]{2,}', '', text)  
+    text = text.replace('--','-')
+
+    return text.strip()
 
 def detect_dominant_header_format(text):
     lines = text.split('\n')
