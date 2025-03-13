@@ -1,5 +1,18 @@
 import sqlite3
 from config import USER_DATABASE_URL, RESUME_DATABASE_URL, JOBS_DATABASE_URL
+import us 
+import textblob
+
+
+def correct_spelling(text):
+    """Corrects spelling errors in a given text."""
+    corrected_text = textblob.TextBlob(text).correct()
+    return str(corrected_text)
+
+
+def state_abbreviations(state_name):
+    state = us.states.lookup(state_name)
+    return state.abbr if state else state_name
 
 
 def get_user_by_id(user_id):

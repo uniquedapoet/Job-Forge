@@ -47,18 +47,33 @@ def create_resumes_table():
 
 def validate_and_insert_resume(user_id, uploaded_file):
     """Generates filename and file URL, then inserts into the database."""
-    print('======================',RESUME_DATABASE_URL)
+    print('======================', RESUME_DATABASE_URL)
     if not os.path.exists(RESUME_DATABASE_URL):
-        print(f"❌ Database file {RESUME_DATABASE_URL} does not exist. Creating...")
+        print(
+            f"❌ Database file {RESUME_DATABASE_URL} does not exist. Creating...")
         create_resumes_table()
-
+    
     conn = sqlite3.connect(RESUME_DATABASE_URL)
     cursor = conn.cursor()
-
     try:
+        cursor.execute(
+            "SELECT filename FROM resumes WHERE user_id = ?", (user_id,))
+        existing_resume = cursor.fetchone()
+
+        if existing_resume:
+            existing_file = os.path.join('backend/data/resumes', existing_resume[0])
+            try:
+                os.remove(existing_file)
+                print(f"✅ Removed existing resume file: {existing_resume[0]}")
+            except Exception as e:
+                print(f"❌ Error removing existing file: {e}")
+
+        cursor.execute("DELETE FROM resumes WHERE user_id = ?", (user_id,))
+        conn.commit()
+
         # Generate a unique filename
         unique_filename = f"{user_id}_{uuid.uuid4().hex}.pdf"
-        file_path = os.path.join('data/resumes', unique_filename)
+        file_path = os.path.join('backend/data/resumes', unique_filename)
 
         # Save the file locally
         with open(file_path, "wb") as f:
@@ -74,7 +89,8 @@ def validate_and_insert_resume(user_id, uploaded_file):
         """, (user_id, unique_filename, file_url))
 
         conn.commit()
-        print(f"Inserted resume for user_id: {user_id}, File: {unique_filename}")
+        print(
+            f"Inserted resume for user_id: {user_id}, File: {unique_filename}")
 
     except sqlite3.IntegrityError as e:
         print(f"Error inserting resume for user_id {user_id}: {e}")
@@ -87,4 +103,15 @@ def allowed_file(filename):
     """Check if the uploaded file has an allowed extension."""
     return '.' in filename and (
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-        )
+    )
+
+
+def clear_resumes_table():
+    """Clears the resumes table in SQLite."""
+    conn = sqlite3.connect(RESUME_DATABASE_URL)
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM resumes")
+    conn.commit()
+    conn.close()
+    print("✅ Resumes table cleared.")
