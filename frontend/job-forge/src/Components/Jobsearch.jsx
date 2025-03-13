@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import MainLayout from "./MainLayout";
 import "../Icons+Styling/MainContent.css";
+import { UserContext } from "./UserContext"; // Import UserContext
 
-const JobSearch = ({ onLogout, user }) => {
+const JobSearch = ({ onLogout }) => {
   const [jobTitle, setJobTitle] = useState("");
   const [location, setLocation] = useState("");
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
+  // Use savedJobs and setSavedJobs from UserContext
+  const { user, savedJobs, setSavedJobs } = useContext(UserContext);
+
   useEffect(() => {
     if (user) {
-      setLocation(user.city || ""); 
+      setLocation(user.city || "");
       setSuggestions(user.job_titles ? user.job_titles.split(",").map(title => title.trim()) : []);
     }
   }, [user]);
@@ -33,6 +37,16 @@ const JobSearch = ({ onLogout, user }) => {
     } catch (err) {
       setError(err.message);
       setJobs([]);
+    }
+  };
+
+  const handleSaveJob = (job) => {
+    if (savedJobs.some(savedJob => savedJob.id === job.id)) {
+      // If the job is already saved, unsave it
+      setSavedJobs(savedJobs.filter(savedJob => savedJob.id !== job.id));
+    } else {
+      // Otherwise, save the job
+      setSavedJobs([...savedJobs, job]);
     }
   };
 
@@ -68,7 +82,19 @@ const JobSearch = ({ onLogout, user }) => {
         <ul className="job-search-list">
           {jobs.map((job, index) => (
             <li key={index}>
-              {job.title} - {job.company} ({job.location})
+              <h3>{job.title}</h3>
+              <p>{job.company}</p>
+              <p>{job.location}</p>
+              <button
+                onClick={() => handleSaveJob(job)}
+                className="job-search-button"
+                style={{
+                  backgroundColor: savedJobs.some(savedJob => savedJob.id === job.id) ? "#6c757d" : "#ba5624",
+                  marginTop: "10px",
+                }}
+              >
+                {savedJobs.some(savedJob => savedJob.id === job.id) ? "Remove" : "Save"}
+              </button>
             </li>
           ))}
         </ul>
