@@ -1,14 +1,16 @@
 from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
-from routes.resume import validate_and_insert_resume, allowed_file
+from routes.resume import validate_and_insert_resume, allowed_file, clear_resumes_table
 from flask_cors import CORS
 import sqlite3
 import os
 from config import USER_DATABASE_URL, JOBS_DATABASE_URL
 from services.job_scraper import get_jobs_data
-from routes.jobs import validate_and_insert_jobs, create_jobs_db
+from routes.jobs import validate_and_insert_jobs, create_jobs_db, test_job_data
 import time
 from services.resume_scorer import get_score
+from services.sections_suggestions import improve_sections
+from db_tools import correct_spelling, state_abbreviations
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -94,6 +96,9 @@ def register_user():
     finally:
         conn.close()
 
+"""
+Make Resume Automatically Override 
+"""
 
 @app.route("/upload", methods=["POST"])
 def upload_resume():
@@ -128,11 +133,17 @@ def download_resume(filename):
         return jsonify({"error": "File not found"}), 404
 
 
+"""
+Spellcheck and State names to Abreviations
+"""
 @app.route("/job_search", methods=["POST"])
 def job_search():
     request_data = request.json
     job_title = request_data.get("job_title", "").strip()
     location = request_data.get("location", "").strip()
+
+    job_title = correct_spelling(job_title)
+    location = state_abbreviations(location)
 
     if not job_title and not location:
         return jsonify({"error": "At least one search criteria is required"}), 400
@@ -140,7 +151,6 @@ def job_search():
     try:
         # Fetch jobs based on the search criteria
         jobs = get_jobs_data(job_title=job_title, location=location)
-        print(f"Fetched jobs: {jobs}")
 
         if jobs is None:
             return jsonify({"error": "No matching jobs found"}), 404
@@ -161,14 +171,16 @@ def job_search():
         params = [] 
  
         if job_title:
-            query += " AND title LIKE ?"
-            params.append(f"%{job_title}%")  # Allow partial matching
+            words = job_title.split()  # Split the search term into individual words
+            conditions = " OR ".join(["title LIKE ?"] * len(words))  # Create conditions dynamically
+            query += f" AND ({conditions})"  # Add to the existing query
+            params.extend([f"%{word}%" for word in words])  # Append parameters for each word
 
         if location:
             query += " AND location LIKE ?"
             params.append(f"%{location}%")  # Allow partial matching
         
-        print(f"Query: {query}, Params: {params}")
+        print(f"Params: {params}")
         cursor.execute(query, params)
         jobs = cursor.fetchall()
 
@@ -212,19 +224,43 @@ def get_jobs():
 
 @app.route("/resume_score", methods=["POST"])
 def resume_score():
+    print(f"Received POST request: {request.json}")  # Debugging log
+
     request_data = request.json
     user_id = request_data.get("user_id")
     job_posting_id = request_data.get("job_posting_id")
+
+    print(f"User ID: {user_id}, Job Posting ID: {job_posting_id}")
 
     if not user_id or not job_posting_id:
         return jsonify({"error": "User ID and job posting ID are required"}), 400
 
     try:
+        print("Computing similarity score...")
         response = get_score(user_id, job_posting_id)
+        time.sleep(1)  
+        print(f'Similarity score: {response}')
         return jsonify(response), 200
 
     except Exception as e:
         return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
+
+
+"""
+Make endpoint that returns resume suggestions.
+"""
+@app.route("/resume/suggestions", methods=["POST"])
+def get_resume_suggestions():
+    user_id = request.json.get("user_id")
+    
+    if not user_id:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    try:
+        suggestions = improve_sections(user_id)
+        return jsonify({"success": True, "suggestions": suggestions})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":

@@ -203,9 +203,11 @@ etc
 ---
 
 ## **Contributors**
-Eduardo Benjamin
-Jaden Castle
-Jackson Giezma
+
+* Eduardo Benjamin
+* Jaden Castle
+* Jackson Giezma
+
 ---
 
 ## **License**
