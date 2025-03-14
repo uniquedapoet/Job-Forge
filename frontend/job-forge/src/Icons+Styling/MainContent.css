@@ -6,6 +6,8 @@
   padding: 20px;
   flex: 1;
   height: 100vh;
+  margin-left: 350px;
+  transition: margin-left 0.3s ease;
 }
 
 .main-content-card {
@@ -78,6 +80,8 @@
   padding: 20px;
   flex: 1;
   height: 100vh;
+  margin-left: 350px;
+  transition: margin-left 0.3s ease;
 }
 
 .job-search-header {
@@ -197,4 +201,15 @@
 .dashboard-title-message {
   text-align: center;
   color: #666;
+}
+@media (max-width: 768px) {
+  .main-content-container, .job-search-container, .job-search-header {
+    margin-left: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-container, .job-search-container, .job-search-header {
+    margin-left: 0; 
+  }
 }

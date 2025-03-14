@@ -4,7 +4,7 @@ import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext";
 
 const Dashboard = ({ onLogout }) => {
-  const { savedJobs, user } = useContext(UserContext); // Get savedJobs and user from UserContext
+  const { savedJobs, user, setSavedJobs } = useContext(UserContext); // Get savedJobs, user, and setSavedJobs from UserContext
   const [scores, setScores] = useState({}); // State to store resume scores
 
   // Fetch resume scores for all saved jobs
@@ -21,8 +21,6 @@ const Dashboard = ({ onLogout }) => {
               job_posting_id: job.id, // Assuming job.id is the job posting ID
             }),
           });
-
-          console.log("response", response);
 
           const data = await response.json();
           if (response.ok) {
@@ -44,6 +42,12 @@ const Dashboard = ({ onLogout }) => {
     }
   }, [savedJobs, user]);
 
+  // Function to handle unsaving a job
+  const handleUnsaveJob = (jobId) => {
+    const updatedSavedJobs = savedJobs.filter((job) => job.id !== jobId);
+    setSavedJobs(updatedSavedJobs); // Update the savedJobs list in the context
+  };
+
   return (
     <MainLayout onLogout={onLogout} title="Saved Jobs">
       <div className="job-search-container">
@@ -58,6 +62,16 @@ const Dashboard = ({ onLogout }) => {
                   <p>
                     <strong>Resume Score:</strong> {scores[job.id] || "Loading..."}
                   </p>
+                  <button
+                    onClick={() => handleUnsaveJob(job.id)} // Call handleUnsaveJob when clicked
+                    className="job-search-button"
+                    style={{
+                      backgroundColor: "#ba5624",
+                      marginTop: "10px",
+                    }}
+                  >
+                    Unsave
+                  </button>
                 </div>
               </li>
             ))
