@@ -155,11 +155,18 @@
   margin: 5px 0;
   color: #666;
 }
+
 .dashboard-title-message {
-  margin-top: 10px;
-  color: #ba5624;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  max-width: 500px;
+  width: 100%;
   text-align: center;
-  margin-left: 350px;
+  color: #666;
+  margin: 0 auto;
+  margin-top: 20px;
 }
 .job-search-item {
   background-color: #fff;
@@ -198,10 +205,6 @@
   color: #ba5624;
 }
 
-.dashboard-title-message {
-  text-align: center;
-  color: #666;
-}
 @media (max-width: 768px) {
   .main-content-container, .job-search-container, .job-search-header {
     margin-left: 250px;
