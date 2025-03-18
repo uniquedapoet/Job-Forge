@@ -6,16 +6,17 @@ import sqlite3
 import os
 from config import USER_DATABASE_URL, JOBS_DATABASE_URL
 from services.job_scraper import get_jobs_data
-from routes.jobs import validate_and_insert_jobs, create_jobs_db
+from routes.jobs import validate_and_insert_jobs, create_jobs_db, test_job_data
 import time
 from services.resume_scorer import get_score
 from services.sections_suggestions import improve_sections
 from db_tools import correct_spelling, state_abbreviations
 from routes.users import create_saved_jobs_table
 
+
 # Initialize Flask app
 app = Flask(__name__)
-
+os.environ['TOKENIZERS_PARALLELISM'] = "false"
 # Allow CORS for all routes
 CORS(app, origins=["http://localhost:3000"])
 
@@ -178,11 +179,9 @@ def job_search():
 
         if job_title:
             words = job_title.split()  # Split the search term into individual words
-            # Create conditions dynamically
-            conditions = " OR ".join(["title LIKE ?"] * len(words))
+            conditions = " OR ".join(["title LIKE ?"] * len(words))  # Create conditions dynamically
             query += f" AND ({conditions})"  # Add to the existing query
-            # Append parameters for each word
-            params.extend([f"%{word}%" for word in words])
+            params.extend([f"%{word}%" for word in words])  # Append parameters for each word
 
         if location:
             query += " AND location LIKE ?"
@@ -232,16 +231,21 @@ def get_jobs():
 
 @app.route("/resume_score", methods=["POST"])
 def resume_score():
+    print(f"Received POST request: {request.json}")  # Debugging log
+
     request_data = request.json
     user_id = request_data.get("user_id")
     job_posting_id = request_data.get("job_posting_id")
+
+    print(f"User ID: {user_id}, Job Posting ID: {job_posting_id}")
 
     if not user_id or not job_posting_id:
         return jsonify({"error": "User ID and job posting ID are required"}), 400
 
     try:
+        print("Computing similarity score...")
         response = get_score(user_id, job_posting_id)
-        time.sleep(1)
+        time.sleep(1)  
         print(f'Similarity score: {response}')
         return jsonify(response), 200
 

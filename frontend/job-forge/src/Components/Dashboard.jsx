@@ -17,10 +17,12 @@ const Dashboard = ({ onLogout }) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              user_id: user._id, // Assuming user._id is the user's ID
+              user_id: user.id, // Assuming user._id is the user's ID
               job_posting_id: job.id, // Assuming job.id is the job posting ID
             }),
           });
+
+          console.log("response", response);
 
           const data = await response.json();
           if (response.ok) {

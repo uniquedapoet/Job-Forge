@@ -200,7 +200,7 @@ def test_job_data():
     conn = sqlite3.connect(JOBS_DATABASE_URL)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id FROM jobs")
+    cursor.execute("SELECT * FROM jobs WHERE id = 1734")
     jobs = cursor.fetchall()
 
     conn.close()

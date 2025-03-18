@@ -6,8 +6,9 @@ import textblob
 
 def correct_spelling(text):
     """Corrects spelling errors in a given text."""
-    corrected_text = textblob.TextBlob(text).correct()
-    return str(corrected_text)
+    # corrected_text = textblob.TextBlob(text).correct()
+    # return str(corrected_text)
+    return text
 
 
 def state_abbreviations(state_name):
@@ -44,22 +45,16 @@ def get_resumes_by_user_id(user_id):
 
     return [dict(zip(column_names, resume)) for resume in resumes]
 
-
-def get_job(job_id):   
+def get_job_desc(job_id):
     conn = sqlite3.connect(JOBS_DATABASE_URL)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM jobs WHERE job_id = ?", (job_id,))
-    job = cursor.fetchall()
+    cursor.execute("SELECT description FROM jobs WHERE id = ?", (job_id,))
+    # cursor.execute("SELECT * FROM jobs")
+    job = cursor.fetchone()
     conn.close()
 
-    if job is None:
-        return None 
-
-    columns = [desc[0] for desc in cursor.description]  
-    job_dict = dict(zip(columns, job))  
-
-    return job_dict
+    return job[0]
 
 
 
