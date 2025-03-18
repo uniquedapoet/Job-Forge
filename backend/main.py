@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
-from routes.resume import validate_and_insert_resume, allowed_file, clear_resumes_table
+from routes.resume import validate_and_insert_resume, allowed_file
 from flask_cors import CORS
 import sqlite3
 import os
@@ -11,6 +11,7 @@ import time
 from services.resume_scorer import get_score
 from services.sections_suggestions import improve_sections
 from db_tools import correct_spelling, state_abbreviations
+from routes.users import create_saved_jobs_table
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -32,7 +33,7 @@ def get_users():
     # Fetch all users
     cursor.execute("SELECT * FROM users")
     users = cursor.fetchall()
- 
+
     # Get column names
     column_names = [description[0] for description in cursor.description]
 
@@ -96,16 +97,18 @@ def register_user():
     finally:
         conn.close()
 
+
 """
 Make Resume Automatically Override 
 """
+
 
 @app.route("/upload", methods=["POST"])
 def upload_resume():
     """Upload a resume file to the server. and store it. Called with file """
     if 'file' not in request.files:
         return jsonify({"error": "No file part in the request"}), 400
-    
+
     file = request.files['file']
     user_id = request.form.get('user_id')
 
@@ -114,9 +117,9 @@ def upload_resume():
 
     if file.filename == '':
         return jsonify({"error": "No file selected for uploading"}), 400
-    
+
     if file and allowed_file(file.filename):
-        validate_and_insert_resume(user_id, file) 
+        validate_and_insert_resume(user_id, file)
         return jsonify({"message": "File uploaded successfully"}), 201
 
     return jsonify({"error": "File type not allowed"}), 400
@@ -126,7 +129,7 @@ def upload_resume():
 def download_resume(filename):
     """Flask endpoint to serve a stored resume."""
     file_path = os.path.join('data/resumes', secure_filename(filename))
-    
+
     if os.path.exists(file_path):
         return send_from_directory('data/resumes', filename, as_attachment=True)
     else:
@@ -136,6 +139,8 @@ def download_resume(filename):
 """
 Spellcheck and State names to Abreviations
 """
+
+
 @app.route("/job_search", methods=["POST"])
 def job_search():
     request_data = request.json
@@ -160,7 +165,8 @@ def job_search():
             validate_and_insert_jobs(jobs)
             time.sleep(1)  # Wait 1 second before querying
         except Exception as e:
-            print(f"Error inserting jobs: {str(e)}")  # Log but don’t block search results
+            # Log but don’t block search results
+            print(f"Error inserting jobs: {str(e)}")
 
         # Query the database to get relevant jobs
         conn = sqlite3.connect(JOBS_DATABASE_URL)
@@ -168,16 +174,20 @@ def job_search():
 
         # Build dynamic query for filtering
         query = "SELECT * FROM jobs WHERE 1=1"
-        params = [] 
- 
+        params = []
+
         if job_title:
-            query += " AND title LIKE ?"
-            params.append(f"%{job_title}%")  # Allow partial matching
+            words = job_title.split()  # Split the search term into individual words
+            # Create conditions dynamically
+            conditions = " OR ".join(["title LIKE ?"] * len(words))
+            query += f" AND ({conditions})"  # Add to the existing query
+            # Append parameters for each word
+            params.extend([f"%{word}%" for word in words])
 
         if location:
             query += " AND location LIKE ?"
             params.append(f"%{location}%")  # Allow partial matching
-        
+
         print(f"Params: {params}")
         cursor.execute(query, params)
         jobs = cursor.fetchall()
@@ -210,7 +220,7 @@ def get_jobs():
     # Fetch all jobs
     cursor.execute("SELECT * FROM jobs")
     jobs = cursor.fetchall()
-            
+
     # Get column names
     column_names = [description[0] for description in cursor.description]
 
@@ -231,19 +241,56 @@ def resume_score():
 
     try:
         response = get_score(user_id, job_posting_id)
+        time.sleep(1)
+        print(f'Similarity score: {response}')
         return jsonify(response), 200
 
     except Exception as e:
         return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
 
 
+@app.route("/save_job" methods=["POST"])
+def save_job():
+    job_data = request.json
+    user_id = job_data.get("user_id")
+    job_id = job_data.get("job_id")
+
+    if not user_id or not job_id:
+        return jsonify({"error": "User ID and job ID are required"}), 400
+
+    try:
+        conn = sqlite3.connect(USER_DATABASE_URL)
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                """ INSERT INTO saved_jobs (user_id, job_id) VALUES (?, ?) """, (user_id, job_id))
+            conn.commit()
+            conn.close()
+            return jsonify({"message": "Job saved successfully"}), 201
+
+        except sqlite3.IntegrityError as e:
+            create_saved_jobs_table()
+
+            cursor.execute(
+                """ INSERT INTO saved_jobs (user_id, job_id) VALUES (?, ?) """, (user_id, job_id))
+            conn.commit()
+            conn.close()
+            return jsonify({"message": "Job saved successfully"}), 201
+
+    except Exception as e:
+        return jsonify({"error": f"Error saving job: {str(e)}"}), 500
+
+
 """
 Make endpoint that returns resume suggestions.
 """
+
+
 @app.route("/resume/suggestions", methods=["POST"])
 def get_resume_suggestions():
     user_id = request.json.get("user_id")
-    
+
     if not user_id:
         return jsonify({"error": "Missing user_id"}), 400
 

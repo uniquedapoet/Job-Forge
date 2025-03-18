@@ -29,6 +29,23 @@ def create_users_table():
     print("Users table created successfully!")
 
 
+def create_saved_jobs_table():
+    conn = sqlite3.connect(USER_DATABASE_URL)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS saved_jobs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            job_id INTEGER NOT NULL,
+            saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+                   """)
+    conn.commit()
+    conn.close()
+
+
 def validate_and_insert_user(user_data):
     """Validates and inserts a user into the database using sqlite3."""
     conn = sqlite3.connect(USER_DATABASE_URL)
@@ -92,7 +109,5 @@ def test_user_data():
         print(user)
 
 
-
-        
 if __name__ == "__main__":
     pass
