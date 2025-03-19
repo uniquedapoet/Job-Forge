@@ -242,10 +242,7 @@ def resume_score():
             return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
 
     # return jsonify({"score": job_score, "status": "success"}), 200
-    return (
-        (jsonify(job_score), 200
-         ) if "%" in job_score else (
-            jsonify(round(job_score*100), '%'), 200))
+    return jsonify(job_score), 200
 
 
 @app.route("/resume/suggestions", methods=["POST"])
