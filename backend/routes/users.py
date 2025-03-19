@@ -38,12 +38,52 @@ def create_saved_jobs_table():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             job_id INTEGER NOT NULL,
+            job_score FLOAT,
             saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
                    """)
     conn.commit()
     conn.close()
+
+
+def save_job_data(user_id: int, job_id: int, job_score: float = None):
+    conn = sqlite3.connect(USER_DATABASE_URL)
+    cursor = conn.cursor()
+
+    # If job_score is provided, update it. Otherwise, insert the job.
+    if job_score is not None:
+        query = """ UPDATE saved_jobs SET job_score = ? WHERE user_id = ? AND job_id = ? """
+        params = (job_score, user_id, job_id)
+    else:
+        query = """ INSERT INTO saved_jobs (user_id, job_id) VALUES (?, ?) """
+        params = (user_id, job_id)
+
+    try:
+        cursor.execute(query, params)
+
+    except Exception as e:
+        create_saved_jobs_table()
+        cursor.execute(query, params)
+
+    conn.commit()
+    conn.close()
+
+
+def get_job_score(user_id: int, job_id: int) -> str:
+    try:
+        conn = sqlite3.connect(USER_DATABASE_URL)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT job_score FROM saved_jobs WHERE user_id = ? AND job_id = ?", (user_id, job_id))
+
+        job_score = cursor.fetchone()
+        conn.close()
+
+        return job_score[0]
+    except Exception as e:
+        print(f"Error getting job score: {e}")
+        return None
 
 
 def validate_and_insert_user(user_data):

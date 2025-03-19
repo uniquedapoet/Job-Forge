@@ -22,11 +22,11 @@ const Dashboard = ({ onLogout }) => {
             }),
           });
 
-          console.log("response", response);
-
           const data = await response.json();
+          console.log("data", data);
           if (response.ok) {
-            scoresData[job.id] = data.score; // Store the score for this job
+            scoresData[job.id] = data; // Store the score for this job
+            console.log("Fetched score for job:", job.id, data);
           } else {
             console.error("Failed to fetch score for job:", job.id, data.error);
             scoresData[job.id] = "N/A"; // Use "N/A" if the score cannot be fetched

@@ -6,12 +6,12 @@ import sqlite3
 import os
 from config import USER_DATABASE_URL, JOBS_DATABASE_URL
 from services.job_scraper import get_jobs_data
-from routes.jobs import validate_and_insert_jobs, create_jobs_db, test_job_data
+from routes.jobs import validate_and_insert_jobs, create_jobs_db
 import time
 from services.resume_scorer import get_score
 from services.sections_suggestions import improve_sections
 from db_tools import correct_spelling, state_abbreviations
-from routes.users import create_saved_jobs_table
+from routes.users import create_saved_jobs_table, get_job_score, save_job_data
 
 
 # Initialize Flask app
@@ -99,11 +99,6 @@ def register_user():
         conn.close()
 
 
-"""
-Make Resume Automatically Override 
-"""
-
-
 @app.route("/upload", methods=["POST"])
 def upload_resume():
     """Upload a resume file to the server. and store it. Called with file """
@@ -135,11 +130,6 @@ def download_resume(filename):
         return send_from_directory('data/resumes', filename, as_attachment=True)
     else:
         return jsonify({"error": "File not found"}), 404
-
-
-"""
-Spellcheck and State names to Abreviations
-"""
 
 
 @app.route("/job_search", methods=["POST"])
@@ -179,9 +169,11 @@ def job_search():
 
         if job_title:
             words = job_title.split()  # Split the search term into individual words
-            conditions = " OR ".join(["title LIKE ?"] * len(words))  # Create conditions dynamically
+            # Create conditions dynamically
+            conditions = " OR ".join(["title LIKE ?"] * len(words))
             query += f" AND ({conditions})"  # Add to the existing query
-            params.extend([f"%{word}%" for word in words])  # Append parameters for each word
+            # Append parameters for each word
+            params.extend([f"%{word}%" for word in words])
 
         if location:
             query += " AND location LIKE ?"
@@ -231,64 +223,29 @@ def get_jobs():
 
 @app.route("/resume_score", methods=["POST"])
 def resume_score():
-    print(f"Received POST request: {request.json}")  # Debugging log
-
     request_data = request.json
     user_id = request_data.get("user_id")
     job_posting_id = request_data.get("job_posting_id")
-
     print(f"User ID: {user_id}, Job Posting ID: {job_posting_id}")
 
     if not user_id or not job_posting_id:
         return jsonify({"error": "User ID and job posting ID are required"}), 400
 
-    try:
-        print("Computing similarity score...")
-        response = get_score(user_id, job_posting_id)
-        time.sleep(1)  
-        print(f'Similarity score: {response}')
-        return jsonify(response), 200
+    job_score = get_job_score(user_id, job_posting_id)
+    print(f"Job score: {job_score}")
 
-    except Exception as e:
-        return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
-
-
-@app.route("/save_job" methods=["POST"])
-def save_job():
-    job_data = request.json
-    user_id = job_data.get("user_id")
-    job_id = job_data.get("job_id")
-
-    if not user_id or not job_id:
-        return jsonify({"error": "User ID and job ID are required"}), 400
-
-    try:
-        conn = sqlite3.connect(USER_DATABASE_URL)
-        cursor = conn.cursor()
-
+    if not job_score:
         try:
-            cursor.execute(
-                """ INSERT INTO saved_jobs (user_id, job_id) VALUES (?, ?) """, (user_id, job_id))
-            conn.commit()
-            conn.close()
-            return jsonify({"message": "Job saved successfully"}), 201
+            job_score = get_score(user_id, job_posting_id)
 
-        except sqlite3.IntegrityError as e:
-            create_saved_jobs_table()
+        except Exception as e:
+            return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
 
-            cursor.execute(
-                """ INSERT INTO saved_jobs (user_id, job_id) VALUES (?, ?) """, (user_id, job_id))
-            conn.commit()
-            conn.close()
-            return jsonify({"message": "Job saved successfully"}), 201
-
-    except Exception as e:
-        return jsonify({"error": f"Error saving job: {str(e)}"}), 500
-
-
-"""
-Make endpoint that returns resume suggestions.
-"""
+    # return jsonify({"score": job_score, "status": "success"}), 200
+    return (
+        (jsonify(job_score), 200
+         ) if "%" in job_score else (
+            jsonify(round(job_score*100), '%'), 200))
 
 
 @app.route("/resume/suggestions", methods=["POST"])
