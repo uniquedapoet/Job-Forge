@@ -34,8 +34,9 @@ def get_users():
     if not users:
         User.from_csv("data/csvs/user_data.csv")
         users = User.users()
-    
-    user_list = [{column.key: getattr(user, column.key) for column in User.__table__.columns} for user in users]
+
+    user_list = [{column.key: getattr(
+        user, column.key) for column in User.__table__.columns} for user in users]
 
     return jsonify({"users": user_list})
 
@@ -46,10 +47,10 @@ def get_user(user_id):
     user = User.user(user_id)
 
     user = {
-        column.key: getattr(user, column.key) 
+        column.key: getattr(user, column.key)
         for column in User.__table__.columns
-        }
-    
+    }
+
     if user:
         return jsonify({"user": user})
     else:
@@ -68,7 +69,7 @@ def register_user():
         return jsonify({"message": "User created successfully"}), 201
 
     except Exception as e:
-        return jsonify({"error": f"Error creating user: {str(e)}"}), 400  
+        return jsonify({"error": f"Error creating user: {str(e)}"}), 400
 
 
 @app.route("/upload", methods=["POST"])
@@ -213,7 +214,6 @@ def resume_score():
 
         except Exception as e:
             return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
-
 
     return jsonify(round((job_score*100), 2)), 200
 

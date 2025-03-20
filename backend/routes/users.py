@@ -1,10 +1,16 @@
 import os
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Float, TIMESTAMP, func
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    Float,
+    TIMESTAMP,
+    func
+)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import relationship
 import pandas as pd
-from config import USER_DATABASE_URL
-import sqlite3
 from db import UserEngine, UserSession
 
 engine = UserEngine
@@ -30,7 +36,7 @@ class User(Base):
     @staticmethod
     def create_tables():
         print("🔧 Ensuring tables exist in the database...")
-        Base.metadata.create_all(UserEngine, checkfirst=True)  # ✅ Ensures tables are only created if they don't exist
+        Base.metadata.create_all(UserEngine, checkfirst=True)
         print("✅ Tables verified!")
 
     @staticmethod
@@ -78,7 +84,7 @@ class User(Base):
         session.close()
 
         return users
-    
+
     @staticmethod
     def user(user_id: int):
         session = Session()
@@ -99,7 +105,7 @@ class SavedJob(Base):
 
     @staticmethod
     def create_tables():
-        Base.metadata.create_all(engine, checkfirst=True)  
+        Base.metadata.create_all(engine, checkfirst=True)
 
     def save(self):
         try:
