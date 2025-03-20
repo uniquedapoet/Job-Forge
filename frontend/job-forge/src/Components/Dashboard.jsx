@@ -4,13 +4,12 @@ import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext";
 
 const Dashboard = ({ onLogout }) => {
-  const { savedJobs, user } = useContext(UserContext); // Get savedJobs and user from UserContext
-  const [scores, setScores] = useState({}); // State to store resume scores
+  const { savedJobs, user, setSavedJobs, scores, setScores } = useContext(UserContext); // Get scores and setScores from UserContext
 
-  // Fetch resume scores for all saved jobs
+  // Fetch resume scores for all saved jobs that don't have a score yet
   useEffect(() => {
     const fetchScores = async () => {
-      const scoresData = {};
+      const scoresData = { ...scores }; // Start with existing scores
       for (const job of savedJobs) {
         try {
           const response = await fetch("http://localhost:5001/resume_score", {
@@ -23,12 +22,8 @@ const Dashboard = ({ onLogout }) => {
           });
 
           const data = await response.json();
-          console.log("data", data);
-          console.log("Fetched score for job:", job.id, data);
-
           if (response.ok) {
-            scoresData[job.id] = data; // Store the score for this job
-            console.log("Fetched score for job:", job.id, data);
+            scoresData[job.id] = data.score; // Store the score for this job
           } else {
             console.error("Failed to fetch score for job:", job.id, data.error);
             scoresData[job.id] = "N/A"; // Use "N/A" if the score cannot be fetched
@@ -44,7 +39,13 @@ const Dashboard = ({ onLogout }) => {
     if (savedJobs.length > 0 && user) {
       fetchScores();
     }
-  }, [savedJobs, user]);
+  }, [savedJobs, user]); // Only run when savedJobs or user changes
+
+  // Function to handle unsaving a job
+  const handleUnsaveJob = (jobId) => {
+    const updatedSavedJobs = savedJobs.filter((job) => job.id !== jobId);
+    setSavedJobs(updatedSavedJobs); // Update the savedJobs list in the context
+  };
 
   return (
     <MainLayout onLogout={onLogout} title="Saved Jobs">
@@ -60,6 +61,16 @@ const Dashboard = ({ onLogout }) => {
                   <p>
                     <strong>Resume Score:</strong> {scores[job.id] || "Loading..."}
                   </p>
+                  <button
+                    onClick={() => handleUnsaveJob(job.id)}
+                    className="job-search-button"
+                    style={{
+                      backgroundColor: "#ba5624",
+                      marginTop: "10px",
+                    }}
+                  >
+                    Unsave
+                  </button>
                 </div>
               </li>
             ))
