@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
-from werkzeug.utils import secure_filename
-from routes.resume import validate_and_insert_resume, allowed_file
+from routes.resume import allowed_file
 from flask_cors import CORS
 import sqlite3
 import os
@@ -11,7 +10,7 @@ import time
 from services.resume_scorer import get_score
 from services.sections_suggestions import improve_sections
 from db_tools import correct_spelling, state_abbreviations
-from routes.users import User, SavedJob
+from routes.users import User, SavedJob, Resume
 
 
 # Initialize Flask app
@@ -45,11 +44,6 @@ def get_users():
 @app.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     user = User.user(user_id)
-
-    user = {
-        column.key: getattr(user, column.key)
-        for column in User.__table__.columns
-    }
 
     if user:
         return jsonify({"user": user})
@@ -88,21 +82,10 @@ def upload_resume():
         return jsonify({"error": "No file selected for uploading"}), 400
 
     if file and allowed_file(file.filename):
-        validate_and_insert_resume(user_id, file)
+        Resume.insert_resume(user_id, file)
         return jsonify({"message": "File uploaded successfully"}), 201
 
     return jsonify({"error": "File type not allowed"}), 400
-
-
-@app.route("/download/<filename>", methods=["GET"])
-def download_resume(filename):
-    """Flask endpoint to serve a stored resume."""
-    file_path = os.path.join('data/resumes', secure_filename(filename))
-
-    if os.path.exists(file_path):
-        return send_from_directory('data/resumes', filename, as_attachment=True)
-    else:
-        return jsonify({"error": "File not found"}), 404
 
 
 @app.route("/job_search", methods=["POST"])
@@ -233,4 +216,4 @@ def get_resume_suggestions():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    

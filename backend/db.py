@@ -13,4 +13,3 @@ os.makedirs(db_dir, exist_ok=True)
 UserEngine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False}, echo=True)
 UserSession = sessionmaker(bind=UserEngine)
 
-print(f"✅ Database path: {db_path}")

@@ -12,6 +12,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 import pandas as pd
 from db import UserEngine, UserSession
+import uuid
+
 
 engine = UserEngine
 Session = UserSession
@@ -31,13 +33,16 @@ class User(Base):
     zipcode = Column(String)
     job_titles = Column(String)
 
-    saved_jobs = relationship("SavedJob", back_populates="user")
+    resumes = relationship(
+        "Resume", back_populates="user", cascade="all, delete")
+    saved_jobs = relationship(
+        "SavedJob", back_populates="user", cascade="all, delete")
 
     @staticmethod
     def create_tables():
-        print("🔧 Ensuring tables exist in the database...")
+        print("Ensuring tables exist in the database...")
         Base.metadata.create_all(UserEngine, checkfirst=True)
-        print("✅ Tables verified!")
+        print("Tables verified!")
 
     @staticmethod
     def register(user_data):
@@ -69,8 +74,9 @@ class User(Base):
 
         for _, row in user_data.iterrows():
             user = User(**row.to_dict())
-            user.save(session)
+            session.add(user)
 
+        session.commit()
         session.close()
         print("User data loaded successfully!")
 
@@ -90,6 +96,10 @@ class User(Base):
         session = Session()
         user = session.query(User).filter(User.id == user_id).first()
         session.close()
+        user = {
+            column.key: getattr(user, column.key)
+            for column in User.__table__.columns
+        }
         return user
 
 
@@ -127,3 +137,80 @@ class SavedJob(Base):
         except Exception as e:
             print(f"Error getting job score: {e}")
             return None
+
+
+class Resume(Base):
+    __tablename__ = 'resumes'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'),
+                     nullable=False, unique=True)
+    filename = Column(String, nullable=False)
+    file_url = Column(String, nullable=False)
+    uploaded_at = Column(TIMESTAMP, server_default=func.now())
+
+    user = relationship("User", back_populates="resumes")
+
+    def __init__(self, user_id, filename, file_url):
+        self.user_id = user_id
+        self.filename = filename
+        self.file_url = file_url
+
+    @staticmethod
+    def create_tables():
+        Base.metadata.create_all(UserEngine, checkfirst=True)
+
+
+    @staticmethod
+    def insert_resume(user_id: int, uploaded_file):
+        try:
+            session = Session()
+
+            existing_resume = session.query(Resume).filter(Resume.user_id == user_id).first()
+
+            if existing_resume:
+                existing_file = os.path.join('backend/data/resumes', existing_resume.filename)
+
+                session.delete(existing_resume)
+                session.commit()
+
+                try:
+                    os.remove(existing_file)
+                    print(f" Removed existing resume file: {existing_resume.filename}")
+                except FileNotFoundError:
+                    print(f"File not found: {existing_resume.filename}, skipping deletion.")
+                except Exception as e:
+                    print(f"Error removing existing file: {e}")
+
+            unique_filename = f"{user_id}_{uuid.uuid4().hex}.pdf"
+            file_path = os.path.join('backend/data/resumes', unique_filename)
+
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.read())
+
+            file_url = f"/download/{unique_filename}"
+
+            new_resume = Resume(user_id=user_id, filename=unique_filename, file_url=file_url)
+            session.add(new_resume)
+            session.commit()
+            print("Inserted new resume")
+
+        except Exception as e:
+            print(f"Error inserting resume: {e}")
+            session.rollback()
+        finally:
+            session.close()
+
+    @staticmethod
+    def get_resumes_by_user_id(user_id):
+        session = Session()
+        resumes = session.query(Resume).filter(Resume.user_id == user_id).all()
+        session.close()
+        return resumes
+
+    @staticmethod
+    def clear_resumes():
+        session = Session()
+        session.query(Resume).delete()
+        session.commit()
+        session.close()
+        print("✅ Resumes table cleared.")

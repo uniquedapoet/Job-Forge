@@ -1,6 +1,5 @@
 from services.resume_scraper import extract_text_from_pdf
 from services.score import Score
-from routes.users import save_job_data
 import pandas as pd
 import db_tools as db
 import os
@@ -22,7 +21,6 @@ def get_score(user_id, job_posting_id):
         similarity_score = score_obj.compute_similarity() 
         saved_job = SavedJob(user_id=user_id, job_id=job_posting_id, job_score=similarity_score.item())
         saved_job.save()
-        save_job_data(user_id, job_posting_id, similarity_score.item()) # save score to database
         score = f"{round(similarity_score.item(),2)*100}%" # get percentage score from the tensor
 
 
