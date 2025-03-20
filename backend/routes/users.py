@@ -159,25 +159,28 @@ class Resume(Base):
     def create_tables():
         Base.metadata.create_all(UserEngine, checkfirst=True)
 
-
     @staticmethod
     def insert_resume(user_id: int, uploaded_file):
         try:
             session = Session()
 
-            existing_resume = session.query(Resume).filter(Resume.user_id == user_id).first()
+            existing_resume = session.query(Resume).filter(
+                Resume.user_id == user_id).first()
 
             if existing_resume:
-                existing_file = os.path.join('backend/data/resumes', existing_resume.filename)
+                existing_file = os.path.join(
+                    'backend/data/resumes', existing_resume.filename)
 
                 session.delete(existing_resume)
                 session.commit()
 
                 try:
                     os.remove(existing_file)
-                    print(f" Removed existing resume file: {existing_resume.filename}")
+                    print(
+                        f" Removed existing resume file: {existing_resume.filename}")
                 except FileNotFoundError:
-                    print(f"File not found: {existing_resume.filename}, skipping deletion.")
+                    print(
+                        f"File not found: {existing_resume.filename}, skipping deletion.")
                 except Exception as e:
                     print(f"Error removing existing file: {e}")
 
@@ -189,7 +192,8 @@ class Resume(Base):
 
             file_url = f"/download/{unique_filename}"
 
-            new_resume = Resume(user_id=user_id, filename=unique_filename, file_url=file_url)
+            new_resume = Resume(
+                user_id=user_id, filename=unique_filename, file_url=file_url)
             session.add(new_resume)
             session.commit()
             print("Inserted new resume")
