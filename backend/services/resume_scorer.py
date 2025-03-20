@@ -3,7 +3,7 @@ from services.score import Score
 import pandas as pd
 import db_tools as db
 import os
-from routes.users import SavedJob
+from routes.users import SavedJob, Resume
 
 def get_score(user_id, job_posting_id):
     """Get the similarity score between a user's resume and a job posting."""
@@ -12,18 +12,19 @@ def get_score(user_id, job_posting_id):
         job_description = db.get_job_desc(job_posting_id)
 
         # get resume content with user id
-        resume_file_name = db.get_resumes_by_user_id(user_id)[0]['filename']
+        resume_file_name = Resume.get_resumes_by_user_id(user_id).filename
+
         RESUME_PATH = os.path.join("backend/data/resumes", resume_file_name)
         raw_resume = extract_text_from_pdf(RESUME_PATH)
 
         # get similarity score
         score_obj = Score(raw_resume, job_description)
         similarity_score = score_obj.compute_similarity() 
+
+        score = similarity_score.item()
+
         saved_job = SavedJob(user_id=user_id, job_id=job_posting_id, job_score=similarity_score.item())
         saved_job.save()
-        score = f"{round(similarity_score.item(),2)*100}%" # get percentage score from the tensor
-
-
 
         print(f"Similarity score between user {user_id}'s resume and job posting {job_posting_id}: {score}")
         return {

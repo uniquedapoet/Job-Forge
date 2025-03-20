@@ -189,14 +189,17 @@ def resume_score():
         return jsonify({"error": "User ID and job posting ID are required"}), 400
 
     job_score = SavedJob.get_job_score(user_id, job_posting_id)
+    time.sleep(1)
     print(f"Job score: {job_score}")
 
     if not job_score:
         try:
-            job_score = get_score(user_id, job_posting_id).score
-
+            job_score = get_score(user_id, job_posting_id)
+            if isinstance(job_score, dict):
+                job_score = job_score.score
+                
         except Exception as e:
-            return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
+            return jsonify({"error": f"Error computing similarity score: {str(e)} {job_score}"}), 500
 
     return jsonify(round((job_score*100), 2)), 200
 
@@ -216,4 +219,4 @@ def get_resume_suggestions():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True, threaded=True)

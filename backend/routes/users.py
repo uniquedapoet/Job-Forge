@@ -131,9 +131,10 @@ class SavedJob(Base):
     def get_job_score(user_id, job_id):
         session = Session()
         try:
+            session.commit()
             job_score = session.query(SavedJob.job_score).filter(
                 SavedJob.user_id == user_id, SavedJob.job_id == job_id).first()
-            return job_score[0] if job_score else None
+            return job_score[0] if job_score else 0
         except Exception as e:
             print(f"Error getting job score: {e}")
             return None
@@ -207,9 +208,9 @@ class Resume(Base):
     @staticmethod
     def get_resumes_by_user_id(user_id):
         session = Session()
-        resumes = session.query(Resume).filter(Resume.user_id == user_id).all()
+        resume = session.query(Resume).filter(Resume.user_id == user_id).first()
         session.close()
-        return resumes
+        return resume
 
     @staticmethod
     def clear_resumes():
