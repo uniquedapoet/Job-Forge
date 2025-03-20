@@ -12,6 +12,9 @@ from services.sections_suggestions import improve_sections
 from db_tools import correct_spelling, state_abbreviations
 from routes.users import User, SavedJob, Resume
 
+# MAKE ENDPOINT FOR RESUME DOWNLOAD --> PDF
+# MAKE ENDPOINT FOR REMOVING SAVEDJOB
+
 
 # Initialize Flask app
 app = Flask(__name__)
