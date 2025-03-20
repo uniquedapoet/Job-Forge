@@ -11,7 +11,7 @@ import time
 from services.resume_scorer import get_score
 from services.sections_suggestions import improve_sections
 from db_tools import correct_spelling, state_abbreviations
-from routes.users import create_saved_jobs_table, get_job_score, save_job_data
+from routes.users import User, SavedJob
 
 
 # Initialize Flask app
@@ -28,75 +28,47 @@ def read_root():
 
 @app.route("/users", methods=["GET"])
 def get_users():
-    conn = sqlite3.connect(USER_DATABASE_URL)
-    cursor = conn.cursor()
+    User.create_tables()
+    users = User.users()
 
-    # Fetch all users
-    cursor.execute("SELECT * FROM users")
-    users = cursor.fetchall()
-
-    # Get column names
-    column_names = [description[0] for description in cursor.description]
-
-    # Convert tuples to list of dictionaries
-    user_list = [dict(zip(column_names, user)) for user in users]
-
-    conn.close()
+    if not users:
+        User.from_csv("data/csvs/user_data.csv")
+        users = User.users()
+    
+    user_list = [{column.key: getattr(user, column.key) for column in User.__table__.columns} for user in users]
 
     return jsonify({"users": user_list})
 
 
+# change to new user model
 @app.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id):
-    conn = sqlite3.connect(USER_DATABASE_URL)
-    cursor = conn.cursor()
+    user = User.user(user_id)
 
-    # Fetch user by ID
-    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
-    user = cursor.fetchone()
-
-    # Get column names
-    column_names = [description[0] for description in cursor.description]
-
-    conn.close()
-
+    user = {
+        column.key: getattr(user, column.key) 
+        for column in User.__table__.columns
+        }
+    
     if user:
-        return jsonify({"user": dict(zip(column_names, user))})
+        return jsonify({"user": user})
     else:
         return jsonify({"error": "User not found"}), 404
 
 
 @app.route("/register_user", methods=["POST"])
 def register_user():
-    conn = sqlite3.connect(USER_DATABASE_URL)
-    cursor = conn.cursor()
-
     user_data = request.json
 
-    try:
-        cursor.execute("""
-        INSERT INTO users (username, email, password, first_name, last_name, phone, city, zipcode, job_titles)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            user_data["username"],
-            user_data["email"],
-            user_data["password"],  # Should be hashed before storing
-            user_data["first_name"],
-            user_data["last_name"],
-            user_data.get("phone"),
-            user_data.get("city"),
-            user_data.get("zipcode"),
-            user_data.get("job_titles"),
-        ))
+    if not user_data:
+        return jsonify({"error": "No user data provided"}), 400
 
-        conn.commit()
+    try:
+        User.register(user_data)
         return jsonify({"message": "User created successfully"}), 201
 
-    except sqlite3.IntegrityError as e:
-        return jsonify({"error": f"Error inserting user {user_data['username']}: {e}"}), 400
-
-    finally:
-        conn.close()
+    except Exception as e:
+        return jsonify({"error": f"Error creating user: {str(e)}"}), 400  
 
 
 @app.route("/upload", methods=["POST"])
@@ -221,6 +193,7 @@ def get_jobs():
     return jsonify({"jobs": job_list})
 
 
+# PROBLEM: IF NEW RESUME IS UPLOADED, THE SCORE IS NOT UPDATED IF IT WAS ALREADY CALCULATED
 @app.route("/resume_score", methods=["POST"])
 def resume_score():
     request_data = request.json
@@ -231,18 +204,18 @@ def resume_score():
     if not user_id or not job_posting_id:
         return jsonify({"error": "User ID and job posting ID are required"}), 400
 
-    job_score = get_job_score(user_id, job_posting_id)
+    job_score = SavedJob.get_job_score(user_id, job_posting_id)
     print(f"Job score: {job_score}")
 
     if not job_score:
         try:
-            job_score = get_score(user_id, job_posting_id)
+            job_score = get_score(user_id, job_posting_id).score
 
         except Exception as e:
             return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
 
-    # return jsonify({"score": job_score, "status": "success"}), 200
-    return jsonify(job_score), 200
+
+    return jsonify(round((job_score*100), 2)), 200
 
 
 @app.route("/resume/suggestions", methods=["POST"])

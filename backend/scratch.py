@@ -1,4 +1,9 @@
-from services.resume_scorer import get_score
+from sqlalchemy import create_engine, text
 
-if __name__ == "__main__":
-    get_score(1, "in-b26a372f08fef696")
+db_path = "/Users/eduardobenjamin/Desktop/Repos/Job-Forge/backend/data/database/users.db"
+engine = create_engine(f"sqlite:///{db_path}", echo=True)
+
+with engine.connect() as connection:
+    result = connection.execute(text("SELECT * FROM users LIMIT 5;"))
+    for row in result:
+        print(row)

@@ -24,6 +24,8 @@ const Dashboard = ({ onLogout }) => {
 
           const data = await response.json();
           console.log("data", data);
+          console.log("Fetched score for job:", job.id, data);
+
           if (response.ok) {
             scoresData[job.id] = data; // Store the score for this job
             console.log("Fetched score for job:", job.id, data);

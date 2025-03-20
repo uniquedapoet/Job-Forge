@@ -20,7 +20,7 @@ networkx==3.4.2
 nltk==3.9.1
 numpy==1.26.3
 packaging==24.2
-pandas==2.2.3
+pandas==2.1.4
 pdf2image==1.17.0
 pillow==11.1.0
 pydantic==2.10.6
