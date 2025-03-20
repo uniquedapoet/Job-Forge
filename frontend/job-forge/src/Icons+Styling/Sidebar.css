@@ -10,7 +10,9 @@
   top: 0; 
   bottom: 0; 
   left: 0; 
-  overflow-y: auto; 
+  overflow-y: auto;
+  transition: width 0.3s ease;
+  z-index: 1000;
 }
 
 .sidebar-logo {
@@ -92,4 +94,17 @@
 
 .sidebar-logout button:hover {
   background-color: #f0f0f0;
+}
+@media (max-width: 768px) {
+  .sidebar {
+    width: 250px; /* Adjust sidebar width for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 100%; /* Sidebar takes full width on very small screens */
+    position: relative; /* Change to relative positioning */
+    height: auto; /* Adjust height */
+  }
 }
