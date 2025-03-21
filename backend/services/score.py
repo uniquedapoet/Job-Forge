@@ -1,10 +1,6 @@
 import re
 from sentence_transformers import SentenceTransformer
 import string
-import nltk
-# nltk.download('stopwords')
-# nltk.download('punkt_tab')
-# nltk.download('wordnet')
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize

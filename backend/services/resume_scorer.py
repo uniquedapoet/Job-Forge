@@ -4,12 +4,25 @@ import pandas as pd
 import db_tools as db
 import os
 from routes.users import SavedJob, Resume
+from nltk.corpus import wordnet as wn
+import time
+import nltk
+nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('omw-1.4')
+
+
+wn.ensure_loaded()
+
 
 def get_score(user_id, job_posting_id):
     """Get the similarity score between a user's resume and a job posting."""
     try:
         # get job desctiption from jobs
         job_description = db.get_job_desc(job_posting_id)
+
+        time.sleep(1)   
 
         # get resume content with user id
         resume_file_name = Resume.get_resumes_by_user_id(user_id).filename
@@ -22,8 +35,9 @@ def get_score(user_id, job_posting_id):
         similarity_score = score_obj.compute_similarity() 
 
         score = similarity_score.item()
+        # ===============================
 
-        saved_job = SavedJob(user_id=user_id, job_id=job_posting_id, job_score=similarity_score.item())
+        saved_job = SavedJob(user_id=user_id, job_id=job_posting_id, job_score=score)
         saved_job.save()
 
         print(f"Similarity score between user {user_id}'s resume and job posting {job_posting_id}: {score}")

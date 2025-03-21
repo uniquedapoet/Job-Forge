@@ -11,10 +11,22 @@ from services.resume_scorer import get_score
 from services.sections_suggestions import improve_sections
 from db_tools import correct_spelling, state_abbreviations
 from routes.users import User, SavedJob, Resume
+import logging
+import traceback
 
 # MAKE ENDPOINT FOR RESUME DOWNLOAD --> PDF
 # MAKE ENDPOINT FOR REMOVING SAVEDJOB
 
+logging.basicConfig(
+    level=logging.DEBUG,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",  # Log format
+    handlers=[
+        logging.FileHandler("app.log"),  # Log to a file
+        logging.StreamHandler()  # Log to the console
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -181,30 +193,80 @@ def get_jobs():
 
 
 # PROBLEM: IF NEW RESUME IS UPLOADED, THE SCORE IS NOT UPDATED IF IT WAS ALREADY CALCULATED
+# @app.route("/resume_score", methods=["POST"])
+# def resume_score():
+#     request_data = request.json
+#     user_id = request_data.get("user_id")
+#     job_posting_id = request_data.get("job_posting_id")
+#     print(f"User ID: {user_id}, Job Posting ID: {job_posting_id}")
+
+#     if not user_id or not job_posting_id:
+#         return jsonify({"error": "User ID and job posting ID are required"}), 400
+    
+#     try:
+#         job_score = SavedJob.get_job_score(user_id, job_posting_id)
+#         job_score = None if job_score == 0 else job_score
+
+#     except Exception as e:
+#         if not job_score:
+#             try:
+
+#                 job_score = get_score(user_id, job_posting_id)
+#                 if isinstance(job_score, dict):
+#                     job_score = job_score['score']
+                    
+#                 print(f"Job score: {job_score}")
+#             except Exception as e:
+#                 return jsonify({"error": f"Error computing similarity score: {str(e)} {job_score}"}), 500
+
+#     return jsonify({"score":round((job_score*100), 2)}), 200
+
+
 @app.route("/resume_score", methods=["POST"])
 def resume_score():
     request_data = request.json
     user_id = request_data.get("user_id")
     job_posting_id = request_data.get("job_posting_id")
-    print(f"User ID: {user_id}, Job Posting ID: {job_posting_id}")
-
+    
     if not user_id or not job_posting_id:
         return jsonify({"error": "User ID and job posting ID are required"}), 400
+    
+    logger.debug(f"Received user_id: {user_id}, job_posting_id: {job_posting_id}")
+    
+    try:
+        job_score = SavedJob.get_job_score(user_id, job_posting_id)
+        logger.debug(f"Job score from SavedJob: {job_score}")
 
-    job_score = SavedJob.get_job_score(user_id, job_posting_id)
-    time.sleep(1)
-    print(f"Job score: {job_score}")
+        job_score = None if job_score == 0 else job_score
 
+    except Exception as e:
+        logger.error(f"Error fetching job score: {str(e)}")
+        logger.error(traceback.format_exc())
+
+        job_score = None
+    
     if not job_score:
         try:
             job_score = get_score(user_id, job_posting_id)
-            if isinstance(job_score, dict):
-                job_score = job_score.score
-                
-        except Exception as e:
-            return jsonify({"error": f"Error computing similarity score: {str(e)} {job_score}"}), 500
+            logger.debug(f"Job score from get_score: {job_score}")
 
-    return jsonify(round((job_score*100), 2)), 200
+            if isinstance(job_score, dict):
+                job_score = job_score['score']
+                
+            logger.debug(f"Processed job score: {job_score}")
+
+        except Exception as e:
+            logger.error(f"Error computing similarity score: {str(e)}")
+            logger.error(traceback.format_exc())
+
+            return jsonify({"error": f"Error computing similarity score: {str(e)}"}), 500
+    
+    if job_score is None:
+        logger.error("Job score is None after all attempts")
+
+        return jsonify({"error": "Failed to compute job score"}), 500
+    
+    return jsonify({"score": round((job_score * 100), 2)}), 200
 
 
 @app.route("/resume/suggestions", methods=["POST"])
@@ -217,9 +279,10 @@ def get_resume_suggestions():
     try:
         suggestions = improve_sections(user_id)
         return jsonify({"success": True, "suggestions": suggestions})
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True, threaded=True)
+    app.run(host="0.0.0.0", port=5001, debug=False)
