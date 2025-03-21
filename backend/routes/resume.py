@@ -2,8 +2,93 @@ import uuid
 from config import RESUME_DATABASE_URL
 import sqlite3
 import os
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    TIMESTAMP,
+    ForeignKey,
+    func
+)
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
+from db import UserEngine, UserSession
+
+Base = declarative_base()
+engine = UserEngine
+Session = UserSession
+
+class Resume(Base):
+    __tablename__ = 'resumes'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, unique=True)
+    filename = Column(String, nullable=False)
+    file_url = Column(String, nullable=False)
+    uploaded_at = Column(TIMESTAMP, server_default=func.now())
+
+    user = relationship("User", back_populates="resumes")
+
+    def __init__(self, user_id, filename, file_url):
+        self.user_id = user_id
+        self.filename = filename
+        self.file_url = file_url
+
+    @staticmethod
+    def create_tables():
+        print("🔧 Ensuring tables exist in the database...")
+        Base.metadata.create_all(UserEngine, checkfirst=True)
+        
+        print("✅ Tables verified!")
+
+    @staticmethod
+    def insert_resume(user_id: int, uploaded_file):
+        try:
+            session = Session()
+                
+            _ = session.query(Resume).filter(Resume.user_id == user_id).delete()
+            session.commit()
+
+            # Generate a unique filename
+            unique_filename = f"{user_id}_{uuid.uuid4().hex}.pdf"
+            file_path = os.path.join('backend/data/resumes', unique_filename)
+
+            # Save the file locally
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.read())
+
+            # Store the file URL
+            file_url = f"/download/{unique_filename}"  # API path for downloading
+
+            new_resume = Resume(user_id=user_id,
+                                filename=unique_filename,
+                                file_url=file_url)
+            session.add(new_resume)
+            session.commit()
+            print("Inserted resume")
+        except Exception as e:
+            print(f"Error inserting resume: {e}")
+            session.rollback()
+        finally:
+            session.close()
+
+    @staticmethod
+    def get_resumes_by_user_id(user_id):
+        session = Session()
+        resumes = session.query(Resume).filter(Resume.user_id == user_id).all()
+        session.close()
+        return resumes
+    
+    @staticmethod
+    def clear_resumes():
+        session = Session()
+        session.query(Resume).delete()
+        session.commit()
+        session.close()
+        print("✅ Resumes table cleared.")
+
 
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
+
 
 
 def create_resumes_table():

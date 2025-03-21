@@ -1,98 +1,221 @@
 import os
-import sqlite3
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    Float,
+    TIMESTAMP,
+    func
+)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 import pandas as pd
-from config import USER_DATABASE_URL
+from db import UserEngine, UserSession
+import uuid
 
 
-def create_users_table():
-    """Creates the users table in SQLite."""
-    conn = sqlite3.connect(USER_DATABASE_URL)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        first_name TEXT NOT NULL,
-        last_name TEXT NOT NULL,
-        phone TEXT,
-        city TEXT,
-        zipcode TEXT,
-        job_titles TEXT
-    );
-    """)
-
-    conn.commit()
-    conn.close()
-    print("Users table created successfully!")
+engine = UserEngine
+Session = UserSession
+Base = declarative_base()
 
 
-def validate_and_insert_user(user_data):
-    """Validates and inserts a user into the database using sqlite3."""
-    conn = sqlite3.connect(USER_DATABASE_URL)
-    cursor = conn.cursor()
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    phone = Column(String)
+    city = Column(String)
+    zipcode = Column(String)
+    job_titles = Column(String)
 
-    try:
-        cursor.execute("""
-        INSERT INTO users (username, email, password, first_name, last_name, phone, city, zipcode, job_titles)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            user_data["username"],
-            user_data["email"],
-            user_data["password"],  # Should be hashed before storing
-            user_data["first_name"],
-            user_data["last_name"],
-            user_data.get("phone"),
-            user_data.get("city"),
-            user_data.get("zipcode"),
-            user_data.get("job_titles"),
-        ))
+    resumes = relationship(
+        "Resume", back_populates="user", cascade="all, delete")
+    saved_jobs = relationship(
+        "SavedJob", back_populates="user", cascade="all, delete")
 
-        conn.commit()
-        print(f"Inserted user: {user_data['username']}")
+    @staticmethod
+    def create_tables():
+        print("Ensuring tables exist in the database...")
+        Base.metadata.create_all(UserEngine, checkfirst=True)
+        print("Tables verified!")
 
-    except sqlite3.IntegrityError as e:
-        print(f"Error inserting user {user_data['username']}: {e}")
+    @staticmethod
+    def register(user_data):
+        try:
+            session = Session()
+            new_user = User(**user_data)
+            session.add(new_user)
+            session.commit()
+            print("Inserted user")
+        except Exception as e:
+            print(f"Error inserting user: {e}")
+            session.rollback()
 
-    finally:
-        conn.close()
+        finally:
+            session.close()
+
+    @staticmethod
+    def from_csv(csv_path):
+        session = Session()
+        if not os.path.exists(csv_path):
+            print(f"Error: CSV file not found at {csv_path}")
+            return
+
+        user_data = pd.read_csv(csv_path, dtype={
+            "username": str, "email": str, "password": str,
+            "first_name": str, "last_name": str, "phone": str,
+            "city": str, "zipcode": str, "job_titles": str
+        })
+
+        for _, row in user_data.iterrows():
+            user = User(**row.to_dict())
+            session.add(user)
+
+        session.commit()
+        session.close()
+        print("User data loaded successfully!")
+
+    @staticmethod
+    def users(test=False):
+        session = Session()
+        users = session.query(User).all()
+        if test:
+            for user in users:
+                print(user.__dict__)
+        session.close()
+
+        return users
+
+    @staticmethod
+    def user(user_id: int):
+        session = Session()
+        user = session.query(User).filter(User.id == user_id).first()
+        session.close()
+        user = {
+            column.key: getattr(user, column.key)
+            for column in User.__table__.columns
+        }
+        return user
 
 
-def user_csv_to_db(csv_path):
-    """Loads user data from CSV and inserts it into SQLite."""
-    if not os.path.exists(csv_path):
-        print(f"Error: CSV file not found at {csv_path}")
-        return
+class SavedJob(Base):
+    __tablename__ = 'saved_jobs'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    job_id = Column(Integer, nullable=False)
+    job_score = Column(Float)
+    saved_at = Column(TIMESTAMP, server_default=func.now())
 
-    user_data = pd.read_csv(csv_path, dtype={
-        "username": str, "email": str, "password": str,
-        "first_name": str, "last_name": str, "phone": str,
-        "city": str, "zipcode": str, "job_titles": str
-    })
+    user = relationship("User", back_populates="saved_jobs")
 
-    for _, row in user_data.iterrows():
-        validate_and_insert_user(row.to_dict())
+    @staticmethod
+    def create_tables():
+        Base.metadata.create_all(engine, checkfirst=True)
 
-    print("User data loaded successfully!")
+    def save(self):
+        try:
+            session = Session()
+            session.add(self)
+            session.commit()
+            print(f"Inserted saved job: {self.job_id}")
+        except Exception as e:
+            print(f"Error inserting saved job {self.job_id}: {e}")
+            session.rollback()
+
+    @staticmethod
+    def get_job_score(user_id, job_id):
+        session = Session()
+        try:
+            session.commit()
+            job_score = session.query(SavedJob.job_score).filter(
+                SavedJob.user_id == user_id, SavedJob.job_id == job_id).first()
+            return job_score[0] if job_score else 0
+        except Exception as e:
+            print(f"Error getting job score: {e}")
+            return None
 
 
-def test_user_data():
-    """Fetches and prints user data from the database."""
-    conn = sqlite3.connect(USER_DATABASE_URL)
-    cursor = conn.cursor()
+class Resume(Base):
+    __tablename__ = 'resumes'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'),
+                     nullable=False, unique=True)
+    filename = Column(String, nullable=False)
+    file_url = Column(String, nullable=False)
+    uploaded_at = Column(TIMESTAMP, server_default=func.now())
 
-    cursor.execute("SELECT * FROM users")
-    users = cursor.fetchall()
+    user = relationship("User", back_populates="resumes")
 
-    conn.close()
+    def __init__(self, user_id, filename, file_url):
+        self.user_id = user_id
+        self.filename = filename
+        self.file_url = file_url
 
-    for user in users:
-        print(user)
+    @staticmethod
+    def create_tables():
+        Base.metadata.create_all(UserEngine, checkfirst=True)
 
+    @staticmethod
+    def insert_resume(user_id: int, uploaded_file):
+        try:
+            session = Session()
 
+            existing_resume = session.query(Resume).filter(
+                Resume.user_id == user_id).first()
 
-        
-if __name__ == "__main__":
-    pass
+            if existing_resume:
+                existing_file = os.path.join(
+                    'backend/data/resumes', existing_resume.filename)
+
+                session.delete(existing_resume)
+                session.commit()
+
+                try:
+                    os.remove(existing_file)
+                    print(
+                        f" Removed existing resume file: {existing_resume.filename}")
+                except FileNotFoundError:
+                    print(
+                        f"File not found: {existing_resume.filename}, skipping deletion.")
+                except Exception as e:
+                    print(f"Error removing existing file: {e}")
+
+            unique_filename = f"{user_id}_{uuid.uuid4().hex}.pdf"
+            file_path = os.path.join('backend/data/resumes', unique_filename)
+
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.read())
+
+            file_url = f"/download/{unique_filename}"
+
+            new_resume = Resume(
+                user_id=user_id, filename=unique_filename, file_url=file_url)
+            session.add(new_resume)
+            session.commit()
+            print("Inserted new resume")
+
+        except Exception as e:
+            print(f"Error inserting resume: {e}")
+            session.rollback()
+        finally:
+            session.close()
+
+    @staticmethod
+    def get_resumes_by_user_id(user_id):
+        session = Session()
+        resume = session.query(Resume).filter(Resume.user_id == user_id).first()
+        session.close()
+        return resume
+
+    @staticmethod
+    def clear_resumes():
+        session = Session()
+        session.query(Resume).delete()
+        session.commit()
+        session.close()
+        print("✅ Resumes table cleared.")

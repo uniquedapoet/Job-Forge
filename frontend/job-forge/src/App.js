@@ -9,7 +9,7 @@ import {
 import Auth from "./Components/Auth.jsx";
 import Home from "./Components/Home.jsx";
 import ResumeUploader from "./Components/ResumeUploader.jsx";
-import JobSearch from "./Components/JobSearch.jsx";
+import JobSearch from "./Components/Jobsearch.jsx";
 import Dashboard from "./Components/Dashboard.jsx"; // Import the Dashboard component
 import { UserProvider } from "./Components/UserContext.jsx";
 import Register from "./Components/Register.jsx";
