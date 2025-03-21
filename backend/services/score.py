@@ -26,54 +26,63 @@ class Score:
         cleaned_text = " ".join(tokens)
         return cleaned_text
 
-    def clean_resume(self):
-        skills_pattern = re.compile(r'Skills\s*[:\n]', re.IGNORECASE)
-        skills_match = skills_pattern.search(self.raw_resume)
+    def extract_section(self, section_name, next_sections):
+        """
+        Extracts a section of the resume based on section headers.
 
-        if skills_match:
-            skills_start = skills_match.end()
-            skills_end = self.raw_resume.find('\n\n', skills_start)
-            skills_section = self.raw_resume[skills_start:skills_end].strip()
-            skills_lines = skills_section.split('\n')
+        :param section_name: The name of the section to extract.
+        :param next_sections: Possible names of the next sections.
+        :return: Extracted text of the section.
+        """
+        pattern = re.compile(rf'{section_name}\s*[:\n]', re.IGNORECASE)
+        match = pattern.search(self.raw_resume)
 
-            extracted_skills = []
-            for line in skills_lines:
-                line_skills = re.split(r'[:,-]', line)
-                extracted_skills.extend([skill.strip() for skill in line_skills if skill.strip()])
-
-            skills = list(set(extracted_skills))
-        else:
-            skills = []
-
-        skills = ", ".join(skills)
-
-        RESUME_SECTIONS = [
-            "Contact Information", "Objective", "Summary", "Education", "Experience", 
-            "Skills", "Projects", "Certifications", "Licenses", "Awards", "Honors", 
-            "Publications", "References", "Technical Skills", "Computer Skills", 
-            "Programming Languages", "Software Skills", "Soft Skills", "Language Skills", 
-            "Professional Skills", "Transferable Skills", "Work Experience", 
-            "Professional Experience", "Employment History", "Internship Experience", 
-            "Volunteer Experience", "Leadership Experience", "Research Experience", 
-            "Teaching Experience",
-        ]
-
-        experience_start = self.raw_resume.find("Experience")
-        if experience_start == -1:
+        if not match:
             return ""
 
-        experience_end = len(self.raw_resume)
-        for section in RESUME_SECTIONS:
-            if section != "Experience":
-                section_start = self.raw_resume.find(section, experience_start)
-                if section_start != -1:
-                    experience_end = min(experience_end, section_start)
+        start = match.end()
+        end = len(self.raw_resume)
 
-        experience_section = self.raw_resume[experience_start:experience_end].strip()
-        cleaned_experience = self.clean_text(experience_section)
-        cleaned_skills = self.clean_text(skills)
+        for next_section in next_sections:
+            next_match = re.search(rf'{next_section}\s*[:\n]', self.raw_resume[start:], re.IGNORECASE)
+            if next_match:
+                end = start + next_match.start()
+                break
 
-        return cleaned_experience + cleaned_skills
+        section_text = self.raw_resume[start:end].strip()
+        return section_text
+
+    def clean_resume(self):
+        # Possible section names for skills and experience
+        experience_sections = [
+            "Work Experience", "Professional Experience", "Employment History",
+            "Internship Experience", "Volunteer Experience"
+        ]
+        skills_sections = ["Skills", "Technical Skills", "Software Skills"]
+
+        next_sections = [
+            "Projects", "Certifications", "Licenses", "Awards", "Honors",
+            "Publications", "References", "Education", "Objective", "Summary"
+        ]
+
+        # Extract sections
+        experience_text = ""
+        for exp_section in experience_sections:
+            experience_text = self.extract_section(exp_section, next_sections)
+            if experience_text:
+                break
+
+        skills_text = ""
+        for skill_section in skills_sections:
+            skills_text = self.extract_section(skill_section, next_sections)
+            if skills_text:
+                break
+
+        # Clean extracted sections
+        cleaned_experience = self.clean_text(experience_text) if experience_text else ""
+        cleaned_skills = self.clean_text(skills_text) if skills_text else ""
+
+        return cleaned_experience + " " + cleaned_skills
 
     def compute_similarity(self):
         cleaned_resume = self.clean_resume()

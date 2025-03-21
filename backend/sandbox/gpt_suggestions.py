@@ -1,14 +1,13 @@
 import os
-import pandas as pd
 from openai import OpenAI
-import db_tools
+from db_tools import get_resumes_by_user_id, get_job_desc
 from services.resume_scraper import extract_text_from_pdf
 
 def get_suggestions(user_id, job_posting_id=None):
     """Get suggestion from OpenAI API gpt-4o for the users resume or the users resume given a job description."""
 
     # Get user resume
-    resume_file_name = db_tools.get_resumes_by_user_id(user_id)[0]['filename']
+    resume_file_name = get_resumes_by_user_id(user_id)[0]['filename']
     RESUME_PATH = os.path.join("data", "resumes", resume_file_name)
     raw_resume = extract_text_from_pdf(RESUME_PATH)
 
@@ -79,9 +78,7 @@ def get_suggestions(user_id, job_posting_id=None):
     jd_prompt = None
     if job_posting_id != None:
         # Get job description
-        JOBS_PATH = os.path.join("data", "csvs", "jobs.csv")
-        jobs = pd.read_csv(JOBS_PATH)
-        raw_job_description = jobs.loc[jobs["job_id"] == job_posting_id, "description"].iloc[0]
+        raw_job_description = get_job_desc(job_posting_id)
 
         jd_prompt = f"""
         Now, compare the resume to the following job description:
