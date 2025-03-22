@@ -2,14 +2,8 @@ from services.resume_scraper import extract_text_from_pdf
 from services.score import Score
 from db_tools import get_job_desc, get_resumes_by_user_id
 import os
-from routes.users import SavedJob, Resume
+from models.savedJobs import SavedJob
 from nltk.corpus import wordnet as wn
-import time
-import nltk
-nltk.download('wordnet')
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('omw-1.4')
 
 
 wn.ensure_loaded()
