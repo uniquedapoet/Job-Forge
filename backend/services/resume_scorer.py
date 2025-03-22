@@ -1,8 +1,9 @@
 from services.resume_scraper import extract_text_from_pdf
 from services.score import Score
-from db_tools import get_job_desc, get_resumes_by_user_id
+from db_tools import get_job_desc
 import os
 from models.savedJobs import SavedJob
+from models.resume import Resume
 from nltk.corpus import wordnet as wn
 
 
@@ -16,7 +17,12 @@ def get_score(user_id, job_posting_id):
         job_description = get_job_desc(job_posting_id)
 
         # get resume content with user id
-        resume_file_name = get_resumes_by_user_id(user_id)[0]['filename']
+        resume_file_name = Resume.get_resumes_by_user_id(user_id)
+        
+        if isinstance(resume_file_name, str):
+            return {'error': resume_file_name}
+        
+        resume_file_name = resume_file_name['filename']
         RESUME_PATH = os.path.join("backend/data/resumes", resume_file_name)
         raw_resume = extract_text_from_pdf(RESUME_PATH)
 

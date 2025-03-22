@@ -18,19 +18,6 @@ def state_abbreviations(state_name):
     return state.abbr if state else state_name
 
 
-def get_user_by_id(user_id):
-    """Fetches a single users data by User ID."""
-    user = User.user(user_id)
-
-    return user
-
-
-def get_resumes_by_user_id(user_id):
-    """Fetches all resumes for a given user ID."""
-    resume = Resume.get_resumes_by_user_id(user_id)
-
-    return [dict(row) for row in resume]
-
 def get_job_desc(job_id):
     conn = sqlite3.connect(JOBS_DATABASE_URL)
     cursor = conn.cursor()

@@ -1,9 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask
 from flask_cors import CORS
 import os
 from routes.jobs import jobs
 from routes.users import users
 from routes.resumes import resumes
+
+os.environ['TOKENIZERS_PARALLELISM'] = "false"
 
 # MAKE ENDPOINT FOR RESUME DOWNLOAD --> PDF
 # MAKE ENDPOINT FOR REMOVING SAVEDJOB
@@ -11,7 +13,6 @@ from routes.resumes import resumes
 
 # Initialize Flask app
 app = Flask(__name__)
-os.environ['TOKENIZERS_PARALLELISM'] = "false"
 CORS(app, origins=["http://localhost:3000"])
 
 # Register blueprints

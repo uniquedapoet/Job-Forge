@@ -81,6 +81,9 @@ class User(Base):
             for user in users:
                 print(user.__dict__)
         session.close()
+        users = [{column.key: getattr(
+            user, column.key) for column in User.__table__.columns
+        } for user in users]
 
         return users
 

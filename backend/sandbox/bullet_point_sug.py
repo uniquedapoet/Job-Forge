@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 from openai import OpenAI
-from db_tools import get_resumes_by_user_id
+from models.Resume import import Resume
 from services import resume_scraper as rs
 import re
 import json
@@ -26,7 +26,7 @@ def clean_json(json_string):
 
 def improve_bullets(user_id):
     # Get user resume
-    resume_file_name = get_resumes_by_user_id(user_id)[0]['filename']
+    resume_file_name = Resume.get_resumes_by_user_id(user_id)['filename']
     RESUME_PATH = os.path.join("data", "resumes", resume_file_name)
     raw_resume = rs.extract_text_from_pdf(RESUME_PATH)
 

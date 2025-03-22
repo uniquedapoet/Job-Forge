@@ -89,7 +89,15 @@ class Resume(Base):
         session = Session()
         resume = session.query(Resume).filter(Resume.user_id == user_id).first()
         session.close()
-        return resume
+        try:
+            resume = {
+                column.key: getattr(resume, column.key)
+                for column in Resume.__table__.columns
+            }
+            return resume
+        except Exception:
+            return "No Resume Found"
+        
 
     @staticmethod
     def clear_resumes():
