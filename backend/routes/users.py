@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models.users import User
+from models.savedJobs import SavedJob
 
 users = Blueprint("users", __name__)
 
@@ -42,3 +43,13 @@ def register_user():
 
     except Exception as e:
         return jsonify({"error": f"Error creating user: {str(e)}"}), 400
+
+
+@users.route("/<int:user_id>/saved_jobs", methods=["GET"])
+def get_saved_jobs(user_id):
+    saved_jobs = SavedJob.get_saved_jobs(user_id)
+
+    if saved_jobs:
+        return jsonify(saved_jobs)
+    else:
+        return jsonify({"error": "No saved jobs found"}), 404   

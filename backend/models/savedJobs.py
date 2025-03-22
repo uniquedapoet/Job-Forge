@@ -49,3 +49,20 @@ class SavedJob(Base):
         except Exception as e:
             print(f"Error getting job score: {e}")
             return None
+
+    @staticmethod
+    def get_saved_jobs(user_id):
+        session = Session()
+        try:
+            saved_jobs = session.query(SavedJob).filter(
+                SavedJob.user_id == user_id).all()
+            
+            saved_jobs = [{column.key: getattr(
+                saved_job, column.key) for column in SavedJob.__table__.columns
+            } for saved_job in saved_jobs]
+
+            return saved_jobs
+        
+        except Exception as e:
+            print(f"Error getting saved jobs: {e}")
+            return None
