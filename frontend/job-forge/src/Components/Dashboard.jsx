@@ -13,7 +13,7 @@ const Dashboard = ({ onLogout }) => {
       const scoresData = {};
       for (const job of savedJobs) {
         try {
-          const response = await fetch("http://localhost:5001/resume_score", {
+          const response = await fetch("http://localhost:5001/resumes/resume_score", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

@@ -112,7 +112,7 @@ This project is a web-based tool designed to help users tailor their resumes to 
 ### **Authentication**
 - `GET /users` – Retrieve all users.  
 - `GET /users/<user_id>` – Retrieve a specific user.  
-- `POST /register_user` – Register a new user.  
+- `POST users/register_user` – Register a new user.  
 
 ### **Resume Handling**
 - `POST /upload` – Upload a resume file.  

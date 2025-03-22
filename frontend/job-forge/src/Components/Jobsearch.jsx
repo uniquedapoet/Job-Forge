@@ -24,7 +24,7 @@ const JobSearch = ({ onLogout }) => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5001/job_search", {
+      const response = await fetch("http://localhost:5001/jobs/job_search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ job_title: jobTitle, location }),

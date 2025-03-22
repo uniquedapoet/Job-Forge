@@ -19,7 +19,7 @@ const ResumeUploader = ({ onLogout }) => {
     formData.append("user_id", user.id); // Use the user ID from context
 
     try {
-      const response = await fetch("http://127.0.0.1:5001/upload", {
+      const response = await fetch("http://127.0.0.1:5001/resumes/upload", {
         method: "POST",
         body: formData,
       });
