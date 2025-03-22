@@ -1,8 +1,9 @@
 from models.resume import Resume
 from models.savedJobs import SavedJob
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_file
 from services.sections_suggestions import improve_sections
 from services.resume_scorer import get_score
+import os
 
 
 resumes = Blueprint("resumes", __name__)
@@ -68,7 +69,38 @@ def get_resume_suggestions():
     try:
         suggestions = improve_sections(user_id)
         return jsonify({"success": True, "suggestions": suggestions})
-    
+   
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@resumes.route("/download/<int:user_id>", methods=["GET"])
+def download_resume(user_id):
+    resume = Resume.get_resumes_by_user_id(user_id)
+
+    if not resume or not resume['filename']:
+        return jsonify({"error": "No resume found"}), 404
+    
+    resume_filename = resume['filename']
+    resume_path = os.path.join('data/resumes', resume_filename)
+
+    if not os.path.exists(os.path.join('backend', resume_path)):
+        return jsonify({"error": "Resume file not found"}), 404
+
+    return send_file(resume_path, as_attachment=True)
+
+
+@resumes.route("/view/<int:user_id>", methods=["GET"])
+def view_resume(user_id):
+    resume = Resume.get_resumes_by_user_id(user_id)
+
+    if not resume or not resume['filename']:
+        return jsonify({"error": "No resume found"}), 404
+    
+    resume_filename = resume['filename']
+    resume_path = os.path.join('data/resumes', resume_filename)
+
+    if not os.path.exists(os.path.join('backend', resume_path)):
+        return jsonify({"error": "Resume file not found"}), 404
+
+    return send_file(resume_path, mimetype="application/pdf")  
