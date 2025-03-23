@@ -2,7 +2,7 @@ from config import JOBS_DATABASE_URL
 from services.job_scraper import get_jobs_data
 from models.jobs import validate_and_insert_jobs, create_jobs_db
 import time
-from db_tools import correct_spelling, state_abbreviations
+from db_tools import state_abbreviations
 from flask import Blueprint, jsonify, request
 import sqlite3
 import os
@@ -37,11 +37,11 @@ def job_search():
     job_title = request_data.get("job_title", "").strip()
     location = request_data.get("location", "").strip()
 
-    job_title = correct_spelling(job_title)
     location = state_abbreviations(location)
 
     if not job_title and not location:
-        return jsonify({"error": "At least one search criteria is required"}), 400
+        return jsonify(
+            {"error": "At least one search criteria is required"}), 400
 
     try:
         # Fetch jobs based on the search criteria
@@ -67,7 +67,8 @@ def job_search():
         params = []
 
         if job_title:
-            words = job_title.split()  # Split the search term into individual words
+            words = job_title.split()
+
             # Create conditions dynamically
             conditions = " OR ".join(["title LIKE ?"] * len(words))
             query += f" AND ({conditions})"  # Add to the existing query
@@ -93,9 +94,8 @@ def job_search():
         if not job_list:
             return jsonify({"error": "No matching job list found"}), 404
 
-        return jsonify({"message": "Jobs successfully retrieved!", "jobs": job_list}), 200
+        return jsonify(
+            {"message": "Jobs successfully retrieved!", "jobs": job_list}), 200
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
-
-

@@ -7,6 +7,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 import pandas as pd
 from db import UserEngine, UserSession, Base
+from typing import List
 
 
 engine = UserEngine
@@ -32,13 +33,13 @@ class User(Base):
         "SavedJob", back_populates="user", cascade="all, delete")
 
     @staticmethod
-    def create_tables():
+    def create_tables() -> None:
         print("Ensuring tables exist in the database...")
         Base.metadata.create_all(UserEngine, checkfirst=True)
         print("Tables verified!")
 
     @staticmethod
-    def register(user_data):
+    def register(user_data: dict) -> None:
         try:
             session = Session()
             new_user = User(**user_data)
@@ -53,7 +54,7 @@ class User(Base):
             session.close()
 
     @staticmethod
-    def from_csv(csv_path):
+    def from_csv(csv_path: str) -> None:
         session = Session()
         if not os.path.exists(csv_path):
             print(f"Error: CSV file not found at {csv_path}")
@@ -74,7 +75,7 @@ class User(Base):
         print("User data loaded successfully!")
 
     @staticmethod
-    def users(test=False):
+    def users(test: bool = False) -> List[dict]:
         session = Session()
         users = session.query(User).all()
         if test:
@@ -88,7 +89,7 @@ class User(Base):
         return users
 
     @staticmethod
-    def user(user_id: int):
+    def user(user_id: int) -> dict:
         session = Session()
         user = session.query(User).filter(User.id == user_id).first()
         session.close()
