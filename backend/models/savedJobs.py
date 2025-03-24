@@ -8,6 +8,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
+from typing import List
 
 
 engine = UserEngine
@@ -28,7 +29,7 @@ class SavedJob(Base):
     # def create_tables():
     #     Base.metadata.create_all(engine, checkfirst=True)
 
-    def save(self):
+    def save(self) -> None:
         try:
             session = Session()
             session.add(self)
@@ -38,8 +39,11 @@ class SavedJob(Base):
             print(f"Error inserting saved job {self.job_id}: {e}")
             session.rollback()
 
+        finally:
+            session.close()
+
     @staticmethod
-    def get_job_score(user_id, job_id):
+    def get_job_score(user_id: int, job_id: int) -> int:
         session = Session()
         try:
             session.commit()
@@ -50,19 +54,40 @@ class SavedJob(Base):
             print(f"Error getting job score: {e}")
             return None
 
+        finally:
+            session.close()
+
     @staticmethod
-    def get_saved_jobs(user_id):
+    def get_saved_jobs(user_id: int) -> List[dict]:
         session = Session()
         try:
             saved_jobs = session.query(SavedJob).filter(
                 SavedJob.user_id == user_id).all()
-            
+
             saved_jobs = [{column.key: getattr(
                 saved_job, column.key) for column in SavedJob.__table__.columns
             } for saved_job in saved_jobs]
 
             return saved_jobs
-        
+
         except Exception as e:
             print(f"Error getting saved jobs: {e}")
             return None
+
+        finally:
+            session.close()
+
+    @staticmethod
+    def remove_saved_job(user_id: int, job_id: int) -> None:
+        session = Session()
+        try:
+            saved_job = session.query(SavedJob).filter(
+                SavedJob.user_id == user_id, SavedJob.job_id == job_id).first()
+            session.delete(saved_job)
+            session.commit()
+
+        except Exception as e:
+            print(f"Error removing saved job: {e}")
+
+        finally:
+            session.close()

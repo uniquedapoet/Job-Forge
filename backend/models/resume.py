@@ -40,7 +40,7 @@ class Resume(Base):
     #     Base.metadata.create_all(UserEngine, checkfirst=True)
 
     @staticmethod
-    def insert_resume(user_id: int, uploaded_file):
+    def insert_resume(user_id: int, uploaded_file: str) -> None:
         try:
             session = Session()
 
@@ -57,10 +57,14 @@ class Resume(Base):
                 try:
                     os.remove(existing_file)
                     print(
-                        f" Removed existing resume file: {existing_resume.filename}")
+                        f" Removed existing resume file: {
+                            existing_resume.filename}"
+                    )
                 except FileNotFoundError:
                     print(
-                        f"File not found: {existing_resume.filename}, skipping deletion.")
+                        f"File not found: {
+                            existing_resume.filename}, skipping deletion."
+                    )
                 except Exception as e:
                     print(f"Error removing existing file: {e}")
 
@@ -85,9 +89,10 @@ class Resume(Base):
             session.close()
 
     @staticmethod
-    def get_resumes_by_user_id(user_id):
+    def get_resumes_by_user_id(user_id: int) -> dict:
         session = Session()
-        resume = session.query(Resume).filter(Resume.user_id == user_id).first()
+        resume = session.query(Resume).filter(
+            Resume.user_id == user_id).first()
         session.close()
         try:
             resume = {
@@ -97,10 +102,9 @@ class Resume(Base):
             return resume
         except Exception:
             return "No Resume Found"
-        
 
     @staticmethod
-    def clear_resumes():
+    def clear_resumes() -> None:
         session = Session()
         session.query(Resume).delete()
         session.commit()
@@ -108,9 +112,8 @@ class Resume(Base):
         print("✅ Resumes table cleared.")
 
     @staticmethod
-    def allowed_file(filename):
+    def allowed_file(filename) -> bool:
         """Check if the uploaded file has an allowed extension."""
         return '.' in filename and (
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
         )
-

@@ -31,7 +31,8 @@ def upload_resume():
     return jsonify({"error": "File type not allowed"}), 400
 
 
-#  PROBLEM: IF NEW RESUME IS UPLOADED, THE SCORE IS NOT UPDATED IF IT WAS ALREADY CALCULATED
+#  PROBLEM: IF NEW RESUME IS UPLOADED,
+#  THE SCORE IS NOT UPDATED IF IT WAS ALREADY CALCULATED
 @resumes.route("/resume_score", methods=["POST"])
 def resume_score():
     request_data = request.json
@@ -40,8 +41,9 @@ def resume_score():
     print(f"User ID: {user_id}, Job Posting ID: {job_posting_id}")
 
     if not user_id or not job_posting_id:
-        return jsonify({"error": "User ID and job posting ID are required"}), 400
-    
+        return jsonify(
+            {"error": "User ID and job posting ID are required"}), 400
+
     job_score = SavedJob.get_job_score(user_id, job_posting_id)
     job_score = None if job_score == 0 else job_score
 
@@ -51,12 +53,16 @@ def resume_score():
             job_score = get_score(user_id, job_posting_id)
             if isinstance(job_score, dict):
                 job_score = job_score['score']
-                
+
             print(f"Job score: {job_score}")
         except Exception as e:
-            return jsonify({"error": f"Error computing similarity score: {str(e)} {job_score}"}), 500
+            return jsonify(
+                {"error": f"Error computing similarity score: {
+                    str(e)} {job_score}"
+                 }
+            ), 500
 
-    return jsonify({"score":round((job_score*100), 2)}), 200
+    return jsonify({"score": round((job_score*100), 2)}), 200
 
 
 @resumes.route("/resumes/suggestions", methods=["POST"])
@@ -69,7 +75,7 @@ def get_resume_suggestions():
     try:
         suggestions = improve_sections(user_id)
         return jsonify({"success": True, "suggestions": suggestions})
-   
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -80,7 +86,7 @@ def download_resume(user_id):
 
     if not resume or not resume['filename']:
         return jsonify({"error": "No resume found"}), 404
-    
+
     resume_filename = resume['filename']
     resume_path = os.path.join('data/resumes', resume_filename)
 
@@ -96,11 +102,11 @@ def view_resume(user_id):
 
     if not resume or not resume['filename']:
         return jsonify({"error": "No resume found"}), 404
-    
+
     resume_filename = resume['filename']
     resume_path = os.path.join('data/resumes', resume_filename)
 
     if not os.path.exists(os.path.join('backend', resume_path)):
         return jsonify({"error": "Resume file not found"}), 404
 
-    return send_file(resume_path, mimetype="application/pdf")  
+    return send_file(resume_path, mimetype="application/pdf")

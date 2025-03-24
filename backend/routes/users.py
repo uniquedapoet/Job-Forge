@@ -14,10 +14,7 @@ def get_users():
         User.from_csv("data/csvs/user_data.csv")
         users = User.users()
 
-    user_list = [{column.key: getattr(
-        user, column.key) for column in User.__table__.columns} for user in users]
-
-    return jsonify({"users": user_list})
+    return jsonify({"users": users})
 
 
 @users.route("/<int:user_id>", methods=["GET"])
@@ -53,3 +50,16 @@ def get_saved_jobs(user_id):
         return jsonify(saved_jobs)
     else:
         return jsonify({"error": "No saved jobs found"}), 404   
+    
+
+@users.route("/<int:user_id>/saved_jobs/<int:job_id>", methods=["POST"])
+def remove_saved_job(user_id, job_id):
+    if not user_id or not job_id:
+        return jsonify({"error": "User ID and job ID are required"}), 400
+
+    try:
+        SavedJob.remove_saved_job(user_id, job_id)
+        return jsonify({"message": "Job removed successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Error removing job: {str(e)}"}), 400

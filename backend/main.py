@@ -7,7 +7,6 @@ from routes.resumes import resumes
 
 os.environ['TOKENIZERS_PARALLELISM'] = "false"
 
-# MAKE ENDPOINT FOR RESUME DOWNLOAD --> PDF
 # MAKE ENDPOINT FOR REMOVING SAVEDJOB
 
 
