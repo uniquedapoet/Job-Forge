@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import MainLayout from "./MainLayout";
 import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext"; // Import UserContext
-
+// STILL SEARCHES WHEN NOTHING IS PRESENT FIX!!
 const JobSearch = ({ onLogout }) => {
   const [jobTitle, setJobTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -53,7 +53,13 @@ const JobSearch = ({ onLogout }) => {
   return (
     <MainLayout onLogout={onLogout} title="Job Search">
       <div className="job-search-container">
-        <div className="job-search-header">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault(); // Prevent default form submission behavior
+            handleSearch();
+          }}
+          className="job-search-header"
+        >
           <input
             type="text"
             placeholder="Job Title"
@@ -74,10 +80,8 @@ const JobSearch = ({ onLogout }) => {
             onChange={(e) => setLocation(e.target.value)}
             className="job-search-input"
           />
-          <button onClick={handleSearch} className="job-search-button">
-            Search
-          </button>
-        </div>
+          <button type="submit" className="job-search-button">Search</button>
+        </form>
         {error && <p className="job-search-message" style={{ color: "red" }}>{error}</p>}
         <ul className="job-search-list">
           {jobs.map((job, index) => (
