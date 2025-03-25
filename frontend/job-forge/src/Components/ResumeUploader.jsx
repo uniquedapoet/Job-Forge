@@ -16,7 +16,7 @@ const ResumeUploader = ({ onLogout }) => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("user_id", user.id); // Use the user ID from context
+    formData.append("user_id", user.id); 
 
     try {
       const response = await fetch("http://127.0.0.1:5001/resumes/upload", {

@@ -64,7 +64,7 @@ const Dashboard = ({ onLogout }) => {
               </li>
             ))
           ) : (
-            <h2 className="dashboard-title-message">No saved jobs found.</h2>
+            <h2 className="dashboard-title-message" style={{textAlign: "center" }}>No saved jobs found.</h2>
           )}
         </ul>
       </div>

@@ -81,20 +81,22 @@ const JobSearch = ({ onLogout }) => {
         {error && <p className="job-search-message" style={{ color: "red" }}>{error}</p>}
         <ul className="job-search-list">
           {jobs.map((job, index) => (
-            <li key={index}>
-              <h3>{job.title}</h3>
-              <p>{job.company}</p>
-              <p>{job.location}</p>
-              <button
-                onClick={() => handleSaveJob(job)}
-                className="job-search-button"
-                style={{
-                  backgroundColor: savedJobs.some(savedJob => savedJob.id === job.id) ? "#6c757d" : "#ba5624",
-                  marginTop: "10px",
-                }}
-              >
-                {savedJobs.some(savedJob => savedJob.id === job.id) ? "Remove" : "Save"}
-              </button>
+            <li key={index} className="job-search-item">
+              <div className="job-details">
+                <h3>{job.title}</h3>
+                <p>{job.company}</p>
+                <p>{job.location}</p>
+                <button
+                  onClick={() => handleSaveJob(job)}
+                  className="job-search-button"
+                  style={{
+                    backgroundColor: savedJobs.some(savedJob => savedJob.id === job.id) ? "#6c757d" : "#ba5624",
+                    marginTop: "10px",
+                  }}
+                >
+                  {savedJobs.some(savedJob => savedJob.id === job.id) ? "Remove" : "Save"}
+                </button>
+              </div>
             </li>
           ))}
         </ul>

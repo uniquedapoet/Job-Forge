@@ -16,7 +16,7 @@ const Home = ({ onLogout }) => {
               Welcome back, {user.first_name} {user.last_name}!
             </p>
           )}
-          <p>Select an option from the sidebar to get started.</p>
+          <p style={{ marginBottom: "20px", textAlign: "center" }}>Select an option from the sidebar to get started.</p>
         </div>
       </div>
     </MainLayout>
