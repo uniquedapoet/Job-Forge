@@ -66,7 +66,7 @@ def remove_saved_job(user_id, job_id):
     
 
 @users.route("/<int:user_id>/saved_jobs/<int:job_id>/save", methods=["POST"])
-def save_job(user_id, job_id)  
+def save_job(user_id, job_id): 
     if not user_id or not job_id:
         return jsonify({"error": "User ID and job ID are required"}), 400
     try:
