@@ -35,10 +35,6 @@ class Resume(Base):
         self.filename = filename
         self.file_url = file_url
 
-    # @staticmethod
-    # def create_tables():
-    #     Base.metadata.create_all(UserEngine, checkfirst=True)
-
     @staticmethod
     def insert_resume(user_id: int, uploaded_file: str) -> None:
         try:
@@ -117,3 +113,14 @@ class Resume(Base):
         return '.' in filename and (
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
         )
+
+    @staticmethod
+    def delete_resume(user_id):
+        session = Session()
+        try:
+            session.query(Resume).filter(Resume.user_id == user_id).delete()
+
+            return f"Resume Deleted for user ({user_id})"
+        except Exception as e:
+
+            return f'Error deleting resume for user ({e})'
