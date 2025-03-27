@@ -52,7 +52,7 @@ def get_saved_jobs(user_id):
         return jsonify({"error": "No saved jobs found"}), 404   
     
 
-@users.route("/<int:user_id>/saved_jobs/<int:job_id>", methods=["POST"])
+@users.route("/<int:user_id>/saved_jobs/<int:job_id>/delete", methods=["POST"])
 def remove_saved_job(user_id, job_id):
     if not user_id or not job_id:
         return jsonify({"error": "User ID and job ID are required"}), 400
@@ -65,7 +65,7 @@ def remove_saved_job(user_id, job_id):
         return jsonify({"error": f"Error removing job: {str(e)}"}), 400
     
 
-@users.route("/<int:user_id>/saved_jobs/<int:job_id>", methods=["POST"])
+@users.route("/<int:user_id>/saved_jobs/<int:job_id>/save", methods=["POST"])
 def save_job(user_id, job_id)  
     if not user_id or not job_id:
         return jsonify({"error": "User ID and job ID are required"}), 400
