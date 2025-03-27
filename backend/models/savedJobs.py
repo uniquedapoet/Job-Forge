@@ -25,10 +25,6 @@ class SavedJob(Base):
 
     user = relationship("User", back_populates="saved_jobs")
 
-    # @staticmethod
-    # def create_tables():
-    #     Base.metadata.create_all(engine, checkfirst=True)
-
     def save(self) -> None:
         try:
             session = Session()
