@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 import os
 from routes.jobs import jobs
+from models.jobs import Job
 from routes.users import users
 from routes.resumes import resumes
 
@@ -18,4 +19,4 @@ app.register_blueprint(resumes, url_prefix="/resumes")
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=False)

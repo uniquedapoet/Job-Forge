@@ -47,7 +47,7 @@ def resume_score():
     job_score = SavedJob.get_job_score(user_id, job_posting_id)
     job_score = None if job_score == 0 else job_score
 
-    if not job_score:
+    if not job_score or job_score == 0:
         try:
 
             job_score = get_score(user_id, job_posting_id)
