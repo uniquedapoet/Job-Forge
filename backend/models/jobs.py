@@ -205,6 +205,9 @@ class Job(Base):
         try:
             today = time.strftime("%Y-%m-%d")
             todays_jobs = session.query(Job).order_by()
+            
+        except Exception as e:
+            print(e)
 
 
 def validate_and_insert_jobs(job_data):
