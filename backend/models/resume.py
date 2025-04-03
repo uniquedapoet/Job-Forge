@@ -10,7 +10,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
-
+from models.users import User
+from models.savedJobs import SavedJob
 
 engine = UserEngine
 Session = UserSession
@@ -53,13 +54,11 @@ class Resume(Base):
                 try:
                     os.remove(existing_file)
                     print(
-                        f" Removed existing resume file: {
-                            existing_resume.filename}"
+                        f" Removed existing resume file: {existing_resume.filename}"
                     )
                 except FileNotFoundError:
                     print(
-                        f"File not found: {
-                            existing_resume.filename}, skipping deletion."
+                        f"File not found: {existing_resume.filename}, skipping deletion."
                     )
                 except Exception as e:
                     print(f"Error removing existing file: {e}")
