@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import { FaHome, FaSearch, FaUpload, FaSignOutAlt, FaBookmark, FaDesktop } from "react-icons/fa";
 import logo from "../Icons+Styling/Logo.png";
@@ -7,12 +7,13 @@ import "../Icons+Styling/Sidebar.css";
 
 const Sidebar = ({ onLogout }) => {
   const { user } = useContext(UserContext);
+  const navigate = useNavigate();
 
   return (
     <div className="sidebar">
       <div>
         <div className="sidebar-logo">
-          <img src={logo} alt="Job Forge Logo" />
+          <img src={logo} alt="Job Forge Logo" onClick={() => navigate('/home')} style={{cursor:'pointer'}}/>
           <h2>Job Forge</h2>
         </div>
 

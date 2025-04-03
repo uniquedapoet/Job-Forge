@@ -11,7 +11,6 @@ from db import UserEngine, UserSession, Base
 from typing import List
 
 
-
 engine = UserEngine
 Session = UserSession
 
@@ -26,12 +25,12 @@ class SavedJob(Base):
 
     user = relationship("User", back_populates="saved_jobs")
 
-
     @staticmethod
     def save(user_id, job_id, job_score=0) -> None:
         session = Session()
         try:
-            saved_job = SavedJob(user_id=user_id, job_id=job_id, job_score=job_score)
+            saved_job = SavedJob(
+                user_id=user_id, job_id=job_id, job_score=job_score)
 
             session.add(saved_job)
             session.commit()
@@ -95,10 +94,11 @@ class SavedJob(Base):
             session.close()
 
     @staticmethod
-    def remove_job_scores(user_id: int) -> None:
+    def remove_saved_jobs(user_id: int) -> None:
         session = Session()
         try:
-            session.query(SavedJob).filter(SavedJob.user_id == user_id).delete()
+            session.query(SavedJob).filter(
+                SavedJob.user_id == user_id).delete()
             session.commit()
 
         except Exception as e:

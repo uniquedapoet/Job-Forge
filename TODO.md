@@ -2,6 +2,10 @@
 - Create job posting template
 - Find way to display and edit pdf
 
+- Quote sections where changes are reccomended so we dont have to create a text editor.
+
+- Create Resume Template to input users new resume into and give back.
+
 ## Problems
 - Problem with removing saved jobs
 
@@ -27,3 +31,4 @@ Save vectorized resumes in database to reduce score function speed.
 - Hex user passwords
 - Home page
     - more content
+- Changing Fonts
