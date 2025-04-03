@@ -1,110 +1,224 @@
+/* ===== Sidebar Core Styles ===== */
 .sidebar {
-  width: 350px;
-  background-color: #d9824a;
-  color: #fff;
-  padding: 20px;
+  width: 280px;
+  background-color: #fff;
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: fixed; 
-  top: 0; 
-  bottom: 0; 
-  left: 0; 
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
   overflow-y: auto;
-  transition: width 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border-right: 1px solid #e0e0e6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
   z-index: 1000;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 .sidebar-logo {
-  text-align: center;
-  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .sidebar-logo img {
-  width: 100px;
-  height: auto;
-  margin-bottom: 10px;
+  width: 40px;
+  height: 40px;
 }
 
 .sidebar-logo h2 {
-  color: #fff;
-  font-size: 24px;
+  font-size: 1.5rem;
+  color: #1e1e1e;
+  font-weight: 600;
   margin: 0;
 }
 
+/* ===== Navigation Styles ===== */
 .sidebar-nav {
   list-style: none;
   padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.sidebar-nav li {
-  margin-bottom: 20px;
-}
-
-.sidebar-nav a {
-  color: #fff;
-  text-decoration: none;
+.sidebar-nav li a {
   display: flex;
   align-items: center;
-  font-size: 22px;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  padding: 0.85rem 1.25rem;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #495057;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 1rem;
 }
 
-.sidebar-nav a:hover {
-  background-color: #ba5624;
-  color: #fff;
+.sidebar-nav li a:hover {
+  background: #f8f9fa;
+  transform: translateX(2px);
+  color: #1e1e1e;
 }
 
-.sidebar-nav a.active {
-  background-color: #ba5624;
-  color: #fff;
+.sidebar-nav li a.active {
+  background: #ba5624;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(186, 86, 36, 0.2);
 }
 
-.sidebar-nav a .icon {
-  margin-right: 15px;
-  font-size: 24px;
+.sidebar-nav li a.active:hover {
+  background: #9c4a20;
+  transform: translateX(2px);
 }
 
+.sidebar-nav .icon {
+  margin-right: 12px;
+  font-size: 1.1rem;
+}
+
+/* ===== Logout Section ===== */
 .sidebar-logout {
-  text-align: center;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
 }
 
 .sidebar-logout p {
-  color: #fff;
-  margin-bottom: 15px;
-  font-size: 16px;
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: #64748b;
+  padding: 0 1.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .sidebar-logout button {
-  background-color: #fff;
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  background: #f1f5f9;
   color: #ba5624;
   border: none;
-  padding: 12px 24px;
-  border-radius: 5px;
+  border-radius: 10px;
+  font-weight: 600;
   cursor: pointer;
-  width: 100%;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  font-size: 1rem;
 }
 
 .sidebar-logout button:hover {
-  background-color: #f0f0f0;
+  background: #e2e8f0;
+  color: #9c4a20;
 }
+
+/* ===== Animation ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== Toggle Button Styles ===== */
+.sidebar-toggle-btn {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-toggle-btn:hover {
+  background: #9c4a20 !important;
+  transform: scale(1.05);
+}
+
+/* ===== Mobile Responsiveness ===== */
 @media (max-width: 768px) {
   .sidebar {
-    width: 250px; /* Adjust sidebar width for smaller screens */
+    width: 72px;
+    padding: 1.5rem 0.5rem;
+    align-items: center;
+  }
+  
+  .sidebar-logo {
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 1rem;
+  }
+  
+  .sidebar-logo h2 {
+    font-size: 0.75rem;
+    text-align: center;
+  }
+  
+  .sidebar-nav li a {
+    padding: 0.75rem;
+    justify-content: center;
+  }
+  
+  .sidebar-nav li a span {
+    display: none;
+  }
+  
+  .sidebar-nav .icon {
+    margin-right: 0;
+    font-size: 1.25rem;
+  }
+  
+  .sidebar-logout p {
+    display: none;
+  }
+  
+  .sidebar-logout button span {
+    display: none;
+  }
+  
+  .sidebar-logout button .FaSignOutAlt {
+    margin-right: 0;
+  }
+
+  .sidebar-toggle-btn {
+    left: 72px !important;
   }
 }
 
 @media (max-width: 480px) {
   .sidebar {
-    width: 100%; /* Sidebar takes full width on very small screens */
-    position: relative; /* Change to relative positioning */
-    height: auto; /* Adjust height */
+    width: 100%;
+    position: relative;
+    height: auto;
+    padding: 1.5rem;
+  }
+  
+  .sidebar-logo {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .sidebar-nav li a span {
+    display: inline;
+  }
+  
+  .sidebar-nav .icon {
+    margin-right: 12px;
+  }
+  
+  .sidebar-logout p {
+    display: block;
+  }
+  
+  .sidebar-logout button span {
+    display: inline;
+  }
+
+  .sidebar-toggle-btn {
+    display: none !important;
   }
 }

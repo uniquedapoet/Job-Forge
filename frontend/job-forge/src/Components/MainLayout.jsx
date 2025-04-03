@@ -1,10 +1,10 @@
 import React from "react";
 import Sidebar from "./Sidebar";
 
-const MainLayout = ({ children, onLogout, title }) => {
+const MainLayout = ({ children, onLogout, title, sidebarVisible = true }) => {
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      <Sidebar onLogout={onLogout} />
+      {sidebarVisible && <Sidebar onLogout={onLogout} />}
       <div style={{ flex: 1, padding: "20px" }}>
         {children}
       </div>

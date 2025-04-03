@@ -9,7 +9,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
 from typing import List
-from services.resume_scorer import get_score
+
 
 
 engine = UserEngine
@@ -26,6 +26,7 @@ class SavedJob(Base):
 
     user = relationship("User", back_populates="saved_jobs")
 
+
     @staticmethod
     def save(user_id, job_id, job_score=0) -> None:
         session = Session()
@@ -37,7 +38,6 @@ class SavedJob(Base):
             print(f"Inserted saved job: {job_id}")
 
         except Exception as e:
-
             print(f"Error inserting saved job {job_id}: {e}")
             session.rollback()
 
