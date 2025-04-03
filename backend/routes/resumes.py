@@ -26,6 +26,7 @@ def upload_resume():
 
     if file and Resume.allowed_file(file.filename):
         Resume.insert_resume(user_id, file)
+        SavedJob.remove_job_scores(user_id)
         return jsonify({"message": "File uploaded successfully"}), 201
 
     return jsonify({"error": "File type not allowed"}), 400
@@ -47,7 +48,7 @@ def resume_score():
     job_score = SavedJob.get_job_score(user_id, job_posting_id)
     job_score = None if job_score == 0 else job_score
 
-    if not job_score:
+    if not job_score or job_score == 0:
         try:
 
             job_score = get_score(user_id, job_posting_id)
