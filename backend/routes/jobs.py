@@ -64,3 +64,13 @@ def job_search():
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
+
+@jobs.route('/<int:job_id>', methods=['GET'])
+def get_job_by_id(job_id):
+    try:
+        job = Job.jobs_by_id(job_id)
+
+        return jsonify({'jobs':job})
+    
+    except Exception as e:
+        return jsonify({'error':f'Error Fetching Job data ({e})'})
