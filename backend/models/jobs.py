@@ -86,7 +86,7 @@ class Job(Base):
                for column in job.__table__.columns.keys()}
 
         return job
-    
+
     @staticmethod
     def jobs_by_job_id(job_id: str):
         session = Session()
@@ -189,7 +189,7 @@ class Job(Base):
         } for job in jobs]
 
         return job_list
-    
+
     @staticmethod
     def description_by_id(job_id):
         session = Session()
@@ -205,7 +205,7 @@ class Job(Base):
         try:
             today = time.strftime("%Y-%m-%d")
             todays_jobs = session.query(Job).order_by()
-            
+
         except Exception as e:
             print(e)
 
@@ -244,7 +244,6 @@ def validate_and_insert_jobs(job_data):
             print(
                 f"🔄 Job {job_id} already exists in the database. Skipping insertion.")
             return
-
 
         # ✅ Ensure only the required columns are inserted
         filtered_job_data = {key: job_data.get(
