@@ -35,7 +35,6 @@ def improve_bullets(user_id):
     RESUME_PATH = os.path.join("backend", "data", "resumes", resume_file_name)
     raw_resume = extract_text_from_pdf(RESUME_PATH)
 
-
     base_prompt = f"""
     You are an expert in career development and resume optimization, specializing in crafting resumes that maximize job application success. 
     I will provide you with resume and you will analyze the bullet points (lines begining with "-") and provide improvments while not making 

@@ -42,4 +42,3 @@ def get_quant_metrics_score(raw_resume):
     numbers = extract_numbers(bullets)
 
     return f"{round((len(numbers) / len(bullets))*100, 2)}%"
-
