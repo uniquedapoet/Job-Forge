@@ -93,3 +93,16 @@ class SavedJob(Base):
 
         finally:
             session.close()
+
+    @staticmethod
+    def remove_job_scores(user_id: int) -> None:
+        session = Session()
+        try:
+            session.query(SavedJob).filter(SavedJob.user_id == user_id).delete()
+            session.commit()
+
+        except Exception as e:
+            print(f"Error removing job scores: {e}")
+
+        finally:
+            session.close()

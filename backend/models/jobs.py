@@ -15,9 +15,16 @@ from sqlalchemy import (
 )
 from db import Base, JobEngine, JobSession
 from sqlalchemy.exc import IntegrityError
+import time
 
 Engine = JobEngine
 Session = JobSession
+
+#####
+
+# Update the jobs endpoint to ensure that it retrieves jobs from the current day.
+
+#####
 
 
 class Job(Base):
@@ -191,6 +198,13 @@ class Job(Base):
         session.close()
 
         return job.description
+
+    @staticmethod
+    def get_todays_jobs():
+        session = Session()
+        try:
+            today = time.strftime("%Y-%m-%d")
+            todays_jobs = session.query(Job).order_by()
 
 
 def validate_and_insert_jobs(job_data):
