@@ -207,3 +207,62 @@ body {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+.resume-content-wrapper {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.pdf-viewer-container {
+  flex: 2;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.suggestions-container {
+  flex: 1;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.suggestions-list {
+  margin-top: 1rem;
+}
+
+.suggestion-card {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #ba5624;
+}
+
+.suggestion-card p {
+  margin: 0 0 0.5rem 0;
+}
+
+.apply-suggestion-btn {
+  background: #ba5624;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.apply-suggestion-btn:hover {
+  background: #9c4a20;
+}
+
+@media (max-width: 1024px) {
+  .resume-content-wrapper {
+    flex-direction: column;
+  }
+}

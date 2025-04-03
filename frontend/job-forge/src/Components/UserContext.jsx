@@ -3,24 +3,21 @@ import React, { createContext, useState, useEffect } from "react";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  // Retrieve user data from localStorage on initial load
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const [user, setUser] = useState(storedUser || null);
-  const [savedJobs, setSavedJobs] = useState(storedUser?.savedJobs || []);
-  const [scores, setScores] = useState(storedUser?.scores || {}); // Add scores state
+  const [savedJobs, setSavedJobs] = useState([]);
 
-  // Save user data to localStorage whenever it changes
+  // Save user data to localStorage when it changes
   useEffect(() => {
     if (user) {
-      const updatedUser = { ...user, savedJobs, scores }; // Include savedJobs and scores in the user object
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      localStorage.setItem("user", JSON.stringify(user));
     } else {
       localStorage.removeItem("user");
     }
-  }, [user, savedJobs, scores]);
+  }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, savedJobs, setSavedJobs, scores, setScores }}>
+    <UserContext.Provider value={{ user, setUser, savedJobs, setSavedJobs }}>
       {children}
     </UserContext.Provider>
   );

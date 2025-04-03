@@ -9,16 +9,16 @@ import {
 import Auth from "./Components/Auth.jsx";
 import Home from "./Components/Home.jsx";
 import ResumeUploader from "./Components/ResumeUploader.jsx";
+import ResumeEditor from "./Components/ResumeEditor.jsx";
 import JobSearch from "./Components/Jobsearch.jsx";
-import Dashboard from "./Components/Dashboard.jsx"; // Import the Dashboard component
+import Dashboard from "./Components/Dashboard.jsx";
 import { UserProvider } from "./Components/UserContext.jsx";
 import Register from "./Components/Register.jsx";
 
 function App() {
   const handleLogout = () => {
-    // Clear user data from context or local storage
-    localStorage.removeItem("user"); // Example: Clear local storage
-    window.location.href = "/"; // Redirect to the login page
+    localStorage.removeItem("user");
+    window.location.href = "/";
   };
 
   return (
@@ -30,18 +30,10 @@ function App() {
               <Route path="/" element={<Auth />} />
               <Route path="/register" element={<Register />} />
               <Route path="/home" element={<Home onLogout={handleLogout} />} />
-              <Route
-                path="/upload-resume"
-                element={<ResumeUploader onLogout={handleLogout} />}
-              />
-              <Route
-                path="/job-search"
-                element={<JobSearch onLogout={handleLogout} />}
-              />
-              <Route
-                path="/dashboard"
-                element={<Dashboard onLogout={handleLogout} />}
-              />
+              <Route path="/upload-resume" element={<ResumeUploader onLogout={handleLogout} />} />
+              <Route path="/edit-resume" element={<ResumeEditor onLogout={handleLogout} />} />
+              <Route path="/job-search" element={<JobSearch onLogout={handleLogout} />} />
+              <Route path="/dashboard" element={<Dashboard onLogout={handleLogout} />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>

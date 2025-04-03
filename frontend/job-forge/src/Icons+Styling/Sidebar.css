@@ -128,6 +128,17 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
+/* ===== Toggle Button Styles ===== */
+.sidebar-toggle-btn {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-toggle-btn:hover {
+  background: #9c4a20 !important;
+  transform: scale(1.05);
+}
+
 /* ===== Mobile Responsiveness ===== */
 @media (max-width: 768px) {
   .sidebar {
@@ -172,6 +183,10 @@
   .sidebar-logout button .FaSignOutAlt {
     margin-right: 0;
   }
+
+  .sidebar-toggle-btn {
+    left: 72px !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -201,5 +216,9 @@
   
   .sidebar-logout button span {
     display: inline;
+  }
+
+  .sidebar-toggle-btn {
+    display: none !important;
   }
 }
