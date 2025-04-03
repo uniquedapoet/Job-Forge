@@ -26,18 +26,18 @@ class SavedJob(Base):
 
     user = relationship("User", back_populates="saved_jobs")
 
-    def save(user_id, job_id) -> None:
-        from services.resume_scorer import get_score
+
+    @staticmethod
+    def save(user_id, job_id, job_score=0) -> None:
         session = Session()
         try:
-            saved_job = SavedJob(user_id=user_id, job_id=job_id)
+            saved_job = SavedJob(user_id=user_id, job_id=job_id, job_score=job_score)
 
             session.add(saved_job)
             session.commit()
             print(f"Inserted saved job: {job_id}")
 
         except Exception as e:
-            
             print(f"Error inserting saved job {job_id}: {e}")
             session.rollback()
 
@@ -90,6 +90,19 @@ class SavedJob(Base):
 
         except Exception as e:
             print(f"Error removing saved job: {e}")
+
+        finally:
+            session.close()
+
+    @staticmethod
+    def remove_job_scores(user_id: int) -> None:
+        session = Session()
+        try:
+            session.query(SavedJob).filter(SavedJob.user_id == user_id).delete()
+            session.commit()
+
+        except Exception as e:
+            print(f"Error removing job scores: {e}")
 
         finally:
             session.close()
