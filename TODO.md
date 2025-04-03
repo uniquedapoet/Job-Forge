@@ -25,4 +25,5 @@ Save vectorized resumes in database to reduce score function speed.
 - Drop boxes to filter job listings
     - Clean data
 - Hex user passwords
-
+- Home page
+    - more content
