@@ -32,8 +32,6 @@ def upload_resume():
     return jsonify({"error": "File type not allowed"}), 400
 
 
-#  PROBLEM: IF NEW RESUME IS UPLOADED,
-#  THE SCORE IS NOT UPDATED IF IT WAS ALREADY CALCULATED
 @resumes.route("/resume_score", methods=["POST"])
 def resume_score():
     request_data = request.json
