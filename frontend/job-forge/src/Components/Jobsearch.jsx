@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import MainLayout from "./MainLayout";
 import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext";
@@ -11,12 +11,13 @@ const JobSearch = ({ onLogout }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [savingJobs, setSavingJobs] = useState({});
+  const [savedJobIds, setSavedJobIds] = useState([]);
 
-  const { user, savedJobs, setSavedJobs } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
-  const fetchSavedJobs = useCallback(async () => {
+  const fetchSavedJobIds = async () => {
     if (!user?.id) {
-      setSavedJobs([]);
+      setSavedJobIds([]);
       return;
     }
     
@@ -25,21 +26,21 @@ const JobSearch = ({ onLogout }) => {
       if (!response.ok) return;
       
       const data = await response.json();
-      setSavedJobs(data || []);
+      setSavedJobIds(data.map(job => job.job_id) || []);
     } catch (err) {
       console.error("Error fetching saved jobs:", err);
     }
-  }, [user?.id, setSavedJobs]);
+  };
 
   useEffect(() => {
     if (user) {
       setLocation(user.city || "");
       setSuggestions(user.job_titles ? user.job_titles.split(",").map(title => title.trim()) : []);
-      fetchSavedJobs();
+      fetchSavedJobIds();
     } else {
-      setSavedJobs([]);
+      setSavedJobIds([]);
     }
-  }, [user, fetchSavedJobs, setSavedJobs]);
+  }, [user]);
 
   const handleSearch = async () => {
     if (!jobTitle.trim()) {
@@ -77,7 +78,7 @@ const JobSearch = ({ onLogout }) => {
     
     setSavingJobs(prev => ({ ...prev, [job.id]: true }));
     setError("");
-    const isSaved = savedJobs.some(savedJob => savedJob.job_id === job.id);
+    const isSaved = savedJobIds.includes(job.id);
     
     try {
       if (isSaved) {
@@ -88,7 +89,7 @@ const JobSearch = ({ onLogout }) => {
         
         if (!response.ok) throw new Error("Failed to unsave job");
         
-        setSavedJobs(savedJobs.filter(savedJob => savedJob.job_id !== job.id));
+        setSavedJobIds(savedJobIds.filter(id => id !== job.id));
       } else {
         const jobData = {
           job_id: job.id,
@@ -109,7 +110,7 @@ const JobSearch = ({ onLogout }) => {
         
         if (!response.ok) throw new Error("Failed to save job");
         
-        setSavedJobs([...savedJobs, jobData]);
+        setSavedJobIds([...savedJobIds, job.id]);
       }
     } catch (err) {
       setError(err.message);
@@ -163,7 +164,7 @@ const JobSearch = ({ onLogout }) => {
           <ul className="job-search-list">
             {jobs.length > 0 ? (
               jobs.map((job, index) => {
-                const isSaved = savedJobs.some(savedJob => savedJob.job_id === job.id);
+                const isSaved = savedJobIds.includes(job.id);
                 const isProcessing = savingJobs[job.id] || false;
                 
                 return (
