@@ -1,5 +1,9 @@
 - Sketch out resume recommendation system (filtering down suggestions, mix of general and job specific suggestions, )
+
 - Create job posting template
+
+- Start Final Paper
+
 - Find way to display and edit pdf
 
 - Quote sections where changes are reccomended so we dont have to create a text editor.
@@ -20,6 +24,7 @@ Save vectorized resumes in database to reduce score function speed.
 ## Eddie
 - Daily job fetch
 - Create endpoint for resume suggestions
+- General Fomatting and Documentation
 
 ## Jaden
 - Fix problem with resume embedding

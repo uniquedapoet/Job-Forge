@@ -112,19 +112,28 @@ This project is a web-based tool designed to help users tailor their resumes to 
 ### **Authentication**
 - `GET /users` – Retrieve all users.  
 - `GET /users/<user_id>` – Retrieve a specific user.  
-- `POST users/register_user` – Register a new user.  
+- `POST /users/register_user` – Register a new user.  
+
 
 ### **Resume Handling**
 - `POST /upload` – Upload a resume file.  
-- `GET /download/<filename>` – Download a resume.  
+- `GET /download/<int:user_id>` – Download a resume.  
+- `POST /resume_score` – Returns resume score for specific job and resume
+- `POST /resumes/suggestions` – Returns resume suggestions for specific job and resume
+- `Get /view/<int:user_id>` – Returns Users Resume to view
 
 ### **Job Search**
 - `POST /job_search` – Fetch jobs using the **Indeed API**.  
 - `GET /jobs` – Retrieve stored job listings.  
+- `GET /jobs/<int:job_id>` – Retrieves details for specific job
 
 ### **AI-Powered Resume Optimization**
 - `POST /resume_score` – Get AI-based resume suggestions and a match score.  
 
+### **Job Handling**
+- `GET /<int:user_id>/saved_jobs` - returns saved jobs
+- `POST /<int:user_id>/saved_jobs/<int:job_id>/delete` - removes saved job
+- `POST <int:user_id>/saved_jobs/<int:job_id>/save` - saves a selected job
 ---
 
 ## **Database Schema**
