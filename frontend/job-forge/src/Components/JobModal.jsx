@@ -4,24 +4,43 @@ import "../Icons+Styling/MainContent.css";
 const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
   const formatDescription = (description) => {
     if (!description) return null;
-    
-    // Clean Up Formatting
+  
+    // CLEANING + FORMATTING
     let cleaned = description
       .replace(/\\n/g, '\n')
       .replace(/\\-/g, '-')
-      .replace(/\*\*/g, '')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
       .replace(/\*/g, '• ')
-      .replace(/\t\+/g, '  • ');
-      
-    // Split into paragraphs
+      .replace(/\t\+/g, '  • ')
+      .replace(/\n{2,}/g, '\n\n')
+      .trim();
+  
     const paragraphs = cleaned.split('\n\n').filter(p => p.trim().length > 0);
-    
+  
     return paragraphs.map((paragraph, index) => (
-      <p key={index} className="job-description" style={{ marginBottom: '1rem' }}>
-        {paragraph}
-      </p>
+      <p
+        key={index}
+        className="job-description"
+        style={{ marginBottom: '1rem' }}
+        dangerouslySetInnerHTML={{ __html: paragraph }}
+      />
     ));
   };
+
+  const formatJobType = (type) => {
+    if (!type) return null;
+    const map = {
+      fulltime: 'Full-Time',
+      parttime: 'Part-Time',
+      contract: 'Contract',
+      internship: 'Internship',
+      freelance: 'Freelance',
+      temporary: 'Temporary',
+    };
+    return map[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1);
+  };
+  
+  
 
   return (
     <div className="modal-overlay">
@@ -43,7 +62,7 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
           {job.job_type && (
             <div className="meta-item">
               <i className="fas fa-briefcase"></i>
-              <span><strong>Job Type:</strong> {job.job_type}</span>
+              <span><strong>Job Type:</strong> {formatJobType(job.job_type)}</span>
             </div>
           )}
           {job.date_posted && (
@@ -70,7 +89,7 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
           <div className="action-buttons">
             {job.job_url && (
               <a 
-                href={job.job_url} 
+                href={job.job_url_direct} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="apply-button"
