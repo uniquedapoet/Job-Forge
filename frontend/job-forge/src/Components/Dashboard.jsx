@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import MainLayout from "./MainLayout";
 import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext";
+import JobModal from "./JobModal";
 
 const Dashboard = ({ onLogout }) => {
   const { user } = useContext(UserContext);
@@ -12,6 +13,8 @@ const Dashboard = ({ onLogout }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [removingJobs, setRemovingJobs] = useState({});
   const [loadingJobs, setLoadingJobs] = useState(true);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const fetchJobDetails = async (jobId) => {
     try {
@@ -28,10 +31,41 @@ const Dashboard = ({ onLogout }) => {
         title: job.title,
         company: job.company,
         location: job.location,
+        job_type: job.job_type,
+        date_posted: job.date_posted,
+        description: job.description,
+        job_url: job.job_url
       };
     } catch (err) {
       console.error(`Error fetching details for job ${jobId}:`, err);
       return null;
+    }
+  };
+
+  const handleJobClick = async (job) => {
+    try {
+      const jobId = job.job_id || job.id;
+      const response = await fetch(`http://localhost:5001/jobs/${jobId}`);
+      if (!response.ok) throw new Error("Failed to fetch job details");
+      
+      const data = await response.json();
+      const jobData = data.jobs || data.job || data;
+      
+      if (!jobData) throw new Error("No job data received");
+
+      setSelectedJob({
+        id: jobData.id || jobData.job_id,
+        title: jobData.title,
+        company: jobData.company,
+        location: jobData.location,
+        job_type: jobData.job_type,
+        date_posted: jobData.date_posted,
+        description: jobData.description,
+        job_url: jobData.job_url
+      });
+      setShowModal(true);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -77,7 +111,7 @@ const Dashboard = ({ onLogout }) => {
       setJobDetails(detailsMap);
     } catch (err) {
       console.error("Unexpected fetch error:", err);
-      setError("");
+      setError("Failed to load saved jobs");
       setSavedJobs([]);
     } finally {
       setLoadingJobs(false);
@@ -171,7 +205,7 @@ const Dashboard = ({ onLogout }) => {
           <ul className="job-search-list">
             {savedJobs.length > 0 ? (
               savedJobs.map((savedJob, index) => {
-                const job = jobDetails[savedJob.job_id];
+                const job = jobDetails[savedJob.job_id] || savedJob;
                 const isProcessing = removingJobs[savedJob.job_id] || false;
                 const score = scores[savedJob.job_id] !== undefined
                   ? `${scores[savedJob.job_id]}%`
@@ -190,14 +224,22 @@ const Dashboard = ({ onLogout }) => {
                 }
 
                 return (
-                  <li key={index} className="job-search-item">
+                  <li 
+                    key={index} 
+                    className="job-search-item"
+                    onClick={() => handleJobClick(job)}
+                    style={{ cursor: "pointer" }}
+                  >
                     <div className="job-details">
                       <h3>{job.title}</h3>
                       <p>{job.company}</p>
                       <p>{job.location}</p>
                       <p><strong>Resume Score:</strong> {score}</p>
                       <button
-                        onClick={() => handleRemoveJob(savedJob.job_id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveJob(savedJob.job_id);
+                        }}
                         className="job-search-button"
                         style={{ backgroundColor: "#6c757d", marginTop: "10px" }}
                         disabled={isProcessing}
@@ -214,6 +256,13 @@ const Dashboard = ({ onLogout }) => {
               </h2>
             )}
           </ul>
+        )}
+
+        {showModal && selectedJob && (
+          <JobModal
+            job={selectedJob}
+            onClose={() => setShowModal(false)}
+          />
         )}
       </div>
     </MainLayout>

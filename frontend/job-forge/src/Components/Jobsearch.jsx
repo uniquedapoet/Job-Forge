@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import MainLayout from "./MainLayout";
 import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext";
+import JobModal from "./JobModal";
 
 const JobSearch = ({ onLogout }) => {
   const [jobTitle, setJobTitle] = useState("");
@@ -12,6 +13,8 @@ const JobSearch = ({ onLogout }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [savingJobs, setSavingJobs] = useState({});
   const [savedJobIds, setSavedJobIds] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const { user } = useContext(UserContext);
 
@@ -119,6 +122,20 @@ const JobSearch = ({ onLogout }) => {
     }
   };
 
+  const handleJobClick = async (job) => {
+    try {
+      const response = await fetch(`http://localhost:5001/jobs/${job.id}`);
+      if (!response.ok) throw new Error("Failed to fetch job details");
+      
+      const data = await response.json();
+      const jobData = data.jobs || data.job || data;
+      setSelectedJob(jobData);
+      setShowModal(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <MainLayout onLogout={onLogout} title="Job Search">
       <div className="job-search-container">
@@ -168,13 +185,21 @@ const JobSearch = ({ onLogout }) => {
                 const isProcessing = savingJobs[job.id] || false;
                 
                 return (
-                  <li key={index} className="job-search-item">
+                  <li 
+                    key={index} 
+                    className="job-search-item"
+                    onClick={() => handleJobClick(job)}
+                    style={{ cursor: "pointer" }}
+                  >
                     <div className="job-details">
                       <h3>{job.title}</h3>
                       <p>{job.company}</p>
                       <p>{job.location}</p>
                       <button
-                        onClick={() => handleSaveJob(job)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveJob(job);
+                        }}
                         className="job-search-button"
                         style={{
                           backgroundColor: isSaved ? "#6c757d" : "#ba5624",
@@ -192,6 +217,16 @@ const JobSearch = ({ onLogout }) => {
               <p className="job-search-message">No jobs found</p>
             )}
           </ul>
+        )}
+
+        {showModal && selectedJob && (
+          <JobModal
+            job={selectedJob}
+            onClose={() => setShowModal(false)}
+            onSaveJob={handleSaveJob}
+            isSaved={savedJobIds.includes(selectedJob.id)}
+            isProcessing={savingJobs[selectedJob.id] || false}
+          />
         )}
       </div>
     </MainLayout>
