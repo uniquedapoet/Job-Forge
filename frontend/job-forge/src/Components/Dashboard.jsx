@@ -96,7 +96,11 @@ const Dashboard = ({ onLogout }) => {
         return;
       }
 
-      setSavedJobs(savedJobsData);
+        const uniqueJobs = Array.from(
+          new Map(savedJobsData.map(job => [job.job_id, job])).values()
+        );
+        setSavedJobs(uniqueJobs);
+
 
       const detailsPromises = savedJobsData.map(job => fetchJobDetails(job.job_id));
       const detailsResults = await Promise.all(detailsPromises);
