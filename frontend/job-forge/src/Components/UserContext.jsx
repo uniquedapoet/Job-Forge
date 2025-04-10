@@ -5,7 +5,6 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const [user, setUser] = useState(storedUser || null);
-  const [savedJobs, setSavedJobs] = useState([]);
 
   // Save user data to localStorage when it changes
   useEffect(() => {
@@ -17,7 +16,7 @@ export const UserProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <UserContext.Provider value={{ user, setUser, savedJobs, setSavedJobs }}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );
