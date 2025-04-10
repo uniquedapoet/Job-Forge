@@ -12,6 +12,7 @@ from sqlalchemy import (
     Float,
     Date,
     Boolean,
+    or_
 )
 from db import Base, JobEngine, JobSession
 from sqlalchemy.exc import IntegrityError
@@ -182,10 +183,17 @@ class Job(Base):
     @staticmethod
     def jobs_by_location_and_title(location, title):
         session = Session()
+
+        title_keywords = title.split()
+
+        # create ilike conditions for each word in the title
+        title_filters = [
+            Job.title.ilike(f"%{word}%") for word in title_keywords]
+
         jobs = session.query(Job).filter(Job.location.like(
-            f"%{location}%"), Job.title.like(f"%{title}%")).order_by(
+            f"%{location}%"), or_(*title_filters)).order_by(
                  desc(Job.date_posted)).all()
-        session.close()
+
         session.close()
 
         job_list = [{column: getattr(
