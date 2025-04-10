@@ -5,7 +5,7 @@ import pandas as pd
 from config import JOBS_DATABASE_URL
 import os
 from sqlalchemy import (
-    Table,
+    desc,
     Column,
     Integer,
     String,
@@ -15,7 +15,7 @@ from sqlalchemy import (
 )
 from db import Base, JobEngine, JobSession
 from sqlalchemy.exc import IntegrityError
-import time
+from datetime import date
 
 Engine = JobEngine
 Session = JobSession
@@ -37,7 +37,7 @@ class Job(Base):
     title = Column(String, nullable=True)
     company = Column(String, nullable=True)
     location = Column(String, nullable=True)
-    date_posted = Column(String, nullable=True)
+    date_posted = Column(Date, nullable=True)
     job_type = Column(String, nullable=True)
     salary_source = Column(String, nullable=True)
     interval = Column(String, nullable=True)
@@ -101,7 +101,9 @@ class Job(Base):
     @staticmethod
     def jobs_by_title(title):
         session = Session()
-        jobs = session.query(Job).filter(Job.title.like(f"%{title}%")).all()
+        jobs = session.query(Job).filter(
+            Job.title.like(f"%{title}%")).order_by(
+            desc(Job.date_posted)).all()
         session.close()
 
         job_list = [{column: getattr(
@@ -127,7 +129,8 @@ class Job(Base):
     def jobs_by_location(location):
         session = Session()
         jobs = session.query(Job).filter(
-            Job.location.like(f"%{location}%")).all()
+            Job.location.like(f"%{location}%")).order_by(
+            desc(Job.date_posted)).all().all()
         session.close()
 
         job_list = [{column: getattr(
@@ -180,7 +183,8 @@ class Job(Base):
     def jobs_by_location_and_title(location, title):
         session = Session()
         jobs = session.query(Job).filter(Job.location.like(
-            f"%{location}%"), Job.title.like(f"%{title}%")).all()
+            f"%{location}%"), Job.title.like(f"%{title}%")).order_by(
+                 desc(Job.date_posted)).all()
         session.close()
         session.close()
 
@@ -199,16 +203,6 @@ class Job(Base):
 
         return job.description
 
-    @staticmethod
-    def get_todays_jobs():
-        session = Session()
-        try:
-            today = time.strftime("%Y-%m-%d")
-            todays_jobs = session.query(Job).order_by()
-
-        except Exception as e:
-            print(e)
-
 
 def validate_and_insert_jobs(job_data):
     """Validates and inserts jobs into the database using sqlite3."""
@@ -223,7 +217,7 @@ def validate_and_insert_jobs(job_data):
                         'company_description']
 
     try:
-        # ✅ If job_data is a DataFrame, drop duplicates and iterate over each row
+        #  If job_data is a DataFrame, drop duplicates and iterate over each row
         if isinstance(job_data, pd.DataFrame):
             job_data = job_data.drop_duplicates(
                 subset=["id"])  # Remove duplicate job_ids
@@ -231,7 +225,7 @@ def validate_and_insert_jobs(job_data):
                 validate_and_insert_jobs(row.to_dict())
             return
 
-        # ✅ If job_data is a Series (single row), convert to dict
+        #  If job_data is a Series (single row), convert to dict
         if isinstance(job_data, pd.Series):
             job_data = job_data.to_dict()
 
@@ -245,12 +239,12 @@ def validate_and_insert_jobs(job_data):
                 f"🔄 Job {job_id} already exists in the database. Skipping insertion.")
             return
 
-        # ✅ Ensure only the required columns are inserted
+        #  Ensure only the required columns are inserted
         filtered_job_data = {key: job_data.get(
             key, None) for key in expected_columns}
         filtered_job_data['job_id'] = filtered_job_data.pop('id')
 
-        # ✅ Use INSERT OR IGNORE to avoid duplicate errors
+        #  Use INSERT OR IGNORE to avoid duplicate errors
         session.add(Job(**filtered_job_data))
         session.commit()
 
