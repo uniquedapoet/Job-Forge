@@ -4,7 +4,8 @@ from sqlalchemy import (
     TIMESTAMP,
     ForeignKey,
     func,
-    Float
+    Float,
+    UniqueConstraint
 )
 from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
@@ -17,6 +18,10 @@ Session = UserSession
 
 class SavedJob(Base):
     __tablename__ = 'saved_jobs'
+    __table_args__ = (
+        UniqueConstraint('user_id', 'job_id', name='uix_user_job'),
+    )
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     job_id = Column(Integer, nullable=False)
@@ -47,9 +52,10 @@ class SavedJob(Base):
     def get_job_score(user_id: int, job_id: int) -> int:
         session = Session()
         try:
-            session.commit()
             job_score = session.query(SavedJob.job_score).filter(
                 SavedJob.user_id == user_id, SavedJob.job_id == job_id).first()
+            
+            session.commit()
             return job_score[0] if job_score else 0
         except Exception as e:
             print(f"Error getting job score: {e}")
