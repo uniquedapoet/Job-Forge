@@ -48,6 +48,7 @@ def job_search():
             # Log but don’t block search results
             print(f"Error inserting jobs: {str(e)}")
 
+        # Get results from Database
         if job_title and location:
             job_list = Job.jobs_by_location_and_title(
                 location=location, title=job_title)
