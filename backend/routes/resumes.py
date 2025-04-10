@@ -26,7 +26,7 @@ def upload_resume():
 
     if file and Resume.allowed_file(file.filename):
         Resume.insert_resume(user_id, file)
-        SavedJob.remove_job_scores(user_id)
+        SavedJob.remove_saved_jobs(user_id)
         return jsonify({"message": "File uploaded successfully"}), 201
 
     return jsonify({"error": "File type not allowed"}), 400
