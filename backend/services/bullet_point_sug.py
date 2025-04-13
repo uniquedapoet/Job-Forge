@@ -1,8 +1,9 @@
 import os
 import pandas as pd
 from openai import OpenAI
-from models.Resume import import Resume
-from services import resume_scraper as rs
+
+from models.resume import Resume
+from resume_scraper import extract_text_from_pdf
 import re
 import json
 
@@ -26,9 +27,14 @@ def clean_json(json_string):
 
 def improve_bullets(user_id):
     # Get user resume
-    resume_file_name = Resume.get_resumes_by_user_id(user_id)['filename']
-    RESUME_PATH = os.path.join("data", "resumes", resume_file_name)
-    raw_resume = rs.extract_text_from_pdf(RESUME_PATH)
+    resume_file_name = Resume.get_resumes_by_user_id(user_id)
+
+    if isinstance(resume_file_name, str):
+        return {'error': resume_file_name}
+
+    resume_file_name = resume_file_name['filename']
+    RESUME_PATH = os.path.join("backend", "data", "resumes", resume_file_name)
+    raw_resume = extract_text_from_pdf(RESUME_PATH)
 
     base_prompt = f"""
     You are an expert in career development and resume optimization, specializing in crafting resumes that maximize job application success. 

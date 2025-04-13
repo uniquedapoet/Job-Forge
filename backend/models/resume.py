@@ -10,7 +10,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
-
+from models.users import User
+from models.savedJobs import SavedJob
 
 engine = UserEngine
 Session = UserSession
