@@ -1,9 +1,8 @@
 import os
 import pandas as pd
 from openai import OpenAI
-
 from models.resume import Resume
-from resume_scraper import extract_text_from_pdf
+from services.resume_scraper import extract_text_from_pdf
 import re
 import json
 

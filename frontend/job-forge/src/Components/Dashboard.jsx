@@ -10,11 +10,16 @@ const Dashboard = ({ onLogout }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [removingJobs, setRemovingJobs] = useState({}); // Track removing state per job
 
+  // Log savedJobs 
+  useEffect(() => {
+    console.log("Updated savedJobs:", savedJobs);
+  }, [savedJobs]);
+
   useEffect(() => {
     const fetchScores = async () => {
       const scoresData = {};
       setIsLoading(true);
-      
+
       try {
         for (const job of savedJobs) {
           try {
@@ -26,20 +31,21 @@ const Dashboard = ({ onLogout }) => {
                 job_posting_id: job.job_id,
               }),
             });
-
+        
             const data = await response.json();
-            
-            if (response.ok) {
-              scoresData[job.job_id] = data.score;
-            } else {
-              scoresData[job.job_id] = "N/A";
-            }
+        
+            setScores(prev => ({
+              ...prev,
+              [job.job_id]: response.ok ? data.score : "N/A"
+            }));
           } catch (error) {
             console.error("Error fetching score for job:", job.job_id, error);
-            scoresData[job.job_id] = "N/A";
+            setScores(prev => ({
+              ...prev,
+              [job.job_id]: "N/A"
+            }));
           }
         }
-        setScores(scoresData);
       } catch (err) {
         setError("Failed to load resume scores");
       } finally {
@@ -56,29 +62,36 @@ const Dashboard = ({ onLogout }) => {
 
   const handleRemoveJob = async (jobId) => {
     if (!user?.id) return;
-    
-    setRemovingJobs(prev => ({ ...prev, [jobId]: true }));
+
+    setRemovingJobs((prev) => ({ ...prev, [jobId]: true }));
     setError("");
-    
+
     try {
       const response = await fetch(
         `http://localhost:5001/users/${user.id}/saved_jobs/${jobId}/delete`,
         { method: "POST" }
       );
-      
+
       if (!response.ok) throw new Error("Failed to remove job");
-      
-      setSavedJobs(savedJobs.filter(job => job.job_id !== jobId));
+
+      console.log("Before removing:", savedJobs);
+
+      setSavedJobs((prevJobs) => {
+        const updatedJobs = prevJobs.filter((job) => job.job_id !== jobId);
+        console.log("After removing:", updatedJobs);
+        return updatedJobs;
+      });
+
       // Remove the score for the deleted job
-      setScores(prev => {
-        const newScores = {...prev};
+      setScores((prev) => {
+        const newScores = { ...prev };
         delete newScores[jobId];
         return newScores;
       });
     } catch (err) {
       setError(err.message);
     } finally {
-      setRemovingJobs(prev => ({ ...prev, [jobId]: false }));
+      setRemovingJobs((prev) => ({ ...prev, [jobId]: false }));
     }
   };
 
@@ -86,14 +99,16 @@ const Dashboard = ({ onLogout }) => {
     <MainLayout onLogout={onLogout} title="Saved Jobs">
       <div className="job-search-container">
         {error && <p className="job-search-message" style={{ color: "red" }}>{error}</p>}
-        
+
         <ul className="job-search-list">
           {savedJobs.length > 0 ? (
             savedJobs.map((job, index) => {
               const isProcessing = removingJobs[job.job_id] || false;
-              const score = scores[job.job_id] !== undefined ? 
-                `${scores[job.job_id]}%` : 
-                (isLoading ? "Loading..." : "N/A");
+              const score = scores[job.job_id] !== undefined
+                ? `${scores[job.job_id]}%`
+                : isLoading
+                  ? "Loading..."
+                  : "N/A";
 
               return (
                 <li key={index} className="job-search-item">

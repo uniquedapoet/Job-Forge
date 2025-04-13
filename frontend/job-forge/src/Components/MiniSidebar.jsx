@@ -8,7 +8,12 @@ const MiniSidebar = ({ onExpand }) => {
     <div className="mini-sidebar">
       <div className="mini-sidebar-content">
         <div className="sidebar-logo" onClick={onExpand}>
-          <img src={logo} alt="Job Forge Logo" />
+          <img
+            src={logo}
+            alt="Job Forge Logo"
+            onClick={() => navigate("/home")}
+            style={{ cursor: "pointer" }}
+          />
         </div>
 
         <nav>
