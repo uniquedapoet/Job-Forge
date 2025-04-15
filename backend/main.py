@@ -13,7 +13,7 @@ os.environ['TOKENIZERS_PARALLELISM'] = "false"
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
+CORS(app)
 
 # Register blueprints
 app.register_blueprint(jobs, url_prefix="/jobs")

@@ -56,9 +56,7 @@ def resume_score():
             print(f"Job score: {job_score}")
         except Exception as e:
             return jsonify(
-                {"error": f"Error computing similarity score: {
-                    str(e)} {job_score}"
-                 }
+                {"error": f"Error computing similarity score: {str(e)} {job_score}"}
             ), 500
 
     return jsonify({"score": round((job_score*100), 2)}), 200

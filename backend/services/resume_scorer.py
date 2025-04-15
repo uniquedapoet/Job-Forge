@@ -34,7 +34,9 @@ def get_score(user_id, job_posting_id):
         score = similarity_score.item()
         # ===============================
 
-        SavedJob.save(job_id=job_posting_id, user_id=user_id, job_score=score)
+        SavedJob.save_job_score(
+            job_id=job_posting_id, user_id=user_id, job_score=score
+            )
 
         print(f"Similarity score between user {user_id}'s resume and job posting {job_posting_id}: {score}")
         return {
