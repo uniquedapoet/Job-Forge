@@ -4,8 +4,10 @@ from sqlalchemy import (
     TIMESTAMP,
     ForeignKey,
     func,
-    Float
+    Float,
+    UniqueConstraint
 )
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
 from typing import List
@@ -17,6 +19,10 @@ Session = UserSession
 
 class SavedJob(Base):
     __tablename__ = 'saved_jobs'
+    __table_args__ = (
+        UniqueConstraint('user_id', 'job_id', name='uix_user_job'),
+    )
+
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     job_id = Column(Integer, nullable=False)
@@ -26,17 +32,17 @@ class SavedJob(Base):
     user = relationship("User", back_populates="saved_jobs")
 
     @staticmethod
-    def save(user_id, job_id, job_score=0) -> None:
+    def save(user_id, job_id) -> None:
         session = Session()
         try:
             saved_job = SavedJob(
-                user_id=user_id, job_id=job_id, job_score=job_score)
+                user_id=user_id, job_id=job_id, job_score=0)
 
             session.add(saved_job)
             session.commit()
             print(f"Inserted saved job: {job_id}")
 
-        except Exception as e:
+        except IntegrityError as e:
             print(f"Error inserting saved job {job_id}: {e}")
             session.rollback()
 
@@ -44,12 +50,29 @@ class SavedJob(Base):
             session.close()
 
     @staticmethod
+    def save_job_score(user_id, job_id, job_score):
+        session = Session()
+        try:
+            saved_job = session.query(SavedJob).filter(
+                SavedJob.job_id == job_id, SavedJob.user_id == user_id).first()
+
+            if not saved_job:
+                return 'error saving job score', 200
+
+            saved_job.job_score = job_score
+            session.commit()
+
+        except IntegrityError as e:
+            return f'error saving job score {e}', 400
+
+    @staticmethod
     def get_job_score(user_id: int, job_id: int) -> int:
         session = Session()
         try:
-            session.commit()
             job_score = session.query(SavedJob.job_score).filter(
                 SavedJob.user_id == user_id, SavedJob.job_id == job_id).first()
+
+            session.commit()
             return job_score[0] if job_score else 0
         except Exception as e:
             print(f"Error getting job score: {e}")

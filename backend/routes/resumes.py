@@ -26,14 +26,12 @@ def upload_resume():
 
     if file and Resume.allowed_file(file.filename):
         Resume.insert_resume(user_id, file)
-        SavedJob.remove_job_scores(user_id)
+        SavedJob.remove_saved_jobs(user_id)
         return jsonify({"message": "File uploaded successfully"}), 201
 
     return jsonify({"error": "File type not allowed"}), 400
 
 
-#  PROBLEM: IF NEW RESUME IS UPLOADED,
-#  THE SCORE IS NOT UPDATED IF IT WAS ALREADY CALCULATED
 @resumes.route("/resume_score", methods=["POST"])
 def resume_score():
     request_data = request.json
@@ -58,9 +56,7 @@ def resume_score():
             print(f"Job score: {job_score}")
         except Exception as e:
             return jsonify(
-                {"error": f"Error computing similarity score: {
-                    str(e)} {job_score}"
-                 }
+                {"error": f"Error computing similarity score: {str(e)} {job_score}"}
             ), 500
 
     return jsonify({"score": round((job_score*100), 2)}), 200

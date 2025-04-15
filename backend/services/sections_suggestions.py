@@ -27,7 +27,7 @@ def clean_json(json_string: str) -> dict:
 
 def improve_sections(user_id):
     # Get user resume
-    resume_file_name = Resume.get_resumes_by_user_id(user_id)[0]['filename']
+    resume_file_name = Resume.get_resumes_by_user_id(user_id)['filename']
     RESUME_PATH = os.path.join("data", "resumes", resume_file_name)
     raw_resume = rs.extract_text_from_pdf(RESUME_PATH)
     sections = rs.extract_resume_sections(raw_resume)
