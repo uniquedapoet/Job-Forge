@@ -6,7 +6,7 @@ def extract_bullet_points(text):
     current_bullet = ""
 
     for line in lines:
-        if re.match(r'^\s*-\s+', line):  # Check if line starts with '- '
+        if re.match(r'^\s*(-\s+|e\s+)', line):
             if current_bullet:
                 bullets.append(current_bullet.strip())  # Save the previous bullet
             current_bullet = re.sub(r'^\s*-\s+', '', line)  # Start new bullet
@@ -32,9 +32,9 @@ def extract_numbers(bullets):
         # - percentages (e.g. 60%)
         # - negative numbers (e.g. -12%)
         numbers = re.findall(r'-?\d+\.?\d*%?', bullet)
-
-        for number in numbers:
-            bullet_numbers.append(number)
+        
+        if len(numbers) != 0:
+            bullet_numbers.append(numbers[0])
     return bullet_numbers
 
 def get_quant_metrics_score(raw_resume):
@@ -42,4 +42,3 @@ def get_quant_metrics_score(raw_resume):
     numbers = extract_numbers(bullets)
 
     return f"{round((len(numbers) / len(bullets))*100, 2)}%"
-
