@@ -9,7 +9,7 @@ const ResumeEditor = ({ onLogout }) => {
   const { user } = useContext(UserContext);
   const [resumeUrl, setResumeUrl] = useState("");
   const [message, setMessage] = useState({ text: "", isError: false });
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const [suggestions, setSuggestions] = useState([
     "Consider adding more action verbs to your work experience",
     "Your education section could include relevant coursework",
@@ -35,7 +35,7 @@ const ResumeEditor = ({ onLogout }) => {
   };
 
   return (
-    <MainLayout onLogout={onLogout} title="Resume Editor" sidebarVisible={sidebarVisible}>
+    <MainLayout onLogout={onLogout} title="Resume Editor" sidebarVisible={sidebarVisible} onToggleSidebar={toggleSidebar}>
       <div className="resume-editor-container">
         <button 
           onClick={toggleSidebar}

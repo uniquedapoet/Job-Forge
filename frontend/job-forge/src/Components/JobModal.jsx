@@ -7,6 +7,10 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
   
     // CLEANING + FORMATTING
     let cleaned = description
+      .replace(/\\&/g, '&') 
+      .replace(/\\\d+/g, '')
+      .replace(/(\d)\\/g, '$1') 
+      .replace(/(\d)\s?-\s?(\d)/g, '$1-$2')
       .replace(/\\n/g, '\n')
       .replace(/\\-/g, '-')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 

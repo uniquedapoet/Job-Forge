@@ -195,7 +195,6 @@ const JobSearch = ({ onLogout }) => {
                       <h3>{job.title}</h3>
                       <p>{job.company}</p>
                       <p>{job.location}</p>
-                      <p>{job.date_posted}</p>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
