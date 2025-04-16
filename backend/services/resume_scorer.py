@@ -1,9 +1,7 @@
-from services.resume_scraper import extract_text_from_pdf
 from services.score import Score
-import os
 from models.resume import Resume
 from models.jobs import Job
-from nltk.corpus import wordnet as wn
+from nltk.corpus import wordnet as wn  # type: ignore
 
 
 wn.ensure_loaded()
@@ -29,8 +27,6 @@ def get_score(user_id, job_posting_id):
         SavedJob.save_job_score(
             job_id=job_posting_id, user_id=user_id, job_score=score
         )
-        print(
-            f"Similarity score between user {user_id}'s resume and job posting {job_posting_id}: {score}")
         return {
             "status": "success",
             "user_id": user_id,
