@@ -1,5 +1,5 @@
-from flask import Flask
-from flask_cors import CORS
+from flask import Flask  # type: ignore
+from flask_cors import CORS  # type: ignore
 import os
 from routes.jobs import jobs
 from routes.users import users

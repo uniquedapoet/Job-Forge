@@ -1,6 +1,6 @@
 import uuid
 import os
-from sqlalchemy import (
+from sqlalchemy import (  # type: ignore
     Column,
     Integer,
     String,
@@ -8,11 +8,9 @@ from sqlalchemy import (
     ForeignKey,
     func
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship  # type: ignore
 from db import UserEngine, UserSession, Base
-from models.users import User
-from models.savedJobs import SavedJob
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError  # type: ignore
 
 engine = UserEngine
 Session = UserSession
@@ -51,11 +49,11 @@ class Resume(Base):
                 try:
                     os.remove(existing_file)
                     print(
-                        f" Removed existing resume file: {existing_resume.filename}"
+                        f" Removed existing resume: {existing_resume.filename}"
                     )
                 except FileNotFoundError:
                     print(
-                        f"File not found: {existing_resume.filename}, skipping deletion."
+                        f"File not found: {existing_resume.filename}."
                     )
                 except Exception as e:
                     print(f"Error removing existing file: {e}")
