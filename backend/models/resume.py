@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
 from models.users import User
 from models.savedJobs import SavedJob
+from sqlalchemy.exc import IntegrityError
 
 engine = UserEngine
 Session = UserSession
@@ -28,16 +29,12 @@ class Resume(Base):
     filename = Column(String, nullable=False)
     file_url = Column(String, nullable=False)
     uploaded_at = Column(TIMESTAMP, server_default=func.now())
-
+    resume_text = Column(String, nullable=True)
     user = relationship("User", back_populates="resumes")
-
-    def __init__(self, user_id, filename, file_url):
-        self.user_id = user_id
-        self.filename = filename
-        self.file_url = file_url
 
     @staticmethod
     def insert_resume(user_id: int, uploaded_file: str) -> None:
+        from services.resume_scraper import extract_text_from_pdf
         try:
             session = Session()
 
@@ -71,8 +68,16 @@ class Resume(Base):
 
             file_url = f"/download/{unique_filename}"
 
+            resume_text = extract_text_from_pdf(file_path)
+
             new_resume = Resume(
-                user_id=user_id, filename=unique_filename, file_url=file_url)
+                user_id=user_id,
+                filename=unique_filename,
+                file_url=file_url,
+                resume_text=resume_text
+
+            )
+
             session.add(new_resume)
             session.commit()
             print("Inserted new resume")
@@ -123,3 +128,40 @@ class Resume(Base):
         except Exception as e:
 
             return f'Error deleting resume for user ({e})'
+
+    @staticmethod
+    def add_resume_text(user_id, resume_text):
+        session = Session()
+        try:
+            saved_resume = session.query(Resume).filter(
+                Resume.user_id == user_id).first()
+
+            if not saved_resume:
+                return f'No Saved Resume for user {user_id}'
+
+            saved_resume.resume_text = resume_text
+            session.commit()
+
+        except IntegrityError as e:
+            return f'Error Adding Resume Text {e}'
+
+        finally:
+            session.close()
+
+    @staticmethod
+    def get_resume_text(user_id):
+        session = Session()
+        try:
+            resume = session.query(Resume).filter(
+                Resume.user_id == user_id).first()
+
+            if not resume:
+                return f'Error Finding Resume for User: {user_id}'
+
+            session.commit()
+            return resume.resume_text
+        except IntegrityError as e:
+            return f'Error Finding Resume For User: {user_id}, {e}'
+
+        finally:
+            session.close()
