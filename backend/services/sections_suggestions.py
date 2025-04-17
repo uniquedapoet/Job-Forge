@@ -25,6 +25,7 @@ def clean_json(json_string: str) -> dict:
 
     return cleaned_json
 
+
 def improve_sections(user_id):
     # Get user resume
     resume_file_name = Resume.get_resumes_by_user_id(user_id)['filename']
