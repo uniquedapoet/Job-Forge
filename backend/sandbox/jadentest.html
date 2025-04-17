@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Optimized Resume of Jackson Giemza">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 40px;
+      background-color: #fff;
+      color: #000;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .contact {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .summary {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 4px;
+    }
+
+    .job-header, .project-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+    }
+
+    .employer {
+      font-style: normal;
+      margin-bottom: 4px;
+    }
+
+    ul {
+      list-style-type: disc;
+      padding-left: 20px;
+      margin-top: 6px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin: 6px 0;
+    }
+
+    .section {
+      margin-top: 15px;
+    }
+
+    .skills-label {
+      font-weight: bold;
+    }
+
+    @media print {
+      body {
+        margin: 12mm;
+        font-size: 9pt;
+      }
+
+      .section {
+        page-break-inside: avoid;
+        page-break-inside: avoid;
+        page-break-after: avoid;
+      }
+
+      h1 {
+        font-size: 14px;
+      }
+      h2 {
+        font-size: 12px;
+      }
+
+      ul {
+        padding-left: 15px;
+      }
+
+      .contact {
+        font-size: 10pt;
+      }
+
+      .summary {
+        font-size: 10pt;
+      }
+
+      .section:last-of-type {
+        margin-bottom: 0;
+      }
+      @page {
+      size: A4;
+      margin: 0;
+    }
+
+    .section {
+      page-break-inside: avoid;
+    }
+  }
+  
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Jackson Giemza</h1>
+    <p class="contact">Boulder, CO | (708)-340-8105 | jackson.giemza@gmail.com | github.com/JacksonGiemza</p>
+    <p class="summary">Data scientist with hands-on experience in financial risk analysis, data automation, and AI-driven insights. Skilled in Python, SQL, and machine learning, with a passion for solving complex problems through data-driven decision-making.</p>
+  </header>
+
+  <!-- Sections -->
+  <section class="section" aria-label="Education">
+    <h2>Education</h2>
+    <p><strong>University of Colorado, Boulder, CO | Expected Graduation Dec 2025</strong></p>
+    <p><strong>Bachelor of Science, Information Science | Minor, Philosophy</strong></p>
+    <p><strong>Relevant Courses:</strong> Data Visualization, Statistics, Python for Info Sci 1&2, Linear Algebra, R for Data Science, Logic, Quantitative Reasoning, Physics 1&2, Calculus, Economics, UI/UX Design</p>
+  </section>
+
+  <section class="section" aria-label="Experience">
+    <h2>Experience</h2>
+    <div class="job-header">
+      <span>Risk Technology Analyst</span>
+      <span>RJ O’Brien & Associates | May 2024 - Aug. 2024, Chicago, IL</span>
+    </div>
+    <ul>
+      <li>Developed a Python-based solution to automate financial audit requests, reducing work for analysts by dynamically generating and scheduling 15+ personalized emails bi-weekly.</li>
+      <li>Led the project from concept to deployment, including training future maintainers and creating a Power BI dashboard for monitoring requests and manually sending custom emails ad hoc.</li>
+      <li>Identified the need for and developed a Python GUI for generating customized anonymous test data for users of all technical expertise.</li>
+      <li>Served as an ambassador for new AI tools by interviewing coworkers to identify pain points in AI adoption and conducting 10+ one-on-one demos teaching how to leverage gen. AI.</li>
+    </ul>
+
+    <div class="job-header">
+      <span>Data Science Intern</span>
+      <span>CloudQuant | May 2023 - Aug. 2023, Chicago, IL</span>
+    </div>
+    <ul>
+      <li>Expanded the data catalog by 8000+ datasets through seamless integration of various data APIs and dynamic web scrapers.</li>
+      <li>Strategically utilized the new OpenAI API to automate data entry and cleaning processes, significantly enhancing efficiency while reducing manual workload.</li>
+      <li>Drove insights through analysis and data visualization.</li>
+    </ul>
+
+    <div class="job-header">
+      <span>Summer Intern</span>
+      <span>RJ O’Brien & Associates | May 2022 - Aug. 2022, Chicago, IL</span>
+    </div>
+    <ul>
+      <li>Engineered automated risk reports for quarterly and daily distribution.</li>
+      <li>Designed a comprehensive financial analysis dashboard for vendor viability.</li>
+      <li>Conducted rigorous User Acceptance Testing for the credit API.</li>
+    </ul>
+  </section>
+
+  <section class="section" aria-label="Projects">
+    <h2>Projects</h2>
+    <div class="project-header">
+      <span>Statistical Arbitrage Trading Strategy</span>
+    </div>
+    <ul>
+      <li>Leveraged public historical market data to identify mean-reverting stock pairs based on cointegration analysis.</li>
+      <li>Backtested the strategy over 3 years of data, evaluating performance with a Sharpe ratio (1.4), max drawdown (-12%), and win rate (60%), demonstrating consistent profitability in diverse market conditions.</li>
+    </ul>
+
+    <div class="project-header">
+      <span>Kaggle Competition | Multi Class Prediction of Obesity Risk</span>
+    </div>
+    <ul>
+      <li>Developed a classification model to predict obesity risk rates using logistical regression, random forest, and XGBoost.</li>
+      <li>Achieved top 8% ranking by optimizing hyperparameters and handling missing data with imputation strategies.</li>
+    </ul>
+  </section>
+
+  <section class="section" aria-label="Skills">
+    <h2>Skills</h2>
+    <p><span class="skills-label">Programming:</span> Python, R, SQL (MySQL, PostgreSQL), GIT</p>
+    <p><span class="skills-label">Data Science:</span> Scikit-Learn, TensorFlow, PyTorch, Pandas, Numpy, NLP</p>
+    <p><span class="skills-label">Data Visualization:</span> PowerBi, Tableau, Altair, Matplotlib</p>
+    <p><span class="skills-label">Professional Skills:</span> Analytical Thinking, Curiosity & Lifelong Learning, Adaptability, Communication</p>
+  </section>
+
+</body>
+</html>
