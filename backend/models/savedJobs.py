@@ -64,6 +64,9 @@ class SavedJob(Base):
 
         except IntegrityError as e:
             return f'error saving job score {e}', 400
+        
+        finally:
+            session.close()
 
     @staticmethod
     def get_job_score(user_id: int, job_id: int) -> int:

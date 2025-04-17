@@ -6,6 +6,11 @@
 
 - extracting Sections from diffrent types of resumes
 
+## If ^ Doesnt Work
+
+- Get job specifics and general suggestions and give them directly to the user to change resume thier resume on thier own
+- Page that gives these suggestions should also allow you to re upload your resume and get your improved score. 
+
 
 # Next Week 
 

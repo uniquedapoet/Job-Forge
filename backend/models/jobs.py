@@ -1,10 +1,7 @@
 # Scrapes job descriptions from URLs.
 # Stores job applications in the database.import os
-import sqlite3
-import pandas as pd
-from config import JOBS_DATABASE_URL
-import os
-from sqlalchemy import (
+import pandas as pd  # type: ignore
+from sqlalchemy import (  # type: ignore
     desc,
     Column,
     Integer,
@@ -15,17 +12,10 @@ from sqlalchemy import (
     or_
 )
 from db import Base, JobEngine, JobSession
-from sqlalchemy.exc import IntegrityError
-from datetime import date
+from sqlalchemy.exc import IntegrityError  # type: ignore
 
 Engine = JobEngine
 Session = JobSession
-
-#####
-
-# Update the jobs endpoint to ensure that it retrieves jobs from the current day.
-
-#####
 
 
 class Job(Base):
@@ -192,7 +182,7 @@ class Job(Base):
 
         jobs = session.query(Job).filter(Job.location.like(
             f"%{location}%"), or_(*title_filters)).order_by(
-                 desc(Job.date_posted)).all()
+            desc(Job.date_posted)).all()
 
         session.close()
 
@@ -217,15 +207,17 @@ def validate_and_insert_jobs(job_data):
     session = Session()
 
     expected_columns = ['id', 'site', 'job_url', 'job_url_direct', 'title',
-                        'company', 'location', 'date_posted', 'job_type', 'salary_source',
-                        'interval', 'min_amount', 'max_amount', 'currency', 'is_remote',
-                        'job_level', 'job_function', 'listing_type', 'emails', 'description',
-                        'company_industry', 'company_url', 'company_logo', 'company_url_direct',
-                        'company_addresses', 'company_num_employees', 'company_revenue',
-                        'company_description']
+                        'company', 'location', 'date_posted', 'job_type',
+                        'salary_source', 'interval', 'min_amount',
+                        'max_amount', 'currency', 'is_remote', 'job_level',
+                        'job_function', 'listing_type', 'emails',
+                        'description', 'company_industry', 'company_url',
+                        'company_logo', 'company_url_direct',
+                        'company_addresses', 'company_num_employees',
+                        'company_revenue', 'company_description']
 
     try:
-        #  If job_data is a DataFrame, drop duplicates and iterate over each row
+        # If job_data is a DataFrame, drop duplicates and iterate over each row
         if isinstance(job_data, pd.DataFrame):
             job_data = job_data.drop_duplicates(
                 subset=["id"])  # Remove duplicate job_ids
@@ -244,7 +236,7 @@ def validate_and_insert_jobs(job_data):
 
         if job_id in existing_jobs:
             print(
-                f"🔄 Job {job_id} already exists in the database. Skipping insertion.")
+                f"Job: {job_id} Already Inserted Skipping Job")
             return
 
         #  Ensure only the required columns are inserted

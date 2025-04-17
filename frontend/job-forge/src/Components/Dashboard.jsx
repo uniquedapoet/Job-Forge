@@ -124,14 +124,14 @@ const Dashboard = ({ onLogout }) => {
 
   const fetchScores = async () => {
     if (!savedJobs.length || !user) return;
-
+  
     setIsLoading(true);
     setError("");
-
+  
     try {
-      const scoresData = {};
-      
-      for (const job of savedJobs) {
+      for (let i = 0; i < savedJobs.length; i++) {
+        const job = savedJobs[i];
+  
         try {
           const response = await fetch("http://localhost:5001/resumes/resume_score", {
             method: "POST",
@@ -141,22 +141,30 @@ const Dashboard = ({ onLogout }) => {
               job_posting_id: job.job_id,
             }),
           });
-      
+  
           const data = await response.json();
-          scoresData[job.job_id] = response.ok ? data.score : "N/A";
-        } catch (error) {
-          console.error("Error fetching score for job:", job.job_id, error);
-          scoresData[job.job_id] = "N/A";
+          const score = response.ok ? data.score : "N/A";
+  
+          // Update score for just this job
+          setScores((prev) => ({
+            ...prev,
+            [job.job_id]: score,
+          }));
+        } catch (err) {
+          console.error(`Error scoring job ${job.job_id}`, err);
+          setScores((prev) => ({
+            ...prev,
+            [job.job_id]: "N/A",
+          }));
         }
       }
-
-      setScores(scoresData);
     } catch (err) {
       setError("Failed to load resume scores");
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleRemoveJob = async (jobId) => {
     if (!user?.id) return;
