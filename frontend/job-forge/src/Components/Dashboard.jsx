@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "./MainLayout";
 import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext";
@@ -15,6 +16,7 @@ const Dashboard = ({ onLogout }) => {
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [selectedJob, setSelectedJob] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   const fetchJobDetails = async (jobId) => {
     try {
@@ -258,6 +260,16 @@ const Dashboard = ({ onLogout }) => {
                       >
                         {isProcessing ? "Removing..." : "Remove"}
                       </button>
+                      <button
+                        className="job-search-button"
+                        style={{ 
+                          marginLeft: "10px",
+                          backgroundColor:"#ba5624"
+                        }}
+                        onClick={() => navigate("/edit-resume")}
+                      >
+                        Get Suggestions
+                        </button>
                     </div>
                   </li>
                 );
