@@ -193,10 +193,19 @@ class Job(Base):
         return job_list
 
     @staticmethod
-    def description_by_id(job_id):
+    def description_by_id(id :int):
         session = Session()
 
-        job = session.query(Job).filter(Job.id == job_id).first()
+        job = session.query(Job).filter(Job.id == id).first()
+        session.close()
+
+        return job.description
+    
+    @staticmethod
+    def description_by_job_id(job_id :str):
+        session = Session()
+
+        job = session.query(Job).filter(Job.job_id == job_id).first()
         session.close()
 
         return job.description
