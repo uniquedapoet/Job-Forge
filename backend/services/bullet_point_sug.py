@@ -24,7 +24,7 @@ def clean_json(json_string):
 
     return cleaned_json
 
-def improve_bullets(user_id):
+def improve_bullets(user_id, job_posting_id=None):
     # Get user resume
     resume_file_name = Resume.get_resumes_by_user_id(user_id)
 
@@ -69,6 +69,47 @@ def improve_bullets(user_id):
     Provide raw json in this format: {string of the exact line that needs to be improved: string of the improved line}
     Please do not include quotes around the json.
     """
+
+    jd_prompt = None
+    if job_posting_id != None:
+        # Get job description
+        raw_job_description = get_job_desc(job_posting_id)
+
+        jd_prompt = f"""
+        Now, compare the resume to the following job description:
+        
+        **Job Description:**  
+        {raw_job_description}  
+
+        **Comparison Criteria:**
+        1. **Skills Match**
+        - Identify skills from the job description and check if they appear in the resume.
+        - Highlight missing but relevant skills and suggest ways to incorporate them naturally.
+
+        2. **Experience Alignment**
+        - Compare required experience (years, industry, role-specific tasks) with the candidate’s background.
+        - If experience does not fully match, suggest ways to highlight transferable skills.
+
+        3. **Keywords & ATS Optimization**
+        - Identify key industry-specific terms from the job description that should be included for ATS optimization.
+        - Suggest where and how to integrate them into the resume.
+
+        4. **Responsibilities & Achievements**
+        - Check if the resume demonstrates achievements or responsibilities relevant to those in the job description.
+        - Suggest rewording or restructuring if necessary to make it more aligned.
+
+        5. **Education & Certifications**
+        - Verify that required degrees, certifications, and qualifications from the job description are reflected in the resume.
+        - If any are missing but the candidate has equivalent experience, suggest how to phrase it effectively.
+
+        6. **Overall Resume Relevance Score**
+        - Provide a score (out of 10) on how well the resume aligns with the job description.
+        - Offer **three key improvements** that would make the resume stronger for this specific role.
+
+        **Output:**
+        Generate a structured comparison report with specific insights on how well the resume matches the job description, what improvements can be made, and how to increase the chances of passing ATS screening and catching the hiring manager’s attention.
+        """
+
 
     prompt = base_prompt + output_prompt
 

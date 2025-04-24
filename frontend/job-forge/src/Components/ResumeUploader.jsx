@@ -9,6 +9,8 @@ const ResumeUploader = ({ onLogout }) => {
   const [message, setMessage] = useState({ text: "", isError: false });
   const { user } = useContext(UserContext);
   const [hasResume, setHasResume] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [progressMessage, setProgressMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,11 +35,19 @@ const ResumeUploader = ({ onLogout }) => {
       return;
     }
 
+    setIsLoading(true);
+    setProgressMessage("Uploading your resume...");
+    
     const formData = new FormData();
     formData.append("file", file);
     formData.append("user_id", user.id);
 
     try {
+      // Progress Bar
+      setTimeout(() => setProgressMessage("Processing file..."), 1500);
+      setTimeout(() => setProgressMessage("Extracting resume content..."), 3000);
+      setTimeout(() => setProgressMessage("Adding finishing touches..."), 4500);
+
       const response = await fetch("http://localhost:5001/resumes/upload", {
         method: "POST",
         body: formData,
@@ -53,6 +63,9 @@ const ResumeUploader = ({ onLogout }) => {
       }
     } catch (error) {
       setMessage({ text: "Error uploading the file.", isError: true });
+    } finally {
+      setIsLoading(false);
+      setProgressMessage("");
     }
   };
 
@@ -64,6 +77,9 @@ const ResumeUploader = ({ onLogout }) => {
 
   const handleDownloadResume = async () => {
     if (user?.id) {
+      setIsLoading(true);
+      setProgressMessage("Preparing your download...");
+      
       try {
         const response = await fetch(`http://localhost:5001/resumes/download/${user.id}`);
         if (response.ok) {
@@ -75,12 +91,16 @@ const ResumeUploader = ({ onLogout }) => {
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
+          setMessage({ text: "Download started successfully", isError: false });
         } else {
           const error = await response.json();
           setMessage({ text: error.error || "Failed to download resume", isError: true });
         }
       } catch (error) {
         setMessage({ text: "Error downloading resume", isError: true });
+      } finally {
+        setIsLoading(false);
+        setProgressMessage("");
       }
     }
   };
@@ -99,9 +119,14 @@ const ResumeUploader = ({ onLogout }) => {
               accept=".pdf,.doc,.docx"
               onChange={(e) => setFile(e.target.files[0])}
               style={{ marginBottom: "15px", width: "100%" }}
+              disabled={isLoading}
             />
-            <button onClick={handleUpload} className="main-content-button">
-              {hasResume ? "Replace Resume" : "Upload Resume"}
+            <button 
+              onClick={handleUpload} 
+              className="main-content-button"
+              disabled={isLoading}
+            >
+              {isLoading ? "Processing..." : hasResume ? "Replace Resume" : "Upload Resume"}
             </button>
           </div>
 
@@ -113,15 +138,29 @@ const ResumeUploader = ({ onLogout }) => {
                 onClick={handleEditResume} 
                 className="main-content-button"
                 style={{ marginRight: "10px" }}
+                disabled={isLoading}
               >
                 Edit Resume
               </button>
               <button 
                 onClick={handleDownloadResume} 
                 className="main-content-button"
+                disabled={isLoading}
               >
-                Download Resume
+                {isLoading ? "Downloading..." : "Download Resume"}
               </button>
+            </div>
+          )}
+
+          {/* Loading Progress */}
+          {isLoading && (
+            <div style={{ margin: "20px 0" }}>
+              <div className="progress-container">
+                <div className="progress-bar" style={{ width: "100%" }}></div>
+              </div>
+              <p style={{ textAlign: "center", marginTop: "10px" }}>
+                {progressMessage}
+              </p>
             </div>
           )}
 
