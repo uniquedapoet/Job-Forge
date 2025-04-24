@@ -17,38 +17,35 @@ def clean_key(key):
 
 
 def clean_json(json_string):
-    # Remove line breaks for safer parsing
-    json_string = json_string.replace('\n', '')
+    # Remove markdown-style code block formatting
+    if json_string.startswith("```json"):
+        json_string = json_string[7:]  # Remove the opening ```json
+    if json_string.endswith("```"):
+        json_string = json_string[:-3]  # Remove the closing ```
 
-    # Parse the JSON string
+    # Strip and remove newlines (optional depending on formatting)
+    json_string = json_string.strip().replace('\n', '')
+
+    # Now safely parse
     parsed_json = json.loads(json_string)
 
     # Handle if it's a list of dictionaries
     if isinstance(parsed_json, list):
-        cleaned = []
-        for item in parsed_json:
-            if isinstance(item, dict):
-                cleaned_item = {clean_key(k): v.strip() if isinstance(
-                    v, str) else v for k, v in item.items()}
-                cleaned.append(cleaned_item)
-        return cleaned
+        return [
+            {clean_key(k): v.strip() if isinstance(v, str) else v for k, v in item.items()}
+            for item in parsed_json if isinstance(item, dict)
+        ]
 
-    # Or if it's a dict (fallback)
     elif isinstance(parsed_json, dict):
         return {clean_key(k): v.strip() if isinstance(v, str) else v for k, v in parsed_json.items()}
 
     else:
-        raise ValueError(
-            "Parsed JSON is neither a dictionary nor a list of dictionaries.")
+        raise ValueError("Parsed JSON is neither a dictionary nor a list of dictionaries.")
 
 
-def general_suggestions(user_id):
+def general_suggestions(resume_text):
     # Get user resume
-    resume_file_name = Resume.get_resumes_by_user_id(user_id)['filename']
-
-    # resume_file_name = resume_file_name['filename']
-    RESUME_PATH = os.path.join("backend/data", "resumes", resume_file_name)
-    raw_resume = extract_text_from_pdf(RESUME_PATH)
+    raw_resume = resume_text
 
     base_prompt = f"""
     You are an expert in career development and resume optimization, specializing in crafting resumes that maximize job application success. 
@@ -125,13 +122,9 @@ def general_suggestions(user_id):
 
 def job_based_suggestions(user_id, job_id):
     # Get user resume
-    resume_file_name = Resume.get_resumes_by_user_id(user_id)
-    if isinstance(resume_file_name, str):
-        return {'error': resume_file_name}
+    resume = Resume.get_resumes_by_user_id(user_id)
 
-    resume_file_name = resume_file_name['filename']
-    RESUME_PATH = os.path.join("backend/data", "resumes", resume_file_name)
-    raw_resume = extract_text_from_pdf(RESUME_PATH)
+    raw_resume = resume['resume_text']
 
     # Get job description
     raw_job_description = Job.description_by_id(job_id)
