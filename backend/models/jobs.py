@@ -258,10 +258,10 @@ def validate_and_insert_jobs(job_data):
         session.commit()
 
     except IntegrityError as e:
-        print(f"❌ IntegrityError: Job {job_id} could not be inserted: {e}")
+        print(f"IntegrityError: Job {job_id} could not be inserted: {e}")
 
     except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+        print(f"Unexpected error: {e}")
 
     finally:
         session.close()

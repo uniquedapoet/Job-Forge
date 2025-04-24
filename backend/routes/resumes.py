@@ -91,3 +91,12 @@ def view_resume(user_id):
         return jsonify({"error": "Resume file not found"}), 404
 
     return send_file(resume_path, mimetype="application/pdf")
+
+
+@resumes.route('general/<int:user_id>')
+def general_suggestions(user_id):
+    try:
+        suggestions = Resume.get_general_suggestions(user_id=user_id)
+        return jsonify({'suggestions': suggestions})
+    except Exception as e:
+        return jsonify({'error': f'Error getting general suggestions {e}'})
