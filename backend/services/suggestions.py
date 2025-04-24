@@ -4,8 +4,12 @@ from openai import OpenAI
 from models.resume import Resume
 from models.jobs import Job
 from services.resume_scraper import extract_text_from_pdf
+from dotenv import load_dotenv
 import re
 import json
+
+load_dotenv(dotenv_path='backend/key.env')
+
 
 def clean_key(key):
     # Keep letters, numbers, spaces, commas, and hyphens
@@ -38,16 +42,9 @@ def clean_json(json_string):
         raise ValueError("Parsed JSON is neither a dictionary nor a list of dictionaries.")
 
 
-def general_suggestions(user_id):
+def general_suggestions(resume_text):
     # Get user resume
-    # resume_file_name = Resume.get_resumes_by_user_id(user_id)
-    resume_file_name = "Giemza_Jackson_Resume_2025.pdf"
-    # if isinstance(resume_file_name, str):
-    #     return {'error': resume_file_name}
-
-    # resume_file_name = resume_file_name['filename']
-    RESUME_PATH = os.path.join("data", "resumes", resume_file_name)
-    raw_resume = extract_text_from_pdf(RESUME_PATH)
+    raw_resume = resume_text
 
     base_prompt = f"""
     You are an expert in career development and resume optimization, specializing in crafting resumes that maximize job application success. 
@@ -76,8 +73,8 @@ def general_suggestions(user_id):
     **Projects Evaluation Principles**
     - Evaluate clarity in describing role, technologies used, and project outcomes.
     - Suggest how to make descriptions more results-oriented.
-    """ 
-      
+    """
+
     output_prompt = """
     **Output Instructions (IMPORTANT):**
 
@@ -105,8 +102,8 @@ def general_suggestions(user_id):
     ⚠️ Make sure the entire response is valid JSON that can be parsed by json.loads().
     """
 
-    prompt = base_prompt  + output_prompt
-    API_KEY = os.getenv("OPENAI_API_KEY")  
+    prompt = base_prompt + output_prompt
+    API_KEY = os.getenv("OPENAI_API_KEY")
     client = OpenAI(api_key=API_KEY)
 
     # Request GPT-4o
@@ -122,15 +119,11 @@ def general_suggestions(user_id):
     return response_json
 
 
-def job_based_suggestions(user_id,job_id):
+def job_based_suggestions(user_id, job_id):
     # Get user resume
-    resume_file_name = Resume.get_resumes_by_user_id(user_id)
-    if isinstance(resume_file_name, str):
-        return {'error': resume_file_name}
+    resume = Resume.get_resumes_by_user_id(user_id)
 
-    resume_file_name = resume_file_name['filename']
-    RESUME_PATH = os.path.join("data", "resumes", resume_file_name)
-    raw_resume = extract_text_from_pdf(RESUME_PATH)
+    raw_resume = resume['resume_text']
 
     # Get job description
     raw_job_description = Job.description_by_id(job_id)
@@ -162,7 +155,7 @@ def job_based_suggestions(user_id,job_id):
     **Projects Evaluation Principles**
     - Evaluate clarity in describing role, technologies used, and project outcomes.
     - Suggest how to make descriptions more results-oriented.
-    """ 
+    """
 
     jd_prompt = f"""
     Also, compare the resume to the following job description:

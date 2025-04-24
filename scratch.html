@@ -1,127 +1,16 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <title>Editable PDF in Browser</title>
     <style>
-      #pdf-canvas {
-        border: 1px solid #ccc;
-      }
-      .text-layer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        color: black;
-        font-family: Arial, sans-serif;
-      }
-      .editable {
-        position: absolute;
-        background-color: rgba(255, 255, 255, 0.7);
-        border: 1px dashed #ccc;
-        padding: 1px 2px;
+      #p1 {
+        color: blue;
       }
     </style>
   </head>
   <body>
-    <input type="file" id="upload" accept=".pdf" /><br />
-    <button id="save">Download Edited PDF</button>
-    <div id="pdf-container" style="position: relative"></div>
+    <p id="p1">Text</p>
+    <p id="p2">Text</p>
+    <p id="p3">Text</p>
+    <a href="https://www.google.com" target="_new">Google</a> 
 
-    <!-- PDF.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-    <!-- PDF-lib -->
-    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-
-    <script>
-      const container = document.getElementById("pdf-container");
-      const fileInput = document.getElementById("upload");
-
-      let originalTextItems = [];
-
-      fileInput.addEventListener("change", async (e) => {
-        const file = e.target.files[0];
-        const fileReader = new FileReader();
-        fileReader.onload = async function () {
-          const typedArray = new Uint8Array(this.result);
-
-          const loadingTask = pdfjsLib.getDocument({ data: typedArray });
-          const pdf = await loadingTask.promise;
-          const page = await pdf.getPage(1);
-          const scale = 1.5;
-          const viewport = page.getViewport({ scale });
-
-          // Render PDF to canvas
-          const canvas = document.createElement("canvas");
-          canvas.id = "pdf-canvas";
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
-          const ctx = canvas.getContext("2d");
-          const renderTask = page.render({ canvasContext: ctx, viewport });
-          await renderTask.promise;
-
-          container.innerHTML = "";
-          container.appendChild(canvas);
-
-          // Get text content
-          const textContent = await page.getTextContent();
-          const textLayerDiv = document.createElement("div");
-          textLayerDiv.className = "text-layer";
-          textLayerDiv.style.width = canvas.width + "px";
-          textLayerDiv.style.height = canvas.height + "px";
-
-          originalTextItems = [];
-
-          textContent.items.forEach((item, i) => {
-            const div = document.createElement("div");
-            div.className = "editable";
-            div.contentEditable = true;
-            div.textContent = item.str;
-
-            const transform = item.transform;
-            const x = transform[4];
-            const y = transform[5];
-            div.style.left = `${x * scale}px`;
-            div.style.top = `${viewport.height - y * scale}px`; // Flip Y
-            div.style.fontSize = `${item.height * scale}px`;
-
-            originalTextItems.push({
-              text: item.str,
-              x,
-              y,
-              fontSize: item.height,
-              index: i,
-              dom: div,
-            });
-
-            textLayerDiv.appendChild(div);
-          });
-
-          container.appendChild(textLayerDiv);
-        };
-        fileReader.readAsArrayBuffer(file);
-      });
-
-      // Save edited PDF
-      document.getElementById("save").addEventListener("click", async () => {
-        const pdfDoc = await PDFLib.PDFDocument.create();
-        const page = pdfDoc.addPage([600, 800]);
-
-        originalTextItems.forEach((item) => {
-          const newText = item.dom.textContent;
-          const { width, height } = page.getSize();
-          page.drawText(newText, {
-            x: item.x,
-            y: height - item.y,
-            size: item.fontSize,
-          });
-        });
-
-        const pdfBytes = await pdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: "application/pdf" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "edited.pdf";
-        link.click();
-      });
-    </script>
   </body>
 </html>

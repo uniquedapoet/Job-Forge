@@ -130,8 +130,9 @@ body {
 }
 
 .job-search-button:hover {
-  background-color: #9a4620;
+  filter: brightness(90%);
 }
+
 
 /*  Job List Items  */
 .job-search-list {
