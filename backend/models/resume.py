@@ -37,9 +37,10 @@ class Resume(Base):
     def insert_resume(user_id: int, uploaded_file: str) -> None:
         from services.resume_scraper import extract_text_from_pdf
         from services.suggestions import general_suggestions as get_general_suggestions
-        try:
-            session = Session()
+        
+        session = Session()
 
+        try:
             existing_resume = session.query(Resume).filter(
                 Resume.user_id == user_id).first()
 
@@ -172,3 +173,22 @@ class Resume(Base):
 
         finally:
             session.close()
+
+    @staticmethod
+    def get_general_suggestions(user_id: int):
+        session = Session()
+        try:
+            resume = session.query(
+                Resume).filter(Resume.user_id == user_id).first()
+            
+            resume = {
+                column.key: getattr(resume, column.key)
+                for column in Resume.__table__.columns
+            }
+
+            suggestion = resume['general_suggestions']
+
+            return suggestion
+
+        except Exception as e:
+            return f'Error getting resume suggestions {e}'

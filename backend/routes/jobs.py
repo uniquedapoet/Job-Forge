@@ -85,13 +85,3 @@ def job_specifc_suggestions(user_id, job_id):
         return jsonify({'suggestions': suggestions})
     except Exception as e:
         return jsonify({'error': f'Error getting job specific suggestions {e}'})
-
-
-@jobs.route('general/<int:user_id>')
-def general_suggestions(user_id):
-    from services.suggestions import general_suggestions
-    try:
-        suggestions = general_suggestions(user_id=user_id)
-        return jsonify({'suggestions': suggestions})
-    except Exception as e:
-        return jsonify({'error': f'Error getting general suggestions {e}'})
