@@ -12,22 +12,25 @@ def clean_key(key):
     return re.sub(r'[^a-zA-Z0-9\s\-,]', '', key).strip()
 
 def clean_json(json_string):
-    # Remove line breaks for safer parsing
-    json_string = json_string.replace('\n', '')
+    # Remove markdown-style code block formatting
+    if json_string.startswith("```json"):
+        json_string = json_string[7:]  # Remove the opening ```json
+    if json_string.endswith("```"):
+        json_string = json_string[:-3]  # Remove the closing ```
 
-    # Parse the JSON string
+    # Strip and remove newlines (optional depending on formatting)
+    json_string = json_string.strip().replace('\n', '')
+
+    # Now safely parse
     parsed_json = json.loads(json_string)
 
     # Handle if it's a list of dictionaries
     if isinstance(parsed_json, list):
-        cleaned = []
-        for item in parsed_json:
-            if isinstance(item, dict):
-                cleaned_item = {clean_key(k): v.strip() if isinstance(v, str) else v for k, v in item.items()}
-                cleaned.append(cleaned_item)
-        return cleaned
+        return [
+            {clean_key(k): v.strip() if isinstance(v, str) else v for k, v in item.items()}
+            for item in parsed_json if isinstance(item, dict)
+        ]
 
-    # Or if it's a dict (fallback)
     elif isinstance(parsed_json, dict):
         return {clean_key(k): v.strip() if isinstance(v, str) else v for k, v in parsed_json.items()}
 
@@ -210,7 +213,11 @@ def job_based_suggestions(user_id,job_id):
         "General improvement suggestion 1",
         "General improvement suggestion 2",
         ...
-      ]
+      ],
+      "JobSpecificSuggestions": [
+        "Improvement suggestion based on job application1",
+        "General improvement suggestion based on job application 2",
+        ...
     }
 
     ⚠️ Do not include any extra text, markdown, comments, or explanation outside the JSON.
@@ -220,7 +227,7 @@ def job_based_suggestions(user_id,job_id):
     ⚠️ Make sure the entire response is valid JSON that can be parsed by json.loads().
     """
 
-    prompt = base_prompt + output_prompt
+    prompt = base_prompt + jd_prompt + output_prompt
     API_KEY = os.getenv("OPENAI_API_KEY")  
     client = OpenAI(api_key=API_KEY)
 
