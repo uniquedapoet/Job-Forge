@@ -203,9 +203,9 @@ def job_based_suggestions(user_id, job_id):
         },
         ...
       ],
-      "GeneralSuggestions": [
-        "General improvement suggestion 1",
-        "General improvement suggestion 2",
+      "JobBasedSuggestions": [
+        "Job Based improvement suggestion 1",
+        "Job Based improvement suggestion 2",
         ...
       ]
     }
