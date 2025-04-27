@@ -147,7 +147,7 @@ const Dashboard = ({ onLogout }) => {
           const data = await response.json();
           const score = response.ok ? data.score : "N/A";
   
-          // Update score for just this job
+        
           setScores((prev) => ({
             ...prev,
             [job.job_id]: score,
@@ -266,7 +266,10 @@ const Dashboard = ({ onLogout }) => {
                           marginLeft: "10px",
                           backgroundColor:"#ba5624"
                         }}
-                        onClick={() => navigate("/edit-resume")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/edit-resume", { state: {selectedJobId: savedJob.job_id } });
+                        }}
                       >
                         Get Suggestions
                         </button>
