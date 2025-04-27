@@ -71,7 +71,17 @@ def get_job_by_id(job_id):
     try:
         job = Job.jobs_by_id(job_id)
 
-        return jsonify({'jobs':job})
-    
+        return jsonify({'jobs': job})
+
     except Exception as e:
-        return jsonify({'error':f'Error Fetching Job data ({e})'})
+        return jsonify({'error': f'Error Fetching Job data ({e})'})
+
+
+@jobs.route('job_specific_suggestions/<int:job_id>/<int:user_id>')
+def job_specifc_suggestions(user_id, job_id):
+    from services.suggestions import job_based_suggestions
+    try:
+        suggestions = job_based_suggestions(user_id=user_id, job_id=job_id)
+        return jsonify({'suggestions': suggestions})
+    except Exception as e:
+        return jsonify({'error': f'Error getting job specific suggestions {e}'})

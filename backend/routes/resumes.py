@@ -1,7 +1,6 @@
 from models.resume import Resume
 from models.savedJobs import SavedJob
 from flask import Blueprint, jsonify, request, send_file
-from services.sections_suggestions import improve_sections
 from services.resume_scorer import get_score
 import os
 
@@ -62,21 +61,6 @@ def resume_score():
     return jsonify({"score": round((job_score*100), 2)}), 200
 
 
-@resumes.route("/resumes/suggestions", methods=["POST"])
-def get_resume_suggestions():
-    user_id = request.json.get("user_id")
-
-    if not user_id:
-        return jsonify({"error": "Missing user_id"}), 400
-
-    try:
-        suggestions = improve_sections(user_id)
-        return jsonify({"success": True, "suggestions": suggestions})
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
 @resumes.route("/download/<int:user_id>", methods=["GET"])
 def download_resume(user_id):
     resume = Resume.get_resumes_by_user_id(user_id)
@@ -107,3 +91,12 @@ def view_resume(user_id):
         return jsonify({"error": "Resume file not found"}), 404
 
     return send_file(resume_path, mimetype="application/pdf")
+
+
+@resumes.route('general/<int:user_id>')
+def general_suggestions(user_id):
+    try:
+        suggestions = Resume.get_general_suggestions(user_id=user_id)
+        return jsonify({'suggestions': suggestions})
+    except Exception as e:
+        return jsonify({'error': f'Error getting general suggestions {e}'})

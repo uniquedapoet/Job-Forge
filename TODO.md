@@ -6,6 +6,8 @@
 
 - extracting Sections from diffrent types of resumes
 
+- Create Infographic
+
 ## If ^ Doesnt Work
 
 - Get job specifics and general suggestions and give them directly to the user to change resume thier resume on thier own

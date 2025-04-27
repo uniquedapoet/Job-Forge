@@ -6,7 +6,8 @@ from sqlalchemy import (  # type: ignore
     String,
     TIMESTAMP,
     ForeignKey,
-    func
+    func,
+    JSON
 )
 from sqlalchemy.orm import relationship  # type: ignore
 from db import UserEngine, UserSession, Base
@@ -28,14 +29,18 @@ class Resume(Base):
     file_url = Column(String, nullable=False)
     uploaded_at = Column(TIMESTAMP, server_default=func.now())
     resume_text = Column(String, nullable=True)
+    general_suggestions = Column(JSON, nullable=True)
+
     user = relationship("User", back_populates="resumes")
 
     @staticmethod
     def insert_resume(user_id: int, uploaded_file: str) -> None:
         from services.resume_scraper import extract_text_from_pdf
-        try:
-            session = Session()
+        from services.suggestions import general_suggestions as get_general_suggestions
+        
+        session = Session()
 
+        try:
             existing_resume = session.query(Resume).filter(
                 Resume.user_id == user_id).first()
 
@@ -67,12 +72,16 @@ class Resume(Base):
             file_url = f"/download/{unique_filename}"
 
             resume_text = extract_text_from_pdf(file_path)
+            suggestions = get_general_suggestions(
+                resume_text=resume_text
+            )
 
             new_resume = Resume(
                 user_id=user_id,
                 filename=unique_filename,
                 file_url=file_url,
-                resume_text=resume_text
+                resume_text=resume_text,
+                general_suggestions=suggestions
 
             )
 
@@ -81,8 +90,9 @@ class Resume(Base):
             print("Inserted new resume")
 
         except Exception as e:
-            print(f"Error inserting resume: {e}")
             session.rollback()
+            return 'error Inserting Resume'
+
         finally:
             session.close()
 
@@ -163,3 +173,22 @@ class Resume(Base):
 
         finally:
             session.close()
+
+    @staticmethod
+    def get_general_suggestions(user_id: int):
+        session = Session()
+        try:
+            resume = session.query(
+                Resume).filter(Resume.user_id == user_id).first()
+            
+            resume = {
+                column.key: getattr(resume, column.key)
+                for column in Resume.__table__.columns
+            }
+
+            suggestion = resume['general_suggestions']
+
+            return suggestion
+
+        except Exception as e:
+            return f'Error getting resume suggestions {e}'

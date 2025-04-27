@@ -193,16 +193,16 @@ class Job(Base):
         return job_list
 
     @staticmethod
-    def description_by_id(id :int):
+    def description_by_id(id: int):
         session = Session()
 
         job = session.query(Job).filter(Job.id == id).first()
         session.close()
 
         return job.description
-    
+
     @staticmethod
-    def description_by_job_id(job_id :str):
+    def description_by_job_id(job_id: str):
         session = Session()
 
         job = session.query(Job).filter(Job.job_id == job_id).first()
@@ -258,10 +258,10 @@ def validate_and_insert_jobs(job_data):
         session.commit()
 
     except IntegrityError as e:
-        print(f"❌ IntegrityError: Job {job_id} could not be inserted: {e}")
+        print(f"IntegrityError: Job {job_id} could not be inserted: {e}")
 
     except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+        print(f"Unexpected error: {e}")
 
     finally:
         session.close()

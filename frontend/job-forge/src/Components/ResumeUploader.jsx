@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import MainLayout from "./MainLayout";
 import { UserContext } from "./UserContext";
 import "../Icons+Styling/MainContent.css";
@@ -11,7 +11,7 @@ const ResumeUploader = ({ onLogout }) => {
   const [hasResume, setHasResume] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [progressMessage, setProgressMessage] = useState("");
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const checkExistingResume = async () => {
@@ -69,41 +69,41 @@ const ResumeUploader = ({ onLogout }) => {
     }
   };
 
-  const handleEditResume = () => {
-    if (user?.id) {
-      navigate(`/edit-resume`);
-    }
-  };
+  // const handleEditResume = () => {
+  //   if (user?.id) {
+  //     navigate(`/edit-resume`);
+  //   }
+  // };
 
-  const handleDownloadResume = async () => {
-    if (user?.id) {
-      setIsLoading(true);
-      setProgressMessage("Preparing your download...");
+  // const handleDownloadResume = async () => {
+  //   if (user?.id) {
+  //     setIsLoading(true);
+  //     setProgressMessage("Preparing your download...");
       
-      try {
-        const response = await fetch(`http://localhost:5001/resumes/download/${user.id}`);
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `resume_${user.id}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setMessage({ text: "Download started successfully", isError: false });
-        } else {
-          const error = await response.json();
-          setMessage({ text: error.error || "Failed to download resume", isError: true });
-        }
-      } catch (error) {
-        setMessage({ text: "Error downloading resume", isError: true });
-      } finally {
-        setIsLoading(false);
-        setProgressMessage("");
-      }
-    }
-  };
+  //     try {
+  //       const response = await fetch(`http://localhost:5001/resumes/download/${user.id}`);
+  //       if (response.ok) {
+  //         const blob = await response.blob();
+  //         const url = window.URL.createObjectURL(blob);
+  //         const a = document.createElement("a");
+  //         a.href = url;
+  //         a.download = `resume_${user.id}.pdf`;
+  //         document.body.appendChild(a);
+  //         a.click();
+  //         document.body.removeChild(a);
+  //         setMessage({ text: "Download started successfully", isError: false });
+  //       } else {
+  //         const error = await response.json();
+  //         setMessage({ text: error.error || "Failed to download resume", isError: true });
+  //       }
+  //     } catch (error) {
+  //       setMessage({ text: "Error downloading resume", isError: true });
+  //     } finally {
+  //       setIsLoading(false);
+  //       setProgressMessage("");
+  //     }
+  //   }
+  // };
 
   return (
     <MainLayout onLogout={onLogout} title="Resume Manager">
@@ -130,8 +130,7 @@ const ResumeUploader = ({ onLogout }) => {
             </button>
           </div>
 
-          {/* Resume Actions */}
-          {hasResume && (
+          {/* {hasResume && (
             <div style={{ marginTop: "20px" }}>
               <h3>Resume Actions</h3>
               <button 
@@ -150,7 +149,7 @@ const ResumeUploader = ({ onLogout }) => {
                 {isLoading ? "Downloading..." : "Download Resume"}
               </button>
             </div>
-          )}
+          )} */}
 
           {/* Loading Progress */}
           {isLoading && (

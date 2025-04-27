@@ -27,8 +27,8 @@ UserSession = sessionmaker(bind=UserEngine)
 JobEngine = create_engine(f"sqlite:///{job_db_path}", connect_args={"check_same_thread": False}, echo=True)
 JobSession = sessionmaker(bind=JobEngine)
 
-# import models  
+# from models.users import User
+# from models.resume import Resume
 
-# # ✅ Create tables after models are imported
 # Base.metadata.create_all(UserEngine, checkfirst=True)
 # Base.metadata.create_all(JobEngine, checkfirst=True)
