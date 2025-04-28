@@ -4,6 +4,18 @@ import os
 from routes.jobs import jobs
 from routes.users import users
 from routes.resumes import resumes
+import nltk
+
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('vader_lexicon')
+nltk.download('maxent_ne_chunker')
+nltk.download('words')
+nltk.download('names')
+
 
 os.environ['TOKENIZERS_PARALLELISM'] = "false"
 
