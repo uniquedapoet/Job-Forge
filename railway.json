@@ -1,9 +1,9 @@
 {
-    "build": {
-      "builder": "Python"
-    },
-    "deploy": {
-      "startCommand": "python main.py"
-    }
+  "build": {
+    "builder": "Nixpacks",
+    "buildCommand": "pip install --upgrade pip && pip install -r requirements.txt && python -m nltk.downloader -d /opt/venv/nltk_data wordnet omw-1.4"
+  },
+  "deploy": {
+    "startCommand": "python main.py"
   }
-  
+}
