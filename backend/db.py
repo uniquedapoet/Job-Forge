@@ -31,5 +31,7 @@ JobSession = sessionmaker(bind=JobEngine)
 # from models.resume import Resume
 # from models.savedJobs import SavedJob
 
+# User.from_csv('backend/data/seed_data_csvs/user_data.csv')
+
 # Base.metadata.create_all(UserEngine, checkfirst=True)
 # Base.metadata.create_all(JobEngine, checkfirst=True)
