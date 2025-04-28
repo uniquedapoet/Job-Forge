@@ -100,3 +100,11 @@ def general_suggestions(user_id):
         return jsonify({'suggestions': suggestions})
     except Exception as e:
         return jsonify({'error': f'Error getting general suggestions {e}'})
+
+@resumes.route('job_specific_suggestions/<int:job_id>/<int:user_id>')
+def job_specifc_suggestions(user_id, job_id):
+    try:
+        suggestions = Resume.get_job_specific_suggestions(user_id, job_id)
+        return jsonify({'suggestions': suggestions})
+    except Exception as e:
+        return jsonify({'error': f'Error getting job specific suggestions {e}'})
