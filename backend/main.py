@@ -5,12 +5,7 @@ from routes.jobs import jobs
 from routes.users import users
 from routes.resumes import resumes
 import nltk
-
-nltk.download('words')
-nltk.download('stopwords')
-nltk.download('punkt')
-nltk.download('punkt_tab')
-nltk.download('wordnet')
+nltk.data.path.append('/opt/venv/nltk_data')  # <- tell nltk where to find wordnet
 
 
 os.environ['TOKENIZERS_PARALLELISM'] = "false"
