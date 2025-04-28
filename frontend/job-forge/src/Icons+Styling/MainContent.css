@@ -244,9 +244,15 @@ body {
 .suggestion-card {
   padding: 1rem;
   margin-bottom: 1rem;
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #f9fafb 0%, #f1f3f5 100%);
   border-radius: 6px;
   border-left: 4px solid #ba5624;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.suggestion-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 
 .suggestion-card p {

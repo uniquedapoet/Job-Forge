@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Tooltip } from 'react-tooltip';
 import MainLayout from "./MainLayout";
 import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext";
@@ -248,7 +249,14 @@ const Dashboard = ({ onLogout }) => {
                       <h3>{job.title}</h3>
                       <p>{job.company}</p>
                       <p>{job.location}</p>
-                      <p><strong>Resume Score:</strong> {score}</p>
+                      <p><strong
+                                data-tooltip-id="resume-score-tooltip"
+                                data-tooltip-content="We look at your skills and experience, match them against the job description, and give you a score."
+                                style={{ textDecoration: "", cursor: "pointer" }}
+                      >
+                        Resume Score:</strong> {score}
+                        <Tooltip  id="resume-score-tooltip" place="top" style={{ backgroundColor: "#333", color: "#fff",  maxWidth: "250px", textAlign: "center",  whiteSpace: "normal", fontSize: "14px"}} />
+                        </p>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
