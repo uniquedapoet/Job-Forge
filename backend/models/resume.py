@@ -30,7 +30,6 @@ class Resume(Base):
     uploaded_at = Column(TIMESTAMP, server_default=func.now())
     resume_text = Column(String, nullable=True)
     general_suggestions = Column(JSON, nullable=True)
-    job_specific_suggestions = Column(JSON, nullable=True)
 
     user = relationship("User", back_populates="resumes")
 
@@ -194,42 +193,3 @@ class Resume(Base):
         except Exception as e:
             return f'Error getting resume suggestions {e}'
 
-    @staticmethod
-    def get_job_specific_suggestions(user_id: int, job_id: int):
-        session = Session()
-        try:
-            resume = session.query(Resume).filter(Resume.user_id == user_id).first()
-
-            if not resume:
-                return 'Resume not found for this user.'
-            
-            resume_dict = {
-                column.key: getattr(resume, column.key)
-                for column in Resume.__table__.columns
-            }
-
-            if not resume_dict['job_specific_suggestions']:
-                from services.suggestions import job_based_suggestions
-                try:
-                    suggestions = job_based_suggestions(
-                        user_id=user_id, job_id=job_id
-                        )
-
-                    resume.job_specific_suggestions = suggestions
-
-                    session.commit()
-                    return suggestions  
-
-                except Exception as e:
-                    session.rollback()
-                    return f'Error getting job specific suggestions: {e}'
-                
-            else:
-                return resume_dict['job_specific_suggestions']
-
-        except Exception as e:
-            session.rollback()
-            return f'Error getting resume suggestions: {e}'
-
-        finally:
-            session.close()

@@ -5,7 +5,8 @@ from sqlalchemy import (
     ForeignKey,
     func,
     Float,
-    UniqueConstraint
+    UniqueConstraint,
+    JSON
 )
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import relationship
@@ -28,6 +29,7 @@ class SavedJob(Base):
     job_id = Column(Integer, nullable=False)
     job_score = Column(Float)
     saved_at = Column(TIMESTAMP, server_default=func.now())
+    job_specific_suggestions = Column(JSON, nullable=True)
 
     user = relationship("User", back_populates="saved_jobs")
 
@@ -129,6 +131,48 @@ class SavedJob(Base):
 
         except Exception as e:
             print(f"Error removing job scores: {e}")
+
+        finally:
+            session.close()
+
+    @staticmethod
+    def get_job_specific_suggestions(user_id: int, job_id: int):
+        session = Session()
+        try:
+            saved_job = session.query(SavedJob).filter(
+                SavedJob.user_id == user_id, SavedJob.job_id == job_id).first()
+
+            if not saved_job:
+                return 'Resume not found for this user.'
+            
+            saved_job_dict = {
+                column.key: getattr(saved_job, column.key)
+                for column in SavedJob.__table__.columns
+            }
+            
+
+            if not saved_job_dict['job_specific_suggestions']:
+                from services.suggestions import job_based_suggestions
+                try:
+                    suggestions = job_based_suggestions(
+                        user_id=user_id, job_id=job_id
+                        )
+
+                    saved_job.job_specific_suggestions = suggestions
+
+                    session.commit()
+                    return suggestions  
+
+                except Exception as e:
+                    session.rollback()
+                    return f'Error getting job specific suggestions: {e}'
+                
+            else:
+                return saved_job_dict['job_specific_suggestions']
+
+        except Exception as e:
+            session.rollback()
+            return f'Error getting resume suggestions: {e}'
 
         finally:
             session.close()
