@@ -237,7 +237,7 @@ body {
   margin-top: 1rem;
   overflow-y: scroll;
   max-height: 80vh; 
-  overflow-y: auto;  /* Changed from scroll to auto */
+  overflow-y: auto;  
   padding-right: 0.5rem; 
 }
 
