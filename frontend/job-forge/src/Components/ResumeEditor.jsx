@@ -27,11 +27,12 @@ const ResumeEditor = ({ onLogout }) => {
         // Fetch both 
         const [generalRes, jobSpecificRes] = await Promise.all([
           fetch(`http://localhost:5001/resumes/general/${user.id}`),
-          fetch(`http://localhost:5001/jobs/job_specific_suggestions/${selectedJobId}/${user.id}`)
+          fetch(`http://localhost:5001/resumes/job_specific_suggestions/${selectedJobId}/${user.id}`)
         ]);
 
         const generalData = await generalRes.json();
         const jobSpecificData = await jobSpecificRes.json();
+        console.log(jobSpecificData)
 
         if (generalData.suggestions) {
           setGeneralSuggestions(generalData.suggestions.GeneralSuggestions || []);
