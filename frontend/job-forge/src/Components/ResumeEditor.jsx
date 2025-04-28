@@ -21,24 +21,30 @@ const ResumeEditor = ({ onLogout }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!user?.id || !selectedJobId) return;
-      
+
       setLoading(true);
       try {
-        // Fetch both 
+        // Fetch both
         const [generalRes, jobSpecificRes] = await Promise.all([
           fetch(`http://localhost:5001/resumes/general/${user.id}`),
-          fetch(`http://localhost:5001/resumes/job_specific_suggestions/${selectedJobId}/${user.id}`)
+          fetch(
+            `http://localhost:5001/resumes/job_specific_suggestions/${selectedJobId}/${user.id}`
+          ),
         ]);
 
         const generalData = await generalRes.json();
         const jobSpecificData = await jobSpecificRes.json();
-        console.log(jobSpecificData)
+        console.log(jobSpecificData.suggestions.JobBasedSuggestions);
 
         if (generalData.suggestions) {
-          setGeneralSuggestions(generalData.suggestions.GeneralSuggestions || []);
+          setGeneralSuggestions(
+            generalData.suggestions.GeneralSuggestions || []
+          );
         }
         if (jobSpecificData.suggestions) {
-          setJobSpecificSuggestions(jobSpecificData.suggestions.GeneralSuggestions || []);
+          setJobSpecificSuggestions(
+            jobSpecificData.suggestions.JobBasedSuggestions || []
+          );
         }
       } catch (error) {
         setMessage({ text: "Error fetching suggestions.", isError: true });
@@ -69,35 +75,40 @@ const ResumeEditor = ({ onLogout }) => {
   };
 
   return (
-    <MainLayout onLogout={onLogout} title="Resume Editor" sidebarVisible={sidebarVisible} onToggleSidebar={toggleSidebar}>
+    <MainLayout
+      onLogout={onLogout}
+      title="Resume Editor"
+      sidebarVisible={sidebarVisible}
+      onToggleSidebar={toggleSidebar}
+    >
       <div className="resume-editor-container">
-        <button 
+        <button
           onClick={toggleSidebar}
           className="sidebar-toggle-btn"
           style={{
-            position: 'fixed',
-            left: sidebarVisible ? '280px' : '0',
-            top: '20px',
+            position: "fixed",
+            left: sidebarVisible ? "280px" : "0",
+            top: "20px",
             zIndex: 1000,
-            padding: '10px',
-            background: '#ba5624',
-            border: 'none',
-            borderRadius: '0 5px 5px 0',
-            cursor: 'pointer',
-            transition: 'left 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            padding: "10px",
+            background: "#ba5624",
+            border: "none",
+            borderRadius: "0 5px 5px 0",
+            cursor: "pointer",
+            transition: "left 0.3s ease",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <img 
-            src={logo} 
-            alt="Toggle Sidebar" 
-            style={{ 
-              width: '30px', 
-              height: '30px',
-              filter: 'brightness(0) invert(1)'
-            }} 
+          <img
+            src={logo}
+            alt="Toggle Sidebar"
+            style={{
+              width: "30px",
+              height: "30px",
+              filter: "brightness(0) invert(1)",
+            }}
           />
         </button>
 
@@ -110,13 +121,21 @@ const ResumeEditor = ({ onLogout }) => {
                 type="application/pdf"
                 style={{ width: "100%", height: "80vh", border: "none" }}
               >
-                <p>Your browser doesn't support PDF viewing. <a href={resumeUrl}>Download instead</a></p>
+                <p>
+                  Your browser doesn't support PDF viewing.{" "}
+                  <a href={resumeUrl}>Download instead</a>
+                </p>
               </object>
             ) : (
               <p>Loading resume...</p>
             )}
             {message.text && (
-              <p style={{ color: message.isError ? "red" : "green", marginTop: "10px" }}>
+              <p
+                style={{
+                  color: message.isError ? "red" : "green",
+                  marginTop: "10px",
+                }}
+              >
                 {message.text}
               </p>
             )}
@@ -125,12 +144,14 @@ const ResumeEditor = ({ onLogout }) => {
           <div className="suggestions-container">
             <div className="suggestions-tabs">
               <button
-                className={`tab-button ${activeTab === "general" ? "active" : ""}`}
+                className={`tab-button ${
+                  activeTab === "general" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("general")}
               >
                 General Suggestions
               </button>
-              
+
               <button
                 className={`tab-button ${activeTab === "job" ? "active" : ""}`}
                 onClick={() => setActiveTab("job")}
@@ -149,7 +170,10 @@ const ResumeEditor = ({ onLogout }) => {
                   <div className="suggestions-list">
                     {generalSuggestions.length > 0 ? (
                       generalSuggestions.map((suggestion, index) => (
-                        <div key={`general-${index}`} className="suggestion-card">
+                        <div
+                          key={`general-${index}`}
+                          className="suggestion-card"
+                        >
                           <p>{suggestion}</p>
                         </div>
                       ))
@@ -159,12 +183,74 @@ const ResumeEditor = ({ onLogout }) => {
                   </div>
                 ) : (
                   <div className="suggestions-list">
-                    {jobSpecificSuggestions.length > 0 ? (
-                      jobSpecificSuggestions.map((suggestion, index) => (
-                        <div key={`job-${index}`} className="suggestion-card">
-                          <p>{suggestion}</p>
-                        </div>
-                      ))
+                    {jobSpecificSuggestions ? (
+                      <>
+                        {jobSpecificSuggestions.TechnologiesToAdd.length >
+                          0 && (
+                          <div className="suggestion-section">
+                            <h3>Technologies to Add</h3>
+                            {jobSpecificSuggestions.TechnologiesToAdd.map(
+                              (tech, index) => (
+                                <div
+                                  key={`tech-${index}`}
+                                  className="suggestion-card"
+                                >
+                                  <p>{tech}</p>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
+
+                        {jobSpecificSuggestions.SoftSkillsToAdd.length > 0 && (
+                          <div className="suggestion-section">
+                            <h3>Soft Skills to Add</h3>
+                            {jobSpecificSuggestions.SoftSkillsToAdd.map(
+                              (skill, index) => (
+                                <div
+                                  key={`soft-${index}`}
+                                  className="suggestion-card"
+                                >
+                                  <p>{skill}</p>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
+
+                        {jobSpecificSuggestions.CertificationsOrFrameworksToAdd
+                          .length > 0 && (
+                          <div className="suggestion-section">
+                            <h3>Certifications or Frameworks to Add</h3>
+                            {jobSpecificSuggestions.CertificationsOrFrameworksToAdd.map(
+                              (cert, index) => (
+                                <div
+                                  key={`cert-${index}`}
+                                  className="suggestion-card"
+                                >
+                                  <p>{cert}</p>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
+
+                        {jobSpecificSuggestions.EasyKeywordWins.length > 0 && (
+                          <div className="suggestion-section">
+                            <h3>Easy Keyword Wins</h3>
+                            {jobSpecificSuggestions.EasyKeywordWins.map(
+                              (keyword, index) => (
+                                <div
+                                  key={`keyword-${index}`}
+                                  className="suggestion-card"
+                                >
+                                  <p>{keyword}</p>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <p>No job-specific suggestions available.</p>
                     )}
