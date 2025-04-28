@@ -220,6 +220,7 @@ body {
   flex: 2;
   padding: 1rem;
   background: #fff;
+  max-height: 100vh;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
@@ -234,6 +235,10 @@ body {
 
 .suggestions-list {
   margin-top: 1rem;
+  overflow-y: scroll;
+  max-height: 80vh; 
+  overflow-y: auto;  
+  padding-right: 0.5rem; 
 }
 
 .suggestion-card {
