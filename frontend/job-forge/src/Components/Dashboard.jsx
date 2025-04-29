@@ -20,7 +20,7 @@ const Dashboard = ({ onLogout }) => {
 
   const fetchJobDetails = async (jobId) => {
     try {
-      const response = await fetch(`https://04c42e7380c6.ngrok.app/jobs/${jobId}`);
+      const response = await fetch(`https://job-forge.ngrok.app/jobs/${jobId}`);
       if (!response.ok) throw new Error("Failed to fetch job details");
       
       const data = await response.json();
@@ -47,7 +47,7 @@ const Dashboard = ({ onLogout }) => {
   const handleJobClick = async (job) => {
     try {
       const jobId = job.job_id || job.id;
-      const response = await fetch(`https://04c42e7380c6.ngrok.app/jobs/${jobId}`);
+      const response = await fetch(`https://job-forge.ngrok.app/jobs/${jobId}`);
       if (!response.ok) throw new Error("Failed to fetch job details");
       
       const data = await response.json();
@@ -82,7 +82,7 @@ const Dashboard = ({ onLogout }) => {
     setError("");
 
     try {
-      const savedResponse = await fetch(`https://04c42e7380c6.ngrok.app/users/${user.id}/saved_jobs`);
+      const savedResponse = await fetch(`https://job-forge.ngrok.app/users/${user.id}/saved_jobs`);
       const savedJobsData = await savedResponse.json();
 
       console.log(savedResponse)
@@ -137,7 +137,7 @@ const Dashboard = ({ onLogout }) => {
         const job = savedJobs[i];
   
         try {
-          const response = await fetch("https://04c42e7380c6.ngrok.app/resumes/resume_score", {
+          const response = await fetch("https://job-forge.ngrok.app/resumes/resume_score", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -178,7 +178,7 @@ const Dashboard = ({ onLogout }) => {
 
     try {
       const response = await fetch(
-        `https://04c42e7380c6.ngrok.app/users/${user.id}/saved_jobs/${jobId}/delete`,
+        `https://job-forge.ngrok.app/users/${user.id}/saved_jobs/${jobId}/delete`,
         { method: "POST" }
       );
 

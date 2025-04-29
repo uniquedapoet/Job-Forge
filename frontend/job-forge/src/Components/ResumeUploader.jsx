@@ -17,7 +17,7 @@ const ResumeUploader = ({ onLogout }) => {
     const checkExistingResume = async () => {
       if (user?.id) {
         try {
-          const response = await fetch(`https://04c42e7380c6.ngrok.app/resumes/view/${user.id}`);
+          const response = await fetch(`https://job-forge.ngrok.app/resumes/view/${user.id}`);
           if (response.ok) {
             setHasResume(true);
           }
@@ -48,7 +48,7 @@ const ResumeUploader = ({ onLogout }) => {
       setTimeout(() => setProgressMessage("Extracting resume content..."), 3000);
       setTimeout(() => setProgressMessage("Adding finishing touches..."), 4500);
 
-      const response = await fetch("https://04c42e7380c6.ngrok.app/resumes/upload", {
+      const response = await fetch("https://job-forge.ngrok.app/resumes/upload", {
         method: "POST",
         body: formData,
       });
@@ -81,7 +81,7 @@ const ResumeUploader = ({ onLogout }) => {
   //     setProgressMessage("Preparing your download...");
       
   //     try {
-  //       const response = await fetch(`https://04c42e7380c6.ngrok.app/resumes/download/${user.id}`);
+  //       const response = await fetch(`https://job-forge.ngrok.app/resumes/download/${user.id}`);
   //       if (response.ok) {
   //         const blob = await response.blob();
   //         const url = window.URL.createObjectURL(blob);

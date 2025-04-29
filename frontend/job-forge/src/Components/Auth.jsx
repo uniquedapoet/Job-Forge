@@ -12,7 +12,7 @@ const Auth = () => {
   const { setUser } = useContext(UserContext);
 
   useEffect(() => {
-    fetch("https://04c42e7380c6.ngrok.app/users")
+    fetch("https://job-forge.ngrok.app/users")
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data.users)) {
