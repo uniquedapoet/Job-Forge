@@ -12,7 +12,7 @@ const Auth = () => {
   const { setUser } = useContext(UserContext);
 
   useEffect(() => {
-    fetch("http://localhost:5001/users")
+    fetch("https://04c42e7380c6.ngrok.app/users")
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data.users)) {

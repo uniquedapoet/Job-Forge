@@ -25,7 +25,7 @@ const JobSearch = ({ onLogout }) => {
     }
     
     try {
-      const response = await fetch(`http://localhost:5001/users/${user.id}/saved_jobs`);
+      const response = await fetch(`https://04c42e7380c6.ngrok.app/users/${user.id}/saved_jobs`);
       if (!response.ok) return;
       
       const data = await response.json();
@@ -55,7 +55,7 @@ const JobSearch = ({ onLogout }) => {
     setIsSearching(true);
 
     try {
-      const response = await fetch("http://localhost:5001/jobs/job_search", {
+      const response = await fetch("https://04c42e7380c6.ngrok.app/jobs/job_search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ job_title: jobTitle, location }),
@@ -86,7 +86,7 @@ const JobSearch = ({ onLogout }) => {
     try {
       if (isSaved) {
         const response = await fetch(
-          `http://localhost:5001/users/${user.id}/saved_jobs/${job.id}/delete`,
+          `https://04c42e7380c6.ngrok.app/users/${user.id}/saved_jobs/${job.id}/delete`,
           { method: "POST" }
         );
         
@@ -103,7 +103,7 @@ const JobSearch = ({ onLogout }) => {
         };
 
         const response = await fetch(
-          `http://localhost:5001/users/${user.id}/saved_jobs/${job.id}/save`,
+          `https://04c42e7380c6.ngrok.app/users/${user.id}/saved_jobs/${job.id}/save`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -124,7 +124,7 @@ const JobSearch = ({ onLogout }) => {
 
   const handleJobClick = async (job) => {
     try {
-      const response = await fetch(`http://localhost:5001/jobs/${job.id}`);
+      const response = await fetch(`https://04c42e7380c6.ngrok.app/jobs/${job.id}`);
       if (!response.ok) throw new Error("Failed to fetch job details");
       
       const data = await response.json();
