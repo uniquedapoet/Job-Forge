@@ -35,20 +35,16 @@ def job_search():
             {"error": "At least one search criteria is required"}), 400
 
     try:
-        # Fetch jobs based on the search criteria
         jobs = get_jobs_data(job_title=job_title, location=location)
 
         if jobs is None:
             return jsonify({"error": "No matching jobs found"}), 404
 
-        # Try inserting jobs into the database
         try:
             validate_and_insert_jobs(jobs)
         except Exception as e:
-            # Log but don’t block search results
             print(f"Error inserting jobs: {str(e)}")
 
-        # Get results from Database
         if job_title and location:
             job_list = Job.jobs_by_location_and_title(
                 location=location, title=job_title)
