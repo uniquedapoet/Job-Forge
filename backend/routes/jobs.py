@@ -1,10 +1,6 @@
-from config import JOBS_DATABASE_URL
 from services.job_scraper import get_jobs_data
-import time
-from db_tools import state_abbreviations
+from db_tools import state_abbreviations, clean_nans
 from flask import Blueprint, jsonify, request
-import sqlite3
-import os
 from models.jobs import Job, validate_and_insert_jobs
 
 
@@ -57,8 +53,10 @@ def job_search():
 
         job_list += inserted_jobs
 
+        job_list = clean_nans(job_list)
+
         return jsonify(
-            {"message": "Jobs successfully retrieved!", "jobs": job_list[:20]}), 200
+            {"message": "Jobs successfully retrieved!", "jobs": job_list[:25]}), 200
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500

@@ -64,7 +64,6 @@ const JobSearch = ({ onLogout }) => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Failed to search for jobs");
 
-      console.log(data)
 
       setJobs(data.jobs || []);
     } catch (err) {
