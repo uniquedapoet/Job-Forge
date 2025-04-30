@@ -156,37 +156,6 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
 
         <div className="modal-footer">
           <div className="action-buttons">
-            {/* {job.job_url && (
-              <a
-                href={job.job_url_direct}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="apply-button"
-                style={{
-                  backgroundColor: "#6c757d",
-                }}
-              >
-                <i className="fas fa-external-link-alt"></i>
-                View Original Posting
-              </a>
-            )}
-
-            {onSaveJob && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSaveJob(job);
-                }}
-                className="apply-button"
-                style={{
-                  backgroundColor: isSaved ? "#6c757d" : "#ba5624",
-                }}
-                disabled={isProcessing}
-              >
-                <i className={isSaved ? "fas fa-trash-alt" : "fas fa-bookmark"}></i>
-                {isProcessing ? "Processing..." : (isSaved ? "Remove" : "Save")}
-              </button>
-            )} */}
             <button onClick={onClose} className="close-modal-button">
               <i className="fas fa-times"></i>
               Close
