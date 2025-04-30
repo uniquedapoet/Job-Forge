@@ -2,21 +2,25 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import { FaBars } from "react-icons/fa";
 
-const MainLayout = ({ children, onLogout }) => {
+const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisible, onToggleSidebar }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [internalSidebarVisible, setInternalSidebarVisible] = useState(!isMobile);
+
+  const sidebarVisible = controlledSidebarVisible !== undefined ? controlledSidebarVisible : internalSidebarVisible;
+  const toggleSidebar = onToggleSidebar || (() => setInternalSidebarVisible((prev) => !prev));
 
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
-      if (mobile) setSidebarVisible(false);
-      else setSidebarVisible(true);
+      if (!onToggleSidebar) {
+        setInternalSidebarVisible(!mobile);
+      }
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [onToggleSidebar]);
 
   return (
     <div style={{
@@ -25,9 +29,10 @@ const MainLayout = ({ children, onLogout }) => {
       height: "100vh",
       position: "relative"
     }}>
-      {isMobile && (
+      {/* Toggle Button */}
+      {isMobile && !sidebarVisible && (
         <button
-          onClick={() => setSidebarVisible(true)}
+          onClick={toggleSidebar}
           style={{
             position: "absolute",
             top: 20,
@@ -45,9 +50,10 @@ const MainLayout = ({ children, onLogout }) => {
         </button>
       )}
 
+      {/* Overlay */}
       {isMobile && sidebarVisible && (
         <div
-          onClick={() => setSidebarVisible(false)}
+          onClick={toggleSidebar}
           style={{
             position: "fixed",
             top: 0,
@@ -60,10 +66,11 @@ const MainLayout = ({ children, onLogout }) => {
         />
       )}
 
+      {/* Sidebar */}
       {sidebarVisible && (
         <Sidebar
           onLogout={onLogout}
-          onCloseSidebar={() => setSidebarVisible(false)}
+          onCloseSidebar={toggleSidebar}
           isVisible={sidebarVisible}
         />
       )}
