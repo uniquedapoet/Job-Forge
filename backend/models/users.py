@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 import pandas as pd
 from db import UserEngine, UserSession, Base
 from typing import List
+from db_tools import to_list
 
 
 engine = UserEngine
@@ -82,9 +83,7 @@ class User(Base):
             for user in users:
                 print(user.__dict__)
         session.close()
-        users = [{column.key: getattr(
-            user, column.key) for column in User.__table__.columns
-        } for user in users]
+        users = to_list(users, User)
 
         return users
 

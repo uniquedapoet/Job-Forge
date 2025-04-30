@@ -43,7 +43,7 @@ def job_search():
 
         # Try inserting jobs into the database
         try:
-            validate_and_insert_jobs(jobs)
+            inserted_jobs = validate_and_insert_jobs(jobs)
         except Exception as e:
             # Log but don’t block search results
             print(f"Error inserting jobs: {str(e)}")
@@ -59,8 +59,10 @@ def job_search():
         elif location:
             job_list = Job.jobs_by_location(location=location)
 
+        job_list += inserted_jobs
+
         return jsonify(
-            {"message": "Jobs successfully retrieved!", "jobs": job_list}), 200
+            {"message": "Jobs successfully retrieved!", "jobs": job_list[:20]}), 200
 
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
@@ -75,4 +77,3 @@ def get_job_by_id(job_id):
 
     except Exception as e:
         return jsonify({'error': f'Error Fetching Job data ({e})'})
-
