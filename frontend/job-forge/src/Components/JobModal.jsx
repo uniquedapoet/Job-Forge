@@ -76,7 +76,7 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
                 rel="noopener noreferrer"
                 className="apply-button"
                 style={{
-                  backgroundColor: "#6c757d",
+                  backgroundColor: "#ba5624",
                   width:'305px',
                   marginBottom:'10px'
                 }}
