@@ -77,8 +77,8 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
                 className="apply-button"
                 style={{
                   backgroundColor: "#6c757d",
-                  width:'305px'
-
+                  width:'305px',
+                  marginBottom:'10px'
                 }}
               >
                 <i className="fas fa-external-link-alt"></i>
@@ -95,8 +95,7 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
                 className="apply-button"
                 style={{
                   backgroundColor: isSaved ? "#6c757d" : "#ba5624",
-                  width:'342px'
-
+                  width:'342px',
                 }}
                 disabled={isProcessing}
               >
