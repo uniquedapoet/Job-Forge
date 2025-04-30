@@ -13,25 +13,25 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
     if (!description) return null;
 
     let cleaned = description
-      .replace(/\\&/g, '&')
-      .replace(/\\\d+/g, '')
-      .replace(/(\d)\\/g, '$1')
-      .replace(/(\d)\s?-\s?(\d)/g, '$1-$2')
-      .replace(/\\n/g, '\n')
-      .replace(/\\-/g, '-')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*/g, '• ')
-      .replace(/\t\+/g, '  • ')
-      .replace(/\n{2,}/g, '\n\n')
+      .replace(/\\&/g, "&")
+      .replace(/\\\d+/g, "")
+      .replace(/(\d)\\/g, "$1")
+      .replace(/(\d)\s?-\s?(\d)/g, "$1-$2")
+      .replace(/\\n/g, "\n")
+      .replace(/\\-/g, "-")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*/g, "• ")
+      .replace(/\t\+/g, "  • ")
+      .replace(/\n{2,}/g, "\n\n")
       .trim();
 
-    const paragraphs = cleaned.split('\n\n').filter(p => p.trim().length > 0);
+    const paragraphs = cleaned.split("\n\n").filter((p) => p.trim().length > 0);
 
     return paragraphs.map((paragraph, index) => (
       <p
         key={index}
         className="job-description"
-        style={{ marginBottom: '1rem' }}
+        style={{ marginBottom: "1rem" }}
         dangerouslySetInnerHTML={{ __html: paragraph }}
       />
     ));
@@ -40,14 +40,16 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
   const formatJobType = (type) => {
     if (!type) return null;
     const map = {
-      fulltime: 'Full-Time',
-      parttime: 'Part-Time',
-      contract: 'Contract',
-      internship: 'Internship',
-      freelance: 'Freelance',
-      temporary: 'Temporary',
+      fulltime: "Full-Time",
+      parttime: "Part-Time",
+      contract: "Contract",
+      internship: "Internship",
+      freelance: "Freelance",
+      temporary: "Temporary",
     };
-    return map[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1);
+    return (
+      map[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1)
+    );
   };
 
   return (
@@ -69,52 +71,73 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
           <h3>{job.company}</h3>
           <p className="job-location">{job.location}</p>
         </div>
-        {job.job_url && (
-              <a
-                href={job.job_url_direct}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="apply-button"
-                style={{
-                  backgroundColor: "#ba5624",
-                  width:'305px',
-                  marginBottom:'10px'
-                }}
-              >
-                <i className="fas fa-external-link-alt"></i>
-                View Original Posting
-              </a>
-            )}
-
-            {onSaveJob && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSaveJob(job);
-                }}
-                className="apply-button"
-                style={{
-                  backgroundColor: isSaved ? "#6c757d" : "#ba5624",
-                  width:'342px',
-                }}
-                disabled={isProcessing}
-              >
-                <i className={isSaved ? "fas fa-trash-alt" : "fas fa-bookmark"}></i>
-                {isProcessing ? "Processing..." : (isSaved ? "Remove" : "Save")}
-              </button>
-            )}
+        {job.job_url_direct && (
+          <a
+            href={job.job_url_direct}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="apply-button"
+            style={{
+              backgroundColor: "#ba5624",
+              width: "305px",
+              marginBottom: "10px",
+            }}
+          >
+            <i className="fas fa-external-link-alt"></i>
+            View Original Posting
+          </a>
+        )}
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          {job.job_url && (
+            <a
+              href={job.job_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="apply-button"
+              style={{
+                backgroundColor: "#ba5624",
+                width: "305px",
+                marginBottom: "10px",
+              }}
+            >
+              <i className="fas fa-external-link-alt"></i>
+              Apply On Indeed
+            </a>
+          )}
+        </div>
+        {onSaveJob && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSaveJob(job);
+            }}
+            className="apply-button"
+            style={{
+              backgroundColor: isSaved ? "#6c757d" : "#ba5624",
+              width: "342px",
+            }}
+            disabled={isProcessing}
+          >
+            <i className={isSaved ? "fas fa-trash-alt" : "fas fa-bookmark"}></i>
+            {isProcessing ? "Processing..." : isSaved ? "Remove" : "Save"}
+          </button>
+        )}
 
         <div className="job-meta">
           {job.job_type && (
             <div className="meta-item">
               <i className="fas fa-briefcase"></i>
-              <span><strong>Job Type:</strong> {formatJobType(job.job_type)}</span>
+              <span>
+                <strong>Job Type:</strong> {formatJobType(job.job_type)}
+              </span>
             </div>
           )}
           {job.date_posted && (
             <div className="meta-item">
               <i className="fas fa-calendar-alt"></i>
-              <span><strong>Posted:</strong> {job.date_posted}</span>
+              <span>
+                <strong>Posted:</strong> {job.date_posted}
+              </span>
             </div>
           )}
         </div>
@@ -164,10 +187,7 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
                 {isProcessing ? "Processing..." : (isSaved ? "Remove" : "Save")}
               </button>
             )} */}
-            <button
-              onClick={onClose}
-              className="close-modal-button"
-            >
+            <button onClick={onClose} className="close-modal-button">
               <i className="fas fa-times"></i>
               Close
             </button>

@@ -6,7 +6,6 @@ from nltk.corpus import wordnet as wn  # type: ignore
 
 wn.ensure_loaded()
 
-
 def similarity_to_score(similarity):
     if similarity < 0.05:
         return 1
@@ -24,7 +23,6 @@ def similarity_to_score(similarity):
         return 9
     else:
         return 10
-
 
 def get_score(user_id, job_posting_id):
     """Get the similarity score between a user's resume and a job posting."""
