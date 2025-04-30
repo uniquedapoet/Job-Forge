@@ -225,7 +225,7 @@ const Dashboard = ({ onLogout }) => {
                 const job = jobDetails[savedJob.job_id] || savedJob;
                 const isProcessing = removingJobs[savedJob.job_id] || false;
                 const score = scores[savedJob.job_id] !== undefined
-                  ? `${scores[savedJob.job_id]}%`
+                  ? `${scores[savedJob.job_id]}`
                   : isLoading
                     ? "Loading..."
                     : "N/A";
