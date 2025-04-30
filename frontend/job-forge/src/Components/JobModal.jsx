@@ -69,40 +69,37 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
           <h3>{job.company}</h3>
           <p className="job-location">{job.location}</p>
         </div>
-        {job.job_url && (
-              <a
-                href={job.job_url_direct}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="apply-button"
-                style={{
-                  backgroundColor: "#ba5624",
-                  width:'305px',
-                  marginBottom:'10px'
-                }}
-              >
-                <i className="fas fa-external-link-alt"></i>
-                View Original Posting
-              </a>
-            )}
 
-            {onSaveJob && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSaveJob(job);
-                }}
-                className="apply-button"
-                style={{
-                  backgroundColor: isSaved ? "#6c757d" : "#ba5624",
-                  width:'342px',
-                }}
-                disabled={isProcessing}
-              >
-                <i className={isSaved ? "fas fa-trash-alt" : "fas fa-bookmark"}></i>
-                {isProcessing ? "Processing..." : (isSaved ? "Remove" : "Save")}
-              </button>
-            )}
+        <div className="job-modal-buttons">
+          {(job.job_url_direct || job.job_url) && (
+            <a
+              href={job.job_url_direct || job.job_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="apply-button"
+            >
+              <i className="fas fa-external-link-alt"></i>
+              View Original Posting
+            </a>
+          )}
+
+          {onSaveJob && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSaveJob(job);
+              }}
+              className="apply-button"
+              disabled={isProcessing}
+              style={{
+                backgroundColor: isSaved ? "#6c757d" : "#ba5624",
+              }}
+            >
+              <i className={isSaved ? "fas fa-trash-alt" : "fas fa-bookmark"}></i>
+              {isProcessing ? "Processing..." : (isSaved ? "Remove" : "Save")}
+            </button>
+          )}
+        </div>
 
         <div className="job-meta">
           {job.job_type && (
@@ -133,41 +130,7 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
 
         <div className="modal-footer">
           <div className="action-buttons">
-            {/* {job.job_url && (
-              <a
-                href={job.job_url_direct}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="apply-button"
-                style={{
-                  backgroundColor: "#6c757d",
-                }}
-              >
-                <i className="fas fa-external-link-alt"></i>
-                View Original Posting
-              </a>
-            )}
-
-            {onSaveJob && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSaveJob(job);
-                }}
-                className="apply-button"
-                style={{
-                  backgroundColor: isSaved ? "#6c757d" : "#ba5624",
-                }}
-                disabled={isProcessing}
-              >
-                <i className={isSaved ? "fas fa-trash-alt" : "fas fa-bookmark"}></i>
-                {isProcessing ? "Processing..." : (isSaved ? "Remove" : "Save")}
-              </button>
-            )} */}
-            <button
-              onClick={onClose}
-              className="close-modal-button"
-            >
+            <button onClick={onClose} className="close-modal-button">
               <i className="fas fa-times"></i>
               Close
             </button>

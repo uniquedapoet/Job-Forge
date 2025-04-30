@@ -273,6 +273,25 @@ body {
   background: #9c4a20;
 }
 
+.job-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.job-modal-buttons .apply-button {
+  font-size: 1rem;
+  padding: 0.7rem 1.2rem;
+  width: auto;
+  min-width: 200px;
+  text-align: center;
+  justify-content: center; 
+}
+
+
+
 /* Enhanced Modal Styles */
 .modal-overlay {
   position: fixed;
