@@ -26,9 +26,9 @@ const ResumeEditor = ({ onLogout }) => {
       try {
         // Fetch both
         const [generalRes, jobSpecificRes] = await Promise.all([
-          fetch(`http://localhost:5001/resumes/general/${user.id}`),
+          fetch(`https://job-forge.ngrok.app/resumes/general/${user.id}`),
           fetch(
-            `http://localhost:5001/resumes/job_specific_suggestions/${selectedJobId}/${user.id}`
+            `https://job-forge.ngrok.app/resumes/job_specific_suggestions/${selectedJobId}/${user.id}`
           ),
         ]);
 
@@ -60,7 +60,7 @@ const ResumeEditor = ({ onLogout }) => {
     const fetchResumeUrl = async () => {
       if (user?.id) {
         try {
-          const url = `http://localhost:5001/resumes/view/${user.id}`;
+          const url = `https://job-forge.ngrok.app/resumes/view/${user.id}`;
           setResumeUrl(url);
         } catch (error) {
           setMessage({ text: "Error fetching resume URL.", isError: true });

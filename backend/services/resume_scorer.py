@@ -7,6 +7,25 @@ from nltk.corpus import wordnet as wn  # type: ignore
 wn.ensure_loaded()
 
 
+def similarity_to_score(similarity):
+    if similarity < 0.05:
+        return 1
+    elif similarity < 0.1:
+        return 2
+    elif similarity < 0.2:
+        return 4
+    elif similarity < 0.5:
+        return 6
+    elif similarity < 0.6:
+        return 7
+    elif similarity < 0.75:
+        return 8
+    elif similarity < 0.9:
+        return 9
+    else:
+        return 10
+
+
 def get_score(user_id, job_posting_id):
     """Get the similarity score between a user's resume and a job posting."""
     from models.savedJobs import SavedJob
@@ -21,8 +40,7 @@ def get_score(user_id, job_posting_id):
         score_obj = Score(raw_resume, job_description)
         similarity_score = score_obj.compute_similarity()
 
-        score = similarity_score.item()
-        # ===============================
+        score = similarity_to_score(similarity_score.item())
 
         SavedJob.save_job_score(
             job_id=job_posting_id, user_id=user_id, job_score=score
