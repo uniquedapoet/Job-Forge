@@ -183,10 +183,6 @@
   .sidebar-logout button .FaSignOutAlt {
     margin-right: 0;
   }
-
-  .sidebar-toggle-btn {
-    left: 72px !important;
-  }
 }
 
 @media (max-width: 480px) {
@@ -216,10 +212,6 @@
   
   .sidebar-logout button span {
     display: inline;
-  }
-
-  .sidebar-toggle-btn {
-    display: none !important;
   }
 }
 

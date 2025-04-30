@@ -174,7 +174,11 @@ const ResumeEditor = ({ onLogout }) => {
                           key={`general-${index}`}
                           className="suggestion-card"
                         >
-                          <p>{suggestion}</p>
+                          <p>
+                            {suggestion.replace(/^(\w)/, (c) =>
+                              c.toUpperCase()
+                            )}
+                          </p>
                         </div>
                       ))
                     ) : (
@@ -211,7 +215,11 @@ const ResumeEditor = ({ onLogout }) => {
                                   key={`soft-${index}`}
                                   className="suggestion-card"
                                 >
-                                  <p>{skill}</p>
+                                  <p>
+                                    {skill.replace(/^(\w)/, (c) =>
+                                      c.toUpperCase()
+                                    )}
+                                  </p>
                                 </div>
                               )
                             )}
@@ -228,7 +236,11 @@ const ResumeEditor = ({ onLogout }) => {
                                   key={`cert-${index}`}
                                   className="suggestion-card"
                                 >
-                                  <p>{cert}</p>
+                                  <p>
+                                    {cert.replace(/^(\w)/, (c) =>
+                                      c.toUpperCase()
+                                    )}
+                                  </p>
                                 </div>
                               )
                             )}
@@ -244,7 +256,11 @@ const ResumeEditor = ({ onLogout }) => {
                                   key={`keyword-${index}`}
                                   className="suggestion-card"
                                 >
-                                  <p>{keyword}</p>
+                                  <p>
+                                    {keyword.replace(/^(\w)/, (c) =>
+                                      c.toUpperCase()
+                                    )}
+                                  </p>
                                 </div>
                               )
                             )}
