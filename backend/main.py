@@ -4,9 +4,6 @@ import os
 from routes.jobs import jobs
 from routes.users import users
 from routes.resumes import resumes
-import nltk
-nltk.data.path.append('/opt/venv/nltk_data')  # <- tell nltk where to find wordnet
-
 
 os.environ['TOKENIZERS_PARALLELISM'] = "false"
 

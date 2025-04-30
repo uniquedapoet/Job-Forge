@@ -26,9 +26,9 @@ const ResumeEditor = ({ onLogout }) => {
       try {
         // Fetch both
         const [generalRes, jobSpecificRes] = await Promise.all([
-          fetch(`http://localhost:5001/resumes/general/${user.id}`),
+          fetch(`https://job-forge.ngrok.app/resumes/general/${user.id}`),
           fetch(
-            `http://localhost:5001/resumes/job_specific_suggestions/${selectedJobId}/${user.id}`
+            `https://job-forge.ngrok.app/resumes/job_specific_suggestions/${selectedJobId}/${user.id}`
           ),
         ]);
 
@@ -60,7 +60,7 @@ const ResumeEditor = ({ onLogout }) => {
     const fetchResumeUrl = async () => {
       if (user?.id) {
         try {
-          const url = `http://localhost:5001/resumes/view/${user.id}`;
+          const url = `https://job-forge.ngrok.app/resumes/view/${user.id}`;
           setResumeUrl(url);
         } catch (error) {
           setMessage({ text: "Error fetching resume URL.", isError: true });
@@ -82,7 +82,7 @@ const ResumeEditor = ({ onLogout }) => {
       onToggleSidebar={toggleSidebar}
     >
       <div className="resume-editor-container">
-        <button
+        {/* <button
           onClick={toggleSidebar}
           className="sidebar-toggle-btn"
           style={{
@@ -110,7 +110,7 @@ const ResumeEditor = ({ onLogout }) => {
               filter: "brightness(0) invert(1)",
             }}
           />
-        </button>
+        </button> */}
 
         <div className="resume-content-wrapper">
           <div className="pdf-viewer-container">
@@ -174,7 +174,11 @@ const ResumeEditor = ({ onLogout }) => {
                           key={`general-${index}`}
                           className="suggestion-card"
                         >
-                          <p>{suggestion}</p>
+                          <p>
+                            {suggestion.replace(/^(\w)/, (c) =>
+                              c.toUpperCase()
+                            )}
+                          </p>
                         </div>
                       ))
                     ) : (
@@ -211,7 +215,11 @@ const ResumeEditor = ({ onLogout }) => {
                                   key={`soft-${index}`}
                                   className="suggestion-card"
                                 >
-                                  <p>{skill}</p>
+                                  <p>
+                                    {skill.replace(/^(\w)/, (c) =>
+                                      c.toUpperCase()
+                                    )}
+                                  </p>
                                 </div>
                               )
                             )}
@@ -228,7 +236,11 @@ const ResumeEditor = ({ onLogout }) => {
                                   key={`cert-${index}`}
                                   className="suggestion-card"
                                 >
-                                  <p>{cert}</p>
+                                  <p>
+                                    {cert.replace(/^(\w)/, (c) =>
+                                      c.toUpperCase()
+                                    )}
+                                  </p>
                                 </div>
                               )
                             )}
@@ -244,7 +256,11 @@ const ResumeEditor = ({ onLogout }) => {
                                   key={`keyword-${index}`}
                                   className="suggestion-card"
                                 >
-                                  <p>{keyword}</p>
+                                  <p>
+                                    {keyword.replace(/^(\w)/, (c) =>
+                                      c.toUpperCase()
+                                    )}
+                                  </p>
                                 </div>
                               )
                             )}

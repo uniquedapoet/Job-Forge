@@ -244,9 +244,15 @@ body {
 .suggestion-card {
   padding: 1rem;
   margin-bottom: 1rem;
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #f9fafb 0%, #f1f3f5 100%);
   border-radius: 6px;
   border-left: 4px solid #ba5624;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.suggestion-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 
 .suggestion-card p {
@@ -523,5 +529,145 @@ body {
 @media (max-width: 1024px) {
   .resume-content-wrapper {
     flex-direction: column;
+  }
+}
+
+body {
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.main-content-container,
+.job-search-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  padding: 2rem;
+  min-height: 100vh;
+  margin-left: 280px;
+  background-color: transparent;
+  transition: margin-left 0.3s ease;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+}
+
+.main-content-card {
+  background-color: #fff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 680px;
+  border: 1px solid #e0e0e6;
+  animation: fadeIn 0.4s ease-out forwards;
+  margin-left: 350px;
+}
+
+@media (max-width: 1024px) {
+  .resume-content-wrapper {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-container,
+  .job-search-container {
+    margin-left: 72px;
+    padding: 1.5rem;
+  }
+
+  .main-content-card {
+    padding: 1.5rem;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content-container,
+  .job-search-container {
+    margin-left: 0;
+    padding: 1rem;
+  }
+
+  .main-content-card {
+    padding: 1.25rem;
+  }
+
+  .main-content-heading {
+    font-size: 1.5rem;
+  }
+
+  .job-search-item {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95%;
+    padding: 1rem;
+    max-width: 95%;
+    max-height: 85vh;
+    font-size: 0.95rem;
+    border-radius: 8px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .job-description {
+    font-size: 0.95rem;
+  }
+
+  .modal-footer {
+    padding-top: 1rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .apply-button,
+  .close-modal-button {
+    width: 100%;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .job-meta .apply-button {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    padding: 0.7rem 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0.5rem;
+    margin-left: 0;
+  }
+
+  .job-meta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 768px) {
+  body.hide-hamburger .sidebar-toggle-btn {
+    display: none !important;
   }
 }

@@ -183,10 +183,6 @@
   .sidebar-logout button .FaSignOutAlt {
     margin-right: 0;
   }
-
-  .sidebar-toggle-btn {
-    left: 72px !important;
-  }
 }
 
 @media (max-width: 480px) {
@@ -217,8 +213,37 @@
   .sidebar-logout button span {
     display: inline;
   }
+}
 
-  .sidebar-toggle-btn {
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 240px;
+    z-index: 1001;
+    background-color: #fff;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .sidebar.sidebar-visible {
+    transform: translateX(0);
+  }
+
+  .sidebar-logout {
+    padding-bottom: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  body.hide-hamburger .hamburger-wrapper {
     display: none !important;
   }
 }

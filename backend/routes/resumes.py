@@ -25,7 +25,7 @@ def upload_resume():
 
     if file and Resume.allowed_file(file.filename):
         Resume.insert_resume(user_id, file)
-        SavedJob.remove_saved_jobs(user_id)
+        SavedJob.remove_saved_job_scores(user_id)
         return jsonify({"message": "File uploaded successfully"}), 201
 
     return jsonify({"error": "File type not allowed"}), 400
@@ -58,7 +58,7 @@ def resume_score():
                 {"error": f"Error computing similarity score: {str(e)} {job_score}"}
             ), 500
 
-    return jsonify({"score": round((job_score*100), 2)}), 200
+    return jsonify({"score": f'{int(job_score)}/10'}), 200
 
 
 @resumes.route("/download/<int:user_id>", methods=["GET"])

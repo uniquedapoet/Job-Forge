@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Tooltip } from 'react-tooltip';
 import MainLayout from "./MainLayout";
 import "../Icons+Styling/MainContent.css";
 import { UserContext } from "./UserContext";
@@ -20,7 +21,7 @@ const Dashboard = ({ onLogout }) => {
 
   const fetchJobDetails = async (jobId) => {
     try {
-      const response = await fetch(`http://localhost:5001/jobs/${jobId}`);
+      const response = await fetch(`https://job-forge.ngrok.app/jobs/${jobId}`);
       if (!response.ok) throw new Error("Failed to fetch job details");
       
       const data = await response.json();
@@ -47,7 +48,7 @@ const Dashboard = ({ onLogout }) => {
   const handleJobClick = async (job) => {
     try {
       const jobId = job.job_id || job.id;
-      const response = await fetch(`http://localhost:5001/jobs/${jobId}`);
+      const response = await fetch(`https://job-forge.ngrok.app/jobs/${jobId}`);
       if (!response.ok) throw new Error("Failed to fetch job details");
       
       const data = await response.json();
@@ -82,8 +83,10 @@ const Dashboard = ({ onLogout }) => {
     setError("");
 
     try {
-      const savedResponse = await fetch(`http://localhost:5001/users/${user.id}/saved_jobs`);
+      const savedResponse = await fetch(`https://job-forge.ngrok.app/users/${user.id}/saved_jobs`);
       const savedJobsData = await savedResponse.json();
+
+      console.log(savedResponse)
 
       if (!savedResponse.ok || !Array.isArray(savedJobsData)) {
         console.warn("Saved jobs fetch failed or returned unexpected format:", savedJobsData);
@@ -135,7 +138,7 @@ const Dashboard = ({ onLogout }) => {
         const job = savedJobs[i];
   
         try {
-          const response = await fetch("http://localhost:5001/resumes/resume_score", {
+          const response = await fetch("https://job-forge.ngrok.app/resumes/resume_score", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -176,7 +179,7 @@ const Dashboard = ({ onLogout }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5001/users/${user.id}/saved_jobs/${jobId}/delete`,
+        `https://job-forge.ngrok.app/users/${user.id}/saved_jobs/${jobId}/delete`,
         { method: "POST" }
       );
 
@@ -222,7 +225,7 @@ const Dashboard = ({ onLogout }) => {
                 const job = jobDetails[savedJob.job_id] || savedJob;
                 const isProcessing = removingJobs[savedJob.job_id] || false;
                 const score = scores[savedJob.job_id] !== undefined
-                  ? `${scores[savedJob.job_id]}%`
+                  ? `${scores[savedJob.job_id]}`
                   : isLoading
                     ? "Loading..."
                     : "N/A";
@@ -248,7 +251,14 @@ const Dashboard = ({ onLogout }) => {
                       <h3>{job.title}</h3>
                       <p>{job.company}</p>
                       <p>{job.location}</p>
-                      <p><strong>Resume Score:</strong> {score}</p>
+                      <p><strong
+                                data-tooltip-id="resume-score-tooltip"
+                                data-tooltip-content="We look at your skills and experience, match them against the job description, and give you a score."
+                                style={{ textDecoration: "", cursor: "pointer" }}
+                      >
+                        Resume Score:</strong> {score}
+                        <Tooltip  id="resume-score-tooltip" place="top" style={{ backgroundColor: "#333", color: "#fff",  maxWidth: "250px", textAlign: "center",  whiteSpace: "normal", fontSize: "14px"}} />
+                        </p>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

@@ -1,10 +1,15 @@
 import React, { useContext } from "react";
 import MainLayout from "./MainLayout";
 import { UserContext } from "./UserContext";
+import { useEffect } from "react";
 import "../Icons+Styling/MainContent.css";
 
 const Home = ({ onLogout }) => {
   const { user } = useContext(UserContext); // Access user context
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <MainLayout onLogout={onLogout} title="Welcome to Job Forge" showWelcomeMessage={false}>

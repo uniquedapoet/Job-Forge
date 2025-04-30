@@ -12,8 +12,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
 from typing import List
+from services.resume_scorer import get_score
 from db_tools import to_list
-
 
 engine = UserEngine
 Session = UserSession
@@ -79,7 +79,7 @@ class SavedJob(Base):
                 SavedJob.user_id == user_id, SavedJob.job_id == job_id).first()
 
             session.commit()
-            return job_score[0] if job_score else 0
+            return int(job_score[0]) if job_score else 0
         except Exception as e:
             print(f"Error getting job score: {e}")
             return None
@@ -126,6 +126,26 @@ class SavedJob(Base):
         try:
             session.query(SavedJob).filter(
                 SavedJob.user_id == user_id).delete()
+            session.commit()
+
+        except Exception as e:
+            print(f"Error removing job scores: {e}")
+
+        finally:
+            session.close()
+
+    @staticmethod
+    def remove_saved_job_scores(user_id: int) -> None:
+        session = Session()
+        try:
+            saved_jobs = session.query(SavedJob).filter(
+                SavedJob.user_id == user_id)
+            
+            for job in saved_jobs:
+                job_posting_id = job.job_id
+                new_score = get_score(user_id, job_posting_id)
+                saved_jobs.job_score = new_score
+                
             session.commit()
 
         except Exception as e:
