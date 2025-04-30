@@ -1,19 +1,43 @@
 import React, { useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
-import { FaHome, FaSearch, FaUpload, FaSignOutAlt, FaDesktop } from "react-icons/fa";
+import { FaHome, FaSearch, FaUpload, FaSignOutAlt, FaDesktop, FaTimes } from "react-icons/fa";
 import logo from "../Icons+Styling/Logo.png";
 import "../Icons+Styling/Sidebar.css";
 
-const Sidebar = ({ onLogout }) => {
+const Sidebar = ({ onLogout, onCloseSidebar }) => {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
+  const isMobile = window.innerWidth <= 768;
+/* I HATE MOBILE RESPONSIVENESS!!!!!*/
   return (
     <div className="sidebar">
+      {isMobile && (
+        <button
+          onClick={onCloseSidebar}
+          style={{
+            alignSelf: 'flex-end',
+            background: 'none',
+            border: 'none',
+            fontSize: '1.5rem',
+            color: '#ba5624',
+            cursor: 'pointer',
+            marginBottom: '1rem'
+          }}
+        >
+          <FaTimes />
+        </button>
+      )}
+
       <div>
         <div className="sidebar-logo">
-          <img src={logo} alt="Job Forge Logo" onClick={() => navigate('/home')} style={{cursor:'pointer'}}/>
+          <img
+            src={logo}
+            alt="Job Forge Logo"
+            onClick={() => navigate("/home")}
+            style={{ cursor: "pointer" }}
+          />
           <h2>Job Forge</h2>
         </div>
 
