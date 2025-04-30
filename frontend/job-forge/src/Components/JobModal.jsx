@@ -75,6 +75,17 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
               <span><strong>Posted:</strong> {job.date_posted}</span>
             </div>
           )}
+            {job.job_url && (
+              <a 
+                href={job.job_url_direct} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="apply-button"
+              >
+                <i className="fas fa-external-link-alt"></i>
+                View Original Posting
+              </a>
+            )}
         </div>
         
         <div className="modal-body">
@@ -91,17 +102,6 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
         
         <div className="modal-footer">
           <div className="action-buttons">
-            {job.job_url && (
-              <a 
-                href={job.job_url_direct} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="apply-button"
-              >
-                <i className="fas fa-external-link-alt"></i>
-                View Original Posting
-              </a>
-            )}
             {onSaveJob && (
               <button
                 onClick={(e) => {
