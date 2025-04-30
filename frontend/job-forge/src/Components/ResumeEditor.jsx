@@ -82,7 +82,7 @@ const ResumeEditor = ({ onLogout }) => {
       onToggleSidebar={toggleSidebar}
     >
       <div className="resume-editor-container">
-        <button
+        {/* <button
           onClick={toggleSidebar}
           className="sidebar-toggle-btn"
           style={{
@@ -110,7 +110,7 @@ const ResumeEditor = ({ onLogout }) => {
               filter: "brightness(0) invert(1)",
             }}
           />
-        </button>
+        </button> */}
 
         <div className="resume-content-wrapper">
           <div className="pdf-viewer-container">

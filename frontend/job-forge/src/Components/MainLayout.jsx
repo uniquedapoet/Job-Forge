@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import { FaBars } from "react-icons/fa";
+import logo from "../Icons+Styling/Logo.png";
 
-const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisible, onToggleSidebar }) => {
+const MainLayout = ({
+  children,
+  onLogout,
+  sidebarVisible: controlledSidebarVisible,
+  onToggleSidebar,
+}) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [internalSidebarVisible, setInternalSidebarVisible] = useState(!isMobile);
+  const [internalSidebarVisible, setInternalSidebarVisible] = useState(
+    !isMobile
+  );
 
-  const sidebarVisible = controlledSidebarVisible !== undefined ? controlledSidebarVisible : internalSidebarVisible;
-  const toggleSidebar = onToggleSidebar || (() => setInternalSidebarVisible((prev) => !prev));
+  const sidebarVisible =
+    controlledSidebarVisible !== undefined
+      ? controlledSidebarVisible
+      : internalSidebarVisible;
+  const toggleSidebar =
+    onToggleSidebar || (() => setInternalSidebarVisible((prev) => !prev));
 
   useEffect(() => {
     const handleResize = () => {
@@ -28,11 +40,10 @@ const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisib
         display: "flex",
         flexDirection: isMobile ? "column" : "row",
         height: "100vh",
-        position: "relative"
+        position: "relative",
       }}
     >
-      {/* DOES NOT EVEN WORK */}
-      {isMobile && !sidebarVisible && (
+      {!sidebarVisible && (
         <button
           className="sidebar-toggle-btn"
           onClick={toggleSidebar}
@@ -42,14 +53,24 @@ const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisib
             left: 20,
             zIndex: 1001,
             backgroundColor: "#ba5624",
-            color: "white",
             border: "none",
             borderRadius: "8px",
             padding: "10px",
-            cursor: "pointer"
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <FaBars />
+          <img
+            src={logo}
+            alt="Toggle Sidebar"
+            style={{
+              width: "24px",
+              height: "24px",
+              filter: "brightness(0) invert(1)",
+            }}
+          />
         </button>
       )}
 
@@ -64,7 +85,7 @@ const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisib
             width: "100vw",
             height: "100vh",
             backgroundColor: "rgba(0,0,0,0.3)",
-            zIndex: 1000
+            zIndex: 1000,
           }}
         />
       )}
@@ -82,7 +103,7 @@ const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisib
         style={{
           flex: 1,
           padding: "20px",
-          overflowY: "auto"
+          overflowY: "auto",
         }}
       >
         {children}
