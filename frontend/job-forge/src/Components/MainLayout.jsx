@@ -23,15 +23,18 @@ const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisib
   }, [onToggleSidebar]);
 
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: isMobile ? "column" : "row",
-      height: "100vh",
-      position: "relative"
-    }}>
-      {/* Toggle Button */}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        height: "100vh",
+        position: "relative"
+      }}
+    >
+      {/* DOES NOT EVEN WORK */}
       {isMobile && !sidebarVisible && (
         <button
+          className="sidebar-toggle-btn"
           onClick={toggleSidebar}
           style={{
             position: "absolute",
@@ -50,7 +53,7 @@ const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisib
         </button>
       )}
 
-      {/* Overlay */}
+      {/* Mobile Sidebar Overlay */}
       {isMobile && sidebarVisible && (
         <div
           onClick={toggleSidebar}
@@ -75,11 +78,13 @@ const MainLayout = ({ children, onLogout, sidebarVisible: controlledSidebarVisib
         />
       )}
 
-      <div style={{
-        flex: 1,
-        padding: "20px",
-        overflowY: "auto"
-      }}>
+      <div
+        style={{
+          flex: 1,
+          padding: "20px",
+          overflowY: "auto"
+        }}
+      >
         {children}
       </div>
     </div>

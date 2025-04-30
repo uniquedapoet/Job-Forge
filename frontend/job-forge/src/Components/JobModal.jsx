@@ -1,26 +1,32 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../Icons+Styling/MainContent.css";
 
 const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
+  useEffect(() => {
+    document.body.classList.add("hide-hamburger");
+    return () => {
+      document.body.classList.remove("hide-hamburger");
+    };
+  }, []);
+
   const formatDescription = (description) => {
     if (!description) return null;
-  
-    // CLEANING + FORMATTING
+
     let cleaned = description
-      .replace(/\\&/g, '&') 
+      .replace(/\\&/g, '&')
       .replace(/\\\d+/g, '')
-      .replace(/(\d)\\/g, '$1') 
+      .replace(/(\d)\\/g, '$1')
       .replace(/(\d)\s?-\s?(\d)/g, '$1-$2')
       .replace(/\\n/g, '\n')
       .replace(/\\-/g, '-')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*/g, '• ')
       .replace(/\t\+/g, '  • ')
       .replace(/\n{2,}/g, '\n\n')
       .trim();
-  
+
     const paragraphs = cleaned.split('\n\n').filter(p => p.trim().length > 0);
-  
+
     return paragraphs.map((paragraph, index) => (
       <p
         key={index}
@@ -43,25 +49,27 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
     };
     return map[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1);
   };
-  
-  
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button 
-          className="close-button"
-          onClick={onClose}
-        >
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        if (e.target.classList.contains("modal-overlay")) {
+          onClose();
+        }
+      }}
+    >
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <button className="close-button" onClick={onClose}>
           &times;
         </button>
-        
+
         <div className="modal-header">
           <h2>{job.title}</h2>
           <h3>{job.company}</h3>
           <p className="job-location">{job.location}</p>
         </div>
-        
+
         <div className="job-meta">
           {job.job_type && (
             <div className="meta-item">
@@ -75,19 +83,8 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
               <span><strong>Posted:</strong> {job.date_posted}</span>
             </div>
           )}
-            {job.job_url && (
-              <a 
-                href={job.job_url_direct} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="apply-button"
-              >
-                <i className="fas fa-external-link-alt"></i>
-                View Original Posting
-              </a>
-            )}
         </div>
-        
+
         <div className="modal-body">
           <div className="job-section">
             <h4 className="section-title">
@@ -99,9 +96,24 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
             </div>
           </div>
         </div>
-        
+
         <div className="modal-footer">
           <div className="action-buttons">
+            {job.job_url && (
+              <a
+                href={job.job_url_direct}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="apply-button"
+                style={{
+                  backgroundColor: "#6c757d",
+                }}
+              >
+                <i className="fas fa-external-link-alt"></i>
+                View Original Posting
+              </a>
+            )}
+
             {onSaveJob && (
               <button
                 onClick={(e) => {
@@ -118,7 +130,7 @@ const JobModal = ({ job, onClose, onSaveJob, isSaved, isProcessing }) => {
                 {isProcessing ? "Processing..." : (isSaved ? "Remove" : "Save")}
               </button>
             )}
-            <button 
+            <button
               onClick={onClose}
               className="close-modal-button"
             >
