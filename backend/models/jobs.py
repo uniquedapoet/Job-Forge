@@ -13,6 +13,7 @@ from sqlalchemy import (  # type: ignore
 )
 from db import Base, JobEngine, JobSession
 from sqlalchemy.exc import IntegrityError  # type: ignore
+from db_tools import to_list
 
 Engine = JobEngine
 Session = JobSession
@@ -61,9 +62,7 @@ class Job(Base):
         jobs = session.query(Job).all()
         session.close()
 
-        job_list = [{column: getattr(
-            job, column) for column in job.__table__.columns.keys()
-        } for job in jobs]
+        job_list = to_list(jobs, Job)
 
         return job_list
 
@@ -97,9 +96,7 @@ class Job(Base):
             desc(Job.date_posted)).all()
         session.close()
 
-        job_list = [{column: getattr(
-            job, column) for column in job.__table__.columns.keys()
-        } for job in jobs]
+        job_list = to_list(jobs, Job)
 
         return job_list
 
@@ -110,9 +107,7 @@ class Job(Base):
             Job.company.like(f"%{company}%")).all()
         session.close()
 
-        job_list = [{column: getattr(
-            job, column) for column in job.__table__.columns.keys()
-        } for job in jobs]
+        job_list = to_list(jobs, Job)
 
         return job_list
 
@@ -124,9 +119,7 @@ class Job(Base):
             desc(Job.date_posted)).all().all()
         session.close()
 
-        job_list = [{column: getattr(
-            job, column) for column in job.__table__.columns.keys()
-        } for job in jobs]
+        job_list = to_list(jobs, Job)
 
         return job_list
 
@@ -138,9 +131,7 @@ class Job(Base):
         session.close()
         session.close()
 
-        job_list = [{column: getattr(
-            job, column) for column in job.__table__.columns.keys()
-        } for job in jobs]
+        job_list = to_list(jobs, Job)
 
         return job_list
 
@@ -151,9 +142,7 @@ class Job(Base):
         session.close()
         session.close()
 
-        job_list = [{column: getattr(
-            job, column) for column in job.__table__.columns.keys()
-        } for job in jobs]
+        job_list = to_list(jobs, Job)
 
         return job_list
 
@@ -164,9 +153,7 @@ class Job(Base):
         session.close()
         session.close()
 
-        job_list = [{column: getattr(
-            job, column) for column in job.__table__.columns.keys()
-        } for job in jobs]
+        job_list = to_list(jobs, Job)
 
         return job_list
 
@@ -186,9 +173,7 @@ class Job(Base):
 
         session.close()
 
-        job_list = [{column: getattr(
-            job, column) for column in job.__table__.columns.keys()
-        } for job in jobs]
+        job_list = to_list(jobs, Job)
 
         return job_list
 
@@ -214,7 +199,7 @@ class Job(Base):
 def validate_and_insert_jobs(job_data):
     """Validates and inserts jobs into the database using sqlite3."""
     session = Session()
-
+    inserted_jobs = []
     expected_columns = ['id', 'site', 'job_url', 'job_url_direct', 'title',
                         'company', 'location', 'date_posted', 'job_type',
                         'salary_source', 'interval', 'min_amount',
@@ -226,15 +211,15 @@ def validate_and_insert_jobs(job_data):
                         'company_revenue', 'company_description']
 
     try:
-        # If job_data is a DataFrame, drop duplicates and iterate over each row
         if isinstance(job_data, pd.DataFrame):
             job_data = job_data.drop_duplicates(
-                subset=["id"])  # Remove duplicate job_ids
+                subset=["id"])  
             for _, row in job_data.iterrows():
-                validate_and_insert_jobs(row.to_dict())
-            return
+                inserted = validate_and_insert_jobs(row.to_dict())
+                if inserted:
+                    inserted_jobs += inserted
+            return inserted_jobs
 
-        #  If job_data is a Series (single row), convert to dict
         if isinstance(job_data, pd.Series):
             job_data = job_data.to_dict()
 
@@ -246,16 +231,17 @@ def validate_and_insert_jobs(job_data):
         if job_id in existing_jobs:
             print(
                 f"Job: {job_id} Already Inserted Skipping Job")
-            return
+            return [job_data]
 
         #  Ensure only the required columns are inserted
         filtered_job_data = {key: job_data.get(
             key, None) for key in expected_columns}
         filtered_job_data['job_id'] = filtered_job_data.pop('id')
-
-        #  Use INSERT OR IGNORE to avoid duplicate errors
-        session.add(Job(**filtered_job_data))
+        
+        job_entry = Job(**filtered_job_data)
+        session.add(job_entry)
         session.commit()
+        inserted_jobs += (to_list([job_entry], Job))
 
     except IntegrityError as e:
         print(f"IntegrityError: Job {job_id} could not be inserted: {e}")
@@ -265,3 +251,5 @@ def validate_and_insert_jobs(job_data):
 
     finally:
         session.close()
+
+    return inserted_jobs

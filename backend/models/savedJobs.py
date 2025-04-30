@@ -13,6 +13,7 @@ from sqlalchemy.orm import relationship
 from db import UserEngine, UserSession, Base
 from typing import List
 from services.resume_scorer import get_score
+from db_tools import to_list
 
 engine = UserEngine
 Session = UserSession
@@ -93,9 +94,7 @@ class SavedJob(Base):
             saved_jobs = session.query(SavedJob).filter(
                 SavedJob.user_id == user_id).all()
 
-            saved_jobs = [{column.key: getattr(
-                saved_job, column.key) for column in SavedJob.__table__.columns
-            } for saved_job in saved_jobs]
+            saved_jobs = to_list(saved_jobs, SavedJob)
 
             return saved_jobs
 
