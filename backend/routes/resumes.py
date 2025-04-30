@@ -58,7 +58,7 @@ def resume_score():
                 {"error": f"Error computing similarity score: {str(e)} {job_score}"}
             ), 500
 
-    return jsonify({"score": round((job_score*100), 2)}), 200
+    return jsonify({"score": f'{int(job_score)}/10'}), 200
 
 
 @resumes.route("/download/<int:user_id>", methods=["GET"])
