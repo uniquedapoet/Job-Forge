@@ -215,7 +215,7 @@ etc
 
 * Eduardo Benjamin
 * Jaden Castle
-* Jackson Giezma
+* Jackson Giemza
 
 ---
 
